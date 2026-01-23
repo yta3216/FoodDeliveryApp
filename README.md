@@ -1,2 +1,2 @@
 # FoodDeliveryApp
-Group Project for COSC310 (University of British Columbia - Okanagan)
+Group 23's Repository for COSC310 (University of British Columbia - Okanagan)
