@@ -13,7 +13,12 @@ def create_item(payload: ItemCreate) -> Item:
     new_id = str(uuid.uuid4())
     if any(it.get("id") == new_id for it in items):  # extremely unlikely, but consistent check
         raise HTTPException(status_code=409, detail="ID collision; retry.")
-    new_item = Item(id=new_id, title=payload.title.strip(), category=payload.category.strip(), tags=payload.tags)
+    new_item = Item(
+        id=new_id,
+        title=payload.title.strip(),
+        category=payload.category.strip(),
+        tags=payload.tags
+    )
     items.append(new_item.dict())
     save_all(items)
     return new_item

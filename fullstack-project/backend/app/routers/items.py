@@ -1,7 +1,13 @@
 from typing import List
 from fastapi import APIRouter, status
 from app.schemas.item import Item, ItemCreate, ItemUpdate
-from app.services.items_service import list_items, create_item, delete_item, update_item, get_item_by_id
+from app.services.items_service import (
+    list_items,
+    create_item,
+    delete_item,
+    update_item,
+    get_item_by_id
+)
 
 router = APIRouter(prefix="/items", tags=["items"])
 
@@ -24,10 +30,8 @@ def get_item(item_id: str):
 def put_item(item_id: str, payload: ItemUpdate):
     return update_item(item_id, payload)
 
-
-## we put the status there becuase in a delete, 
+## we put the status there becuase in a delete,
 ## we wont have a return so it indicates it happened succesfully
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_item(item_id: str):
     delete_item(item_id)
-    return None

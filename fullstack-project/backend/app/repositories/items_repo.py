@@ -1,5 +1,6 @@
 from pathlib import Path
-import json, os
+import json
+import os
 from typing import List, Dict, Any
 
 DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "items.json"
