@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from routers.items import router as items_router
+from .routers.items import router as items_router
 import os
 
 app = FastAPI()
