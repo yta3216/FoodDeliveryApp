@@ -59,7 +59,7 @@ def test_login_wrong_password():
     )
 
     assert response.status_code == 401
-    assert response.json.get("detail") == "Invalid email or password"
+    assert response.json().get("detail") == "Invalid email or password"
 
 # testing with an invalid email
 def test_login_wrong_email():
@@ -72,4 +72,4 @@ def test_login_wrong_email():
     )
 
     assert response.status_code == 401
-    assert response.json.get("detail") == "Invalid email or password"
+    assert response.json().get("detail") == "Invalid email or password"
