@@ -1,4 +1,5 @@
-"""This module defines the basic user schema for the application.
+"""
+This module defines the basic user schema for the application.
 
 Any updated to the users account details should follow this schema.
 """
@@ -17,6 +18,7 @@ class UserRole(str, Enum):
 class User(BaseModel):
     id: str
     email: str
+    name: str
     password: str
     age: int
     gender: str
@@ -30,17 +32,14 @@ class Customer(User):
     # we can extend this model with customer-specific properties in the future
 
 class RestaurantManager(User):
-    """Restaurant manager user type. Can be extended with manager-specific properties."""
     role: UserRole = UserRole.RESTAURANT_MANAGER
     # we can extend this model with manager-specific properties in the future
 
 class Admin(User):
-    """Admin user type. Can be extended with admin-specific properties."""
     role: UserRole = UserRole.ADMIN
     # we can extend this model with admin-specific properties in the future
 
 class DeliveryDriver(User):
-    """Delivery driver user type. Can be extended with driver-specific properties."""
     role: UserRole = UserRole.DELIVERY_DRIVER
     # we can extend this model with driver-specific properties in the future
 
@@ -61,6 +60,21 @@ class User_Update(BaseModel):
     age: int
     gender: str
     role: UserRole
+
+# login request model (email + password)
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+# login response model
+class LoginResponse(BaseModel):
+    token: str
+    user_id: str
+    email: str
+    role: UserRole
+    age: int
+    gender: str
+    name: str
 
 # password reset request model, for when a user forgets their password and needs to reset it.
 class Password_Reset_Request(BaseModel):
