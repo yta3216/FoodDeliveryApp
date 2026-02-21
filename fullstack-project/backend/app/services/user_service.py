@@ -5,9 +5,10 @@ import time
 import uuid
 from fastapi import HTTPException
 from app.repositories.user_repo import load_users, save_users
-from app.schemas.user_schema import User, User_Create, UserRole
+from app.schemas.user_schema import User, User_Create, UserRole, LoginResponse
 
-RESET_TOKEN_EXPIRY = 900 # 15 minutes before password reset token expires
+RESET_TOKEN_EXPIRY = 900  # 15 minutes before password reset token expires
+SESSION_TOKEN_EXPIRY = 86400  # 24 hours before session token expires
 
 def create_user(payload: User_Create) -> User:
     users = load_users()
@@ -43,6 +44,31 @@ def get_user_by_id(user_id: str) -> User:
                 user["role"] = UserRole(user["role"]) 
             return User(**user)
     raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
+
+def login_user(email: str, password: str) -> LoginResponse:
+    users = load_users()
+    email = email.strip()
+    password = password.strip()
+    for user in users:
+        if user.get("email") == email:
+            if user.get("password") != password:
+                raise HTTPException(status_code=401, detail="Invalid email or password")
+            
+            token = secrets.token_urlsafe(32) # generate a secure session token
+            user["auth_token"] = token
+            user["auth_token_expiry"] = time.time() + SESSION_TOKEN_EXPIRY
+            save_users(users)
+            role = UserRole(user["role"]) if isinstance(user.get("role"), str) else user["role"] # convert role to enum
+            return LoginResponse(
+                token = token,
+                user_id= user.get("id"),
+                email = user.get("email"),
+                role= role,
+                age= user.get("age"),
+                gender= user.get("gender"),
+                name=user.get("name"),
+            )
+    raise HTTPException(status_code=401, detail="Invalid email or password")
 
 # Used when a non-logged in user has forgotten their password and needs to reset it.
 def reset_password_request(user_email: str) -> None:

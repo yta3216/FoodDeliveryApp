@@ -4,6 +4,8 @@ from app.schemas.user_schema import (
     User,
     User_Create,
     User_Update,
+    LoginRequest,
+    LoginResponse,
     Password_Reset_Request,
     Password_Reset,
     Password_Update_When_Logged_In,
@@ -11,6 +13,7 @@ from app.schemas.user_schema import (
 from app.services.user_service import (
     create_user,
     get_user_by_id,
+    login_user,
     reset_password_request,
     reset_password,
     update_password_when_logged_in,
@@ -18,22 +21,24 @@ from app.services.user_service import (
 
 router = APIRouter(prefix="/user", tags=["user"])
 
-
 # post request to create a new user
 # we use the User_Create schema because we dont want the client to send an id
 @router.post("", response_model=User, status_code=201)
-def post_user(payload: User_Create):
+def create_user_route(payload: User_Create):
     return create_user(payload)
 
+# login with email and password
+@router.post("/login", response_model=LoginResponse)
+def login_user_route(payload: LoginRequest):
+    return login_user(payload.email, payload.password)
 
 # get request to retrieve a user by id
 @router.get("/{user_id}", response_model=User)
-def get_user(user_id: str):
+def get_user_route(user_id: str):
     return get_user_by_id(user_id)
 
-
 @router.put("/{user_id}")
-def update_user(user_id: str, payload: User_Update):
+def update_user_route(user_id: str, payload: User_Update):
     # placeholder - keep existing behavior in repo
     raise NotImplementedError()
 

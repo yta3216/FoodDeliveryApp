@@ -15,9 +15,9 @@ def backup_and_restore_user_data():
     # Backup
     if USER_DATA_PATH.exists():
         shutil.copy(USER_DATA_PATH, BACKUP_PATH)
-    
+
     yield  # Run all tests
-    
+
     # Restore
     if BACKUP_PATH.exists():
         shutil.copy(BACKUP_PATH, USER_DATA_PATH)
