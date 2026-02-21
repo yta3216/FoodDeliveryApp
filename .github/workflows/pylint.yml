@@ -25,7 +25,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r fullstack-project/backend/requirements.txt
         pip install pylint
-        pip install pytest
     - name: Analysing the code with pylint, do not check for docstrings
       run: |
         pylint --disable=C0114,C0115,C0116 $(git ls-files '*.py')
