@@ -24,3 +24,6 @@ jobs:
     - name: Analysing the code with pylint, do not check for docstrings
       run: |
         pylint --disable=C0114,C0115,C0116 $(git ls-files '*.py')
+    - name: run pytest tests
+      run: |
+        pytest fullstack-project/backend/testing

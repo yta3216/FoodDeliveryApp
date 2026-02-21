@@ -1,0 +1,37 @@
+[
+  {
+    "id": "9c6dbfcb-72c5-4cc4-9f76-29200f0efda7",
+    "email": "user1@example.com",
+    "password": "12345678",
+    "reset_token": null,
+    "reset_token_expiry": null
+  },
+  {
+    "id": "1f35bbcf-a7d6-46c7-85eb-2416da4435f7",
+    "email": "user2@example.com",
+    "password": "87654321",
+    "reset_token": null,
+    "reset_token_expiry": null
+  },
+  {
+    "id": "bf8fe126-f8ce-4299-b347-30dcf6b36ff7",
+    "email": "user3@example.com",
+    "password": "password123",
+    "reset_token": null,
+    "reset_token_expiry": null
+  },
+  {
+    "id": "cded33c1-28e1-4c5a-943d-e6cdd79eef5b",
+    "email": "testing123@example.com",
+    "password": "passwordpassword",
+    "reset_token": "paUoWpifb9bPbShl8VvYK0l0txf2vw7L6Yv37HUG3yE",
+    "reset_token_expiry": 1771652077.4792194
+  },
+  {
+    "id": "b0e09327-b4be-4082-9f05-4e9e52d31fcd",
+    "email": "testing123@example.com",
+    "password": "passwordpassword",
+    "reset_token": null,
+    "reset_token_expiry": null
+  }
+]
