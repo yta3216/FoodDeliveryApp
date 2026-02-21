@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from .routers.items import router as items_router
+from .routers.user_router import router as user_router
 
 app = FastAPI()
 
@@ -29,6 +30,7 @@ frontend_path = os.path.normpath(frontend_path)
 app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 
 app.include_router(items_router)
+app.include_router(user_router)
 
 @app.get("/", tags=["root"])
 async def read_root():
