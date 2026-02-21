@@ -1,7 +1,20 @@
 from typing import List
-from fastapi import APIRouter, status
-from app.schemas.user_schema import User, User_Create, User_Update
-from app.services.user_service import create_user, get_user_by_id
+from fastapi import APIRouter, status, Query
+from app.schemas.user_schema import (
+    User,
+    User_Create,
+    User_Update,
+    Password_Reset_Request,
+    Password_Reset,
+    Password_Update_When_Logged_In,
+)
+from app.services.user_service import (
+    create_user,
+    get_user_by_id,
+    reset_password_request,
+    reset_password,
+    update_password_when_logged_in,
+)
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -12,7 +25,32 @@ router = APIRouter(prefix="/user", tags=["user"])
 def post_user(payload: User_Create):
     return create_user(payload)
 
+
 # get request to retrieve a user by id
 @router.get("/{user_id}", response_model=User)
 def get_user(user_id: str):
     return get_user_by_id(user_id)
+
+
+@router.put("/{user_id}")
+def update_user(user_id: str, payload: User_Update):
+    # placeholder - keep existing behavior in repo
+    raise NotImplementedError()
+
+# password reset request - non-logged in user wants to reset password.
+@router.post("/password-reset/request")
+def password_reset_request(payload: Password_Reset_Request):
+    reset_password_request(payload.email)
+    return {"detail": "If the email exists, a password reset link has been sent."}
+
+# once user has received reset token, they can use it to reset their password.
+@router.post("/reset-password")
+def perform_reset_password(payload: Password_Reset):
+    reset_password(payload.new_password, payload.reset_token)
+    return {"detail": "Password reset successful."}
+
+# logged in user wants to update their password, so they provide old and new password.
+@router.put("/{user_id}/password")
+def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged_In):
+    update_password_when_logged_in(user_id, payload.old_password, payload.new_password)
+    return {"detail": "Password updated."}

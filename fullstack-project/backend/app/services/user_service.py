@@ -1,10 +1,13 @@
 """This module implements business logic for user management."""
 
+import secrets
+import time
 import uuid
 from fastapi import HTTPException
 from app.repositories.user_repo import load_users, save_users
 from app.schemas.user_schema import User
 
+RESET_TOKEN_EXPIRY = 900 # 15 minutes before password reset token expires
 
 def create_user(payload: User) -> User:
     users = load_users()
@@ -14,7 +17,9 @@ def create_user(payload: User) -> User:
     new_user = {
         "id": new_id,
         "email": payload.email.strip(),
-        "password": payload.password.strip()
+        "password": payload.password.strip(),
+        "reset_token": None,
+        "reset_token_expiry": None
     }
     users.append(new_user)
     save_users(users)
@@ -25,4 +30,48 @@ def get_user_by_id(user_id: str) -> User:
     for user in users:
         if user.get("id") == user_id:
             return User(**user)
+    raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
+
+# Used when a non-logged in user has forgotten their password and needs to reset it.
+def reset_password_request(user_email: str) -> None:
+    users = load_users()
+    for user in users:
+        if user.get("email") == user_email:
+            token = secrets.token_urlsafe(32)  # generate a secure random token
+            user["reset_token"] = token
+            user["reset_token_expiry"] = time.time() + RESET_TOKEN_EXPIRY  # set expiry timestamp
+            save_users(users)
+
+            # simulate sending email by printing the reset link to the console
+            print(f"\nPassword reset link:")
+            print(f"http://localhost:8000/user/reset-password?token={token}\n")
+
+            return None
+    return None  # don't want to reveal whether the email exists or not, so we do not return any information here.
+
+# Used when a non-logged in user has requested a password reset and has input their new password.
+def reset_password(new_password: str, reset_token: str) -> None:
+    users = load_users()
+    for user in users:
+        if user.get("reset_token") == reset_token:
+            if user.get("reset_token_expiry", 0) < time.time():
+                raise HTTPException(status_code=400, detail="Reset token has expired")
+            # update user password and clear reset token and expiry
+            user["password"] = new_password.strip()
+            user["reset_token"] = None
+            user["reset_token_expiry"] = None
+            save_users(users)
+            return None
+    raise HTTPException(status_code=400, detail="Invalid reset token")
+
+# Used when a logged in user wants to change their password.
+def update_password_when_logged_in(user_id: str, old_password: str, new_password: str) -> None:
+    users = load_users()
+    for user in users:
+        if user.get("id") == user_id:
+            if user.get("password") != old_password:
+                raise HTTPException(status_code=400, detail="Old password is incorrect")
+            user["password"] = new_password.strip()
+            save_users(users)
+            return None
     raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
