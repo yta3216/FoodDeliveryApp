@@ -5,7 +5,7 @@ Any updated to the users account details should follow this schema.
 """
 
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator, EmailStr
 
 # User role enumeration (for fixed set of roles)
 class UserRole(str, Enum):
@@ -48,6 +48,42 @@ class User_Create(BaseModel):
     age: int
     gender: str
     role: UserRole
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v):
+        if not v.strip():
+            raise ValueError("Email cannot be empty")
+        return v.strip()
+    
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v):
+        if len(v.strip()) < 8:
+            raise ValueError("Password must be at least 8 characters long")
+        return v
+    
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v):
+        if not v.strip():
+            raise ValueError("Name cannot be empty")
+        return v.strip()
+    
+    @field_validator("age")
+    @classmethod
+    def validate_age(cls, v):
+        if v < 0 or v > 100:
+            raise ValueError("Age must be between 0 and 100")
+        return v
+    
+    @field_validator("gender")
+    @classmethod
+    def validate_gender(cls, v):
+        allowed = {"male","female","other","prefer not to say"}
+        if v.strip().lower() not in allowed:
+            raise ValueError("Gender must be one of: male, female, other, prefer not to say");
+        return v.strip().lower()
 
 class User_Update(BaseModel):
     email: str
