@@ -1,4 +1,3 @@
-# fullstack-project/backend/app/routers/user_router.py  <-- replace your existing file with this
 from typing import List
 from fastapi import APIRouter, status, Query, Depends, HTTPException
 from app.schemas.user_schema import (
