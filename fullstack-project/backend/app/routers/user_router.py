@@ -1,5 +1,6 @@
+# fullstack-project/backend/app/routers/user_router.py  <-- replace your existing file with this
 from typing import List
-from fastapi import APIRouter, status, Query
+from fastapi import APIRouter, status, Query, Depends, HTTPException
 from app.schemas.user_schema import (
     User,
     User_Create,
@@ -9,6 +10,7 @@ from app.schemas.user_schema import (
     Password_Reset_Request,
     Password_Reset,
     Password_Update_When_Logged_In,
+    UserRole,
 )
 from app.services.user_service import (
     create_user,
@@ -18,6 +20,7 @@ from app.services.user_service import (
     reset_password,
     update_password_when_logged_in,
 )
+from app.auth import get_current_user
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -33,13 +36,19 @@ def login_user_route(payload: LoginRequest):
     return login_user(payload.email, payload.password)
 
 # get request to retrieve a user by id
+# users can only view their own account details (not other users')
 @router.get("/{user_id}", response_model=User)
-def get_user_route(user_id: str):
+def get_user_route(user_id: str, current_user: User = Depends(get_current_user)):
+    # only admins can view any user, everyone else can only view themselves
+    if current_user.role != UserRole.ADMIN and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="You are not authorized to view this user's details")
     return get_user_by_id(user_id)
 
 @router.put("/{user_id}")
-def update_user_route(user_id: str, payload: User_Update):
-    # placeholder - keep existing behavior in repo
+def update_user_route(user_id: str, payload: User_Update, current_user: User = Depends(get_current_user)):
+    # users can only edit their own account
+    if current_user.role != UserRole.ADMIN and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="You are not authorized to edit this user's details")
     raise NotImplementedError()
 
 # password reset request - non-logged in user wants to reset password.
@@ -56,6 +65,9 @@ def perform_reset_password(payload: Password_Reset):
 
 # logged in user wants to update their password, so they provide old and new password.
 @router.put("/{user_id}/password")
-def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged_In):
+def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged_In, current_user: User = Depends(get_current_user)):
+    # users can only change their own password
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="You are not authorized to change this user's password")
     update_password_when_logged_in(user_id, payload.old_password, payload.new_password)
     return {"detail": "Password updated."}
