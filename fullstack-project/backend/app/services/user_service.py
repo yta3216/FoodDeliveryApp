@@ -5,7 +5,7 @@ import time
 import uuid
 from fastapi import HTTPException
 from app.repositories.user_repo import load_users, save_users
-from app.schemas.user_schema import User, User_Create, UserRole, LoginResponse, UserPublic
+from app.schemas.user_schema import User, User_Create, UserRole, LoginResponse, UserPublic, User_Update
 RESET_TOKEN_EXPIRY = 900  # 15 minutes before password reset token expires
 SESSION_TOKEN_EXPIRY = 86400  # 24 hours before session token expires
 
