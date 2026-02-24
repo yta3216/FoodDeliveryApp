@@ -5,8 +5,7 @@ import time
 import uuid
 from fastapi import HTTPException
 from app.repositories.user_repo import load_users, save_users
-from app.schemas.user_schema import User, User_Create, UserRole, LoginResponse
-
+from app.schemas.user_schema import User, User_Create, UserRole, LoginResponse, UserPublic
 RESET_TOKEN_EXPIRY = 900  # 15 minutes before password reset token expires
 SESSION_TOKEN_EXPIRY = 86400  # 24 hours before session token expires
 
@@ -112,4 +111,27 @@ def update_password_when_logged_in(user_id: str, old_password: str, new_password
             user["password"] = new_password.strip()
             save_users(users)
             return None
+    raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
+
+
+def update_user(user_id: str, payload: User_Update) -> UserPublic:
+    users = load_users()
+    for idx, user in enumerate(users):
+        if user.get("id") == user_id:
+            # only update allowed fields, role and password are not changeable here
+            user["name"] = payload.name.strip()
+            user["email"] = payload.email.strip()
+            user["age"] = payload.age
+            user["gender"] = payload.gender.strip()
+            users[idx] = user
+            save_users(users)
+            role = UserRole(user["role"]) if isinstance(user.get("role"), str) else user["role"]
+            return UserPublic(
+                id=user["id"],
+                email=user["email"],
+                name=user["name"],
+                age=user["age"],
+                gender=user["gender"],
+                role=role
+            )
     raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
