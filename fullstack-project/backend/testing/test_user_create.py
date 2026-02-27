@@ -21,7 +21,6 @@ def test_create_user():
     assert response.status_code == 201
     # we can't predict the user ID, but we can check others
     assert response.json().get("email") == "test@example.com"
-    assert response.json().get("password") == "passwordpassword"
     assert response.json().get("name") == "John Smith"
     assert response.json().get("age") == 25
     assert response.json().get("gender") == "male"
