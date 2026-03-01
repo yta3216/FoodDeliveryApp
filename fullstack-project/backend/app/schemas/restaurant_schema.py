@@ -7,13 +7,6 @@ Any updates to the restaurant details should follow this schema.
 from typing import List
 from pydantic import BaseModel
 
-# Menu Item Update model for input validation when updating menu item details.
-class MenuItem_Update(BaseModel):
-    id: int
-    name: str
-    price: float
-    tags: List[str] = []
-
 # Restaurant model
 class Restaurant(BaseModel):
     id: int
