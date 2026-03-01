@@ -5,7 +5,7 @@ client = TestClient(app)
 
 # helper to register a user and log in, returns the auth token and user id
 def register_and_login(email, password="Password123", role="customer"):
-    client.post("/user", json={
+    signup_response = client.post("/user", json={
         "email": email,
         "password": password,
         "name": "Test User",

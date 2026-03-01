@@ -38,9 +38,11 @@ def create_user_route(payload: User_Create):
 def login_user_route(payload: LoginRequest):
     return login_user(payload.email, payload.password)
 
-# get request to retrieve a user by id - returns UserPublic so password is hidden
+# get request to retrieve a user by id
 @router.get("/{user_id}", response_model=UserPublic)
-def get_user_route(user_id: str, current_user: User = Depends(require_role(UserRole.ADMIN))): # only admins can view user details
+def get_user_route(user_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.ADMIN and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="You are not authorized to view this user's details")
     return get_user_by_id(user_id)
 
 # update user details - users can only update their own account
