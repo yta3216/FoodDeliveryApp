@@ -118,6 +118,7 @@ def test_update_restaurant_details(setup_restaurant):
     updated_restaurant = update_response.json()
     assert updated_restaurant["name"] == "Updated Restaurant"
 
+# test updating restaurant managers
 def test_update_restaurant_managers(setup_restaurant):
     restaurant = setup_restaurant["restaurant"]
     token = setup_restaurant["token"]
@@ -150,3 +151,134 @@ def test_update_restaurant_managers(setup_restaurant):
     assert update_response.status_code == 200
     updated_restaurant = update_response.json()
     assert updated_restaurant["manager_ids"] == [restaurant["manager_ids"][0], second_manager_id]
+
+
+
+# ------- MENU OPERATIONS ------- #
+
+# test creating menu item
+def test_create_menu_item(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+
+    # Create a new menu item
+    menu_item_response = client.post(
+        f"/restaurant/{restaurant['id']}/menu",
+        json={
+            "name": "Test Menu Item",
+            "price": 9.99,
+            "tags": ["test"]
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert menu_item_response.status_code == 201
+    menu_item = menu_item_response.json()
+    assert menu_item["name"] == "Test Menu Item"
+    assert menu_item["price"] == 9.99
+    assert menu_item["tags"] == ["test"]
+
+# test updating a menu item
+def test_update_menu_item(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+
+    # Create a menu item to update
+    menu_item_response = client.post(
+        f"/restaurant/{restaurant['id']}/menu",
+        json={
+            "name": "Original Menu Item",
+            "price": 5.99,
+            "tags": ["test, original"]
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert menu_item_response.status_code == 201
+    menu_item = menu_item_response.json()
+
+    # Update the menu item
+    update_response = client.put(
+        f"/restaurant/{restaurant['id']}/menu/{menu_item['id']}",
+        json={
+            "id": menu_item["id"],
+            "name": "Updated Menu Item",
+            "price": 7.99,
+            "tags": ["test, updated"]
+        }
+    )
+    assert update_response.status_code == 200
+    updated_menu_item = update_response.json()
+
+    assert updated_menu_item["name"] == "Updated Menu Item"
+    assert updated_menu_item["price"] == 7.99
+    assert updated_menu_item["tags"] == ["test, updated"]
+
+# test bulk creating menu items
+def test_bulk_create_menu_items(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+
+    # Bulk create menu items
+    bulk_response = client.post(
+        f"/restaurant/{restaurant['id']}/menu/bulk",
+        json={
+            "items": [
+                {"name": "Bulk Item 1", "price": 10.99, "tags": ["test, bulk"]},
+                {"name": "Bulk Item 2", "price": 11.99, "tags": ["test, bulk"]}
+            ]
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert bulk_response.status_code == 201
+    bulk_items = bulk_response.json()
+
+    assert len(bulk_items) == 2
+    assert bulk_items[0]["name"] == "Bulk Item 1"
+    assert bulk_items[1]["name"] == "Bulk Item 2"
+
+# test bulk updating menu items
+def test_bulk_update_menu_items(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+
+    # Create two menu items to update
+    item1_response = client.post(
+        f"/restaurant/{restaurant['id']}/menu",
+        json={
+            "name": "Bulk Update Item 1",
+            "price": 8.99,
+            "tags": ["test, bulk, original"]
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    item2_response = client.post(
+        f"/restaurant/{restaurant['id']}/menu",
+        json={
+            "name": "Bulk Update Item 2",
+            "price": 9.99,
+            "tags": ["test, bulk, original"]
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    item1 = item1_response.json()
+    item2 = item2_response.json()
+
+    # Bulk update the menu items
+    bulk_update_response = client.put(
+        f"/restaurant/{restaurant['id']}/menu/bulk",
+        json={
+            "items": [
+                {"id": item1["id"], "name": "Updated Bulk Item 1", "price": 6.99, "tags": ["test, bulk, updated"]},
+                {"id": item2["id"], "name": "Updated Bulk Item 2", "price": 7.99, "tags": ["test, bulk,updated"]}
+            ]
+        }
+    )
+    assert bulk_update_response.status_code == 200
+    updated_items = bulk_update_response.json()
+
+    assert len(updated_items) == 2
+    assert updated_items[0]["name"] == "Updated Bulk Item 1"
+    assert updated_items[0]["price"] == 6.99
+    assert updated_items[0]["tags"] == ["test, bulk, updated"]
+    assert updated_items[1]["name"] == "Updated Bulk Item 2"
+    assert updated_items[1]["price"] == 7.99
+    assert updated_items[1]["tags"] == ["test, bulk,updated"]
