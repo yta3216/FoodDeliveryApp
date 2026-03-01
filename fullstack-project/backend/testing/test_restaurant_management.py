@@ -188,7 +188,7 @@ def test_update_menu_item(setup_restaurant):
         json={
             "name": "Original Menu Item",
             "price": 5.99,
-            "tags": ["test, original"]
+            "tags": ["test", "original"]
         },
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -202,15 +202,16 @@ def test_update_menu_item(setup_restaurant):
             "id": menu_item["id"],
             "name": "Updated Menu Item",
             "price": 7.99,
-            "tags": ["test, updated"]
-        }
+            "tags": ["test", "updated"]
+        },
+        headers={"Authorization": f"Bearer {token}"}
     )
     assert update_response.status_code == 200
     updated_menu_item = update_response.json()
 
     assert updated_menu_item["name"] == "Updated Menu Item"
     assert updated_menu_item["price"] == 7.99
-    assert updated_menu_item["tags"] == ["test, updated"]
+    assert updated_menu_item["tags"] == ["test", "updated"]
 
 # test bulk creating menu items
 def test_bulk_create_menu_items(setup_restaurant):
@@ -222,8 +223,8 @@ def test_bulk_create_menu_items(setup_restaurant):
         f"/restaurant/{restaurant['id']}/menu/bulk",
         json={
             "items": [
-                {"name": "Bulk Item 1", "price": 10.99, "tags": ["test, bulk"]},
-                {"name": "Bulk Item 2", "price": 11.99, "tags": ["test, bulk"]}
+                {"name": "Bulk Item 1", "price": 10.99, "tags": ["test", "bulk"]},
+                {"name": "Bulk Item 2", "price": 11.99, "tags": ["test", "bulk"]}
             ]
         },
         headers={"Authorization": f"Bearer {token}"}
@@ -246,7 +247,7 @@ def test_bulk_update_menu_items(setup_restaurant):
         json={
             "name": "Bulk Update Item 1",
             "price": 8.99,
-            "tags": ["test, bulk, original"]
+            "tags": ["test", "bulk", "original"]
         },
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -255,7 +256,7 @@ def test_bulk_update_menu_items(setup_restaurant):
         json={
             "name": "Bulk Update Item 2",
             "price": 9.99,
-            "tags": ["test, bulk, original"]
+            "tags": ["test", "bulk", "original"]
         },
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -267,10 +268,11 @@ def test_bulk_update_menu_items(setup_restaurant):
         f"/restaurant/{restaurant['id']}/menu/bulk",
         json={
             "items": [
-                {"id": item1["id"], "name": "Updated Bulk Item 1", "price": 6.99, "tags": ["test, bulk, updated"]},
-                {"id": item2["id"], "name": "Updated Bulk Item 2", "price": 7.99, "tags": ["test, bulk,updated"]}
+                {"id": item1["id"], "name": "Updated Bulk Item 1", "price": 6.99, "tags": ["test", "bulk", "updated"]},
+                {"id": item2["id"], "name": "Updated Bulk Item 2", "price": 7.99, "tags": ["test", "bulk", "updated"]}
             ]
-        }
+        },
+        headers={"Authorization": f"Bearer {token}"}
     )
     assert bulk_update_response.status_code == 200
     updated_items = bulk_update_response.json()
@@ -278,7 +280,7 @@ def test_bulk_update_menu_items(setup_restaurant):
     assert len(updated_items) == 2
     assert updated_items[0]["name"] == "Updated Bulk Item 1"
     assert updated_items[0]["price"] == 6.99
-    assert updated_items[0]["tags"] == ["test, bulk, updated"]
+    assert updated_items[0]["tags"] == ["test", "bulk", "updated"]
     assert updated_items[1]["name"] == "Updated Bulk Item 2"
     assert updated_items[1]["price"] == 7.99
-    assert updated_items[1]["tags"] == ["test, bulk,updated"]
+    assert updated_items[1]["tags"] == ["test", "bulk", "updated"]
