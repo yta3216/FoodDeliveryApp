@@ -22,6 +22,7 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
         "city": payload.city.strip(),
         "address": payload.address.strip(),
         "manager_ids": [manager_id], # The logged in user is the initial manager of the restaurant
+        "menu": [] # Start with an empty menu
     }
     restaurants.append(new_restaurant)
     save_restaurants(restaurants)
