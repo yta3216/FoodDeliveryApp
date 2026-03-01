@@ -56,6 +56,7 @@ def setup_restaurant():
 def test_create_restaurant(setup_restaurant):
     restaurant = setup_restaurant["restaurant"]
     assert restaurant["name"] == "Test Restaurant"
+    assert restaurant["menu"] == []  # Restaurant should have an associated menu, which starts empty
 
 # test a restaurant creation attempt with the wrong role
 def test_create_restaurant_wrong_role():
