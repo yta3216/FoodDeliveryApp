@@ -2,6 +2,8 @@
 This module defines the API routes for restaurant management.
 """
 
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth import require_role
@@ -11,12 +13,21 @@ from app.schemas.restaurant_schema import (
     Restaurant_Create,
     Restaurant_Details_Update,
     Restaurant_Managers_Update,
+    MenuItem,
+    MenuItem_Create,
+    MenuItem_Update,
+    MenuItem_Bulk_Create,
+    MenuItem_Bulk_Update
 )
 
 from app.services.restaurant_service import (
     create_restaurant,
     update_restaurant_details,
     update_restaurant_managers,
+    create_menu_item,
+    update_menu_item,
+    bulk_menu_item_create,
+    bulk_menu_item_update
 )
 
 router = APIRouter(prefix="/restaurant", tags=["restaurant"])
@@ -39,3 +50,25 @@ def update_restaurant_managers_route(restaurant_id: int, payload: Restaurant_Man
     if restaurant_id != payload.id:
         raise HTTPException(status_code=400, detail="Restaurant ID in path and body must match")
     return update_restaurant_managers(payload)
+
+# post request to create a new menu item and add it to the restaurant's menu. only managers can add menu items.
+@router.post("/{restaurant_id}/menu", response_model=MenuItem, status_code=201)
+def create_menu_item_route(restaurant_id: int, payload: MenuItem_Create, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))):
+    return create_menu_item(restaurant_id, payload)
+
+# put request to update a menu item in the restaurant's menu. only managers can update menu items.
+@router.put("/{restaurant_id}/menu/{menu_item_id}", response_model=MenuItem)
+def update_menu_item_route(restaurant_id: int, menu_item_id: int, payload: MenuItem_Update, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))):
+    if menu_item_id != payload.id:
+        raise HTTPException(status_code=400, detail="Menu item ID in path and body must match")
+    return update_menu_item(restaurant_id, payload)
+
+# post request to bulk create menu items in the restaurant's menu. only managers can bulk create menu items.
+@router.post("/{restaurant_id}/menu/bulk", response_model=List[MenuItem], status_code=201)
+def bulk_create_menu_items_route(restaurant_id: int, payload: MenuItem_Bulk_Create, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))):
+    return bulk_menu_item_create(restaurant_id, payload)
+
+# put request to bulk update menu items in the restaurant's menu. only managers can bulk update menu items.
+@router.put("/{restaurant_id}/menu/bulk", response_model=List[MenuItem])
+def bulk_update_menu_items_route(restaurant_id: int, payload: MenuItem_Bulk_Update, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))):
+    return bulk_menu_item_update(restaurant_id, payload)
