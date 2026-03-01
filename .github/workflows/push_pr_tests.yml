@@ -1,4 +1,4 @@
-name: Pylint
+name: Push and PR Tests
 
 on:
   push:
