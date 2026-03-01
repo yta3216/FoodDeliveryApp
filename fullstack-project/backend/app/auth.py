@@ -1,5 +1,6 @@
 import time
 from fastapi import Header, HTTPException
+from fastapi import Depends
 from app.repositories.user_repo import load_users
 from app.schemas.user_schema import User, UserRole
 
@@ -23,3 +24,10 @@ def get_current_user(authorization: str = Header(...)) -> User:
             return User(**user)
     
     raise HTTPException(status_code=401, detail="Invalid or expired session token")
+
+def require_role(required_role: UserRole):
+    def role_check(current_user: User = Depends(get_current_user)):
+        if current_user.role != required_role:
+            raise HTTPException(status_code=403, detail=f"User role '{current_user.role}' does not have access to this resource")
+        return current_user
+    return role_check
