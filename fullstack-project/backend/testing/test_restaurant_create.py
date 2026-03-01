@@ -148,4 +148,4 @@ def test_update_restaurant_managers(setup_restaurant):
     )
     assert update_response.status_code == 200
     updated_restaurant = update_response.json()
-    assert updated_restaurant["manager_ids"] == [restaurant["manager_ids"][0]]
+    assert updated_restaurant["manager_ids"] == [restaurant["manager_ids"][0], second_manager_id]

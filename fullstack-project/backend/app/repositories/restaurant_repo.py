@@ -11,7 +11,11 @@ def load_restaurants() -> List[Dict[str, Any]]:
     if not RESTAURANT_DATA_PATH.exists():
         return []
     with RESTAURANT_DATA_PATH.open("r", encoding="utf-8") as f:
-        return json.load(f)
+        content = f.read().strip()
+        if not content:
+            return []
+        else:
+            return json.loads(content)
 
 def save_restaurants(items: List[Dict[str, Any]]) -> None:
     tmp = RESTAURANT_DATA_PATH.with_suffix(".tmp")
