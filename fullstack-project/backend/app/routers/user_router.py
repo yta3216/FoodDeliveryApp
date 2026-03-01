@@ -1,3 +1,7 @@
+""" 
+This module defines the API routes for user management.
+"""
+
 from fastapi import APIRouter, status, Depends, HTTPException
 from app.schemas.user_schema import (
     User,
@@ -20,7 +24,7 @@ from app.services.user_service import (
     update_password_when_logged_in,
     update_user,
 )
-from app.auth import get_current_user
+from app.auth import get_current_user, require_role
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -34,7 +38,7 @@ def create_user_route(payload: User_Create):
 def login_user_route(payload: LoginRequest):
     return login_user(payload.email, payload.password)
 
-# get request to retrieve a user by id - returns UserPublic so password is hidden
+# get request to retrieve a user by id
 @router.get("/{user_id}", response_model=UserPublic)
 def get_user_route(user_id: str, current_user: User = Depends(get_current_user)):
     if current_user.role != UserRole.ADMIN and current_user.id != user_id:

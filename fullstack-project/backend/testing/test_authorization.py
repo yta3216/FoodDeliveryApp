@@ -23,8 +23,9 @@ def register_and_login(email, password="Password123", role="customer"):
 def test_user_can_view_own_details():
     token, user_id = register_and_login("viewown@example.com")
     response = client.get(f"/user/{user_id}", headers={"Authorization": f"Bearer {token}"})
+    data = response.json()
     assert response.status_code == 200
-    assert response.json().get("id") == user_id
+    assert data.get("id") == user_id
 
 def test_customer_cannot_view_other_user_details():
     # create two users, try to view each other's details

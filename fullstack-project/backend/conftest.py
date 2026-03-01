@@ -6,19 +6,21 @@ import pytest
 # Add the backend directory to sys.path so pytest can find 'app'
 sys.path.insert(0, str(Path(__file__).parent))
 
-USER_DATA_PATH = Path(__file__).resolve().parent / "app" / "data" / "users.json"
-BACKUP_PATH = USER_DATA_PATH.with_suffix(".backup")
+DATA_PATH = Path(__file__).resolve().parent / "app" / "data"
 
-@pytest.fixture(scope="session", autouse=True)
-def backup_and_restore_user_data():
-    """Backup users.json before tests, restore after."""
+@pytest.fixture(autouse=True)
+def backup_and_restore_data():
+    """Backup json files before tests, restore after."""
+    json_files = list(DATA_PATH.glob("*.json"))
+    
     # Backup
-    if USER_DATA_PATH.exists():
-        shutil.copy(USER_DATA_PATH, BACKUP_PATH)
+    for f in json_files:
+        shutil.copy(f, f.with_suffix(".backup"))
 
     yield  # Run all tests
 
     # Restore
-    if BACKUP_PATH.exists():
-        shutil.copy(BACKUP_PATH, USER_DATA_PATH)
-        BACKUP_PATH.unlink()
+    for f in json_files:
+        backup = f.with_suffix(".backup")
+        shutil.copy(backup, f)
+        backup.unlink()
