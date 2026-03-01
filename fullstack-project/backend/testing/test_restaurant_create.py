@@ -3,12 +3,14 @@
 from fastapi.testclient import TestClient
 import pytest
 from app.main import app
+from app.schemas.user_schema import UserRole
 
 client = TestClient(app)
 
 @pytest.fixture
 def setup_restaurant():
     # Create a test user with manager role
+
     test_manager = client.post(
         "/user",
         json={
@@ -26,7 +28,7 @@ def setup_restaurant():
     login_response = client.post(
         "/user/login",
         json={
-            "email": "test@example.com",
+            "email": test_manager.json().get("email"),
             "password": "testpassword",
         }
     )
@@ -66,7 +68,7 @@ def test_create_restaurant_wrong_role():
             "name": "Wrong Role",
             "age": 40,
             "gender": "male",
-            "role": "customer",  # This user is not a manager
+            "role": UserRole.CUSTOMER,  # This user is not a manager
         }
     )
     assert test_user.status_code == 201
@@ -129,7 +131,7 @@ def test_update_restaurant_managers(setup_restaurant):
             "name": "Second Manager",
             "age": 35,
             "gender": "male",
-            "role": "manager",
+            "role": UserRole.RESTAURANT_MANAGER,
         }
     )
 
