@@ -158,12 +158,60 @@ class Restaurant_Create(BaseModel):
     address: Address
     menu: Menu_Create = Menu_Create()  # Optional Menu when creating a restaurant
 
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Restaurant name cannot be empty")
+        if len(v) > 100:
+            raise ValueError("Restaurant name cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("Restaurant name contains invalid characters")
+        return v
+
+    @field_validator("city")
+    @classmethod
+    def validate_city(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("City cannot be empty")
+        if len(v) > 100:
+            raise ValueError("City cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("City contains invalid characters")
+        return v
+
 # Restaurant Details Update model for input validation when updating restaurant details.
 class Restaurant_Details_Update(BaseModel):
     id: int
     name: str
     city: str
     address: Address
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Restaurant name cannot be empty")
+        if len(v) > 100:
+            raise ValueError("Restaurant name cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("Restaurant name contains invalid characters")
+        return v
+
+    @field_validator("city")
+    @classmethod
+    def validate_city(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("City cannot be empty")
+        if len(v) > 100:
+            raise ValueError("City cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("City contains invalid characters")
+        return v
 
 # Restaurant Managers Update model for input validation when updating restaurant managers.
 class Restaurant_Managers_Update(BaseModel):
