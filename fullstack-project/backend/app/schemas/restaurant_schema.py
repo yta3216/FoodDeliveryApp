@@ -4,10 +4,70 @@ This includes the menu details as well.
 
 Any updates to the restaurant details should follow this schema.
 """
-
+import re
 from typing import List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
+#Address model for validating address input when creating or updating restaurant details.
+# Helpers for address input contraints
+_NAME_RE = re.compile(r"^[\w\s\-',\.&]+$",re.UNICODE)  # Allows letters, numbers, spaces, and common punctuation
+_STREET_RE = re.compile(r"^\d+\s+\S+",re.UNICODE)  # Allows letters, numbers, spaces, and common punctuation
+_POSTAL_CODE_RE = re.compile(r"^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$") # Canadian postal code format
+
+PROVINCES = {"AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"}
+
+class Address(BaseModel):
+    street: str
+    city: str
+    province: str
+    postal_code: str
+
+    @field_validator("street")
+    @classmethod
+    def validate_street(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Street address cannot be empty")
+        if len(v)> 100:
+            raise ValueError("Street address cannot be longer than 100 characters")
+        if not _STREET_RE.match(v):
+            raise ValueError("Street address must start with a number followed by the street name (e.g. '123 Main St')")
+        return v
+    
+    @field_validator("city")
+    @classmethod
+    def validate_city(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("City cannot be empty")
+        if len(v)>100:
+            raise ValueError("City cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("City contains invalid characters")
+        return v
+    
+    @field_validator("province")
+    @classmethod
+    def validate_province(cls,v:str) -> str:
+        v = v.strip().upper()
+        if not v:
+            raise ValueError("Province cannot be empty")
+        if v not in PROVINCES:
+            raise ValueError(f"Province must be one of {PROVINCES}")
+        return v
+
+    @field_validator("postal_code")
+    @classmethod
+    def validate_postal_code(cls,v:str) -> str:
+        v = v.strip().upper()
+        if not v:
+            raise ValueError("Postal code cannot be empty")
+        if not _POSTAL_CODE_RE.match(v):
+            raise ValueError("Postal code must be in the format 'A1A 1A1'")
+        if len(v) == 6:
+            v = v[:3]+ " " + v[3:]
+        return v
+    
 # Menu item model
 class MenuItem(BaseModel):
     id: int
@@ -50,7 +110,7 @@ class Restaurant(BaseModel):
     id: int
     name: str
     city: str
-    address: str
+    address: Address
     manager_ids: List[str]  # List of user IDs who are managers of the restaurant
     menu: Menu = Menu()
 
@@ -61,17 +121,18 @@ class Restaurant(BaseModel):
 class Restaurant_Create(BaseModel):
     name: str
     city: str
-    address: str
+    address: Address
     menu: Menu_Create = Menu_Create()  # Optional Menu when creating a restaurant
 
 # Restaurant Details Update model for input validation when updating restaurant details.
 class Restaurant_Details_Update(BaseModel):
     id: int
-    name: str 
+    name: str
     city: str
-    address: str
+    address: Address
 
 # Restaurant Managers Update model for input validation when updating restaurant managers.
 class Restaurant_Managers_Update(BaseModel):
     id: int
     manager_ids: List[str]
+
