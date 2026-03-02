@@ -167,7 +167,6 @@ def test_negative_price_on_update_rejected():
         json={"id": item["id"], "name": "Burger", "price": -5.00, "tags": []},
         headers={"Authorization": f"Bearer {token}"}
     )
-<<<<<<< HEAD
     assert response.status_code == 422
 
 def test_empty_name_on_update_rejected():
@@ -208,6 +207,4 @@ def test_empty_city_on_update_rejected():
         },
         headers={"Authorization": f"Bearer {token}"}
     )
-=======
->>>>>>> origin/main
     assert response.status_code == 422
