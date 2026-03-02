@@ -168,3 +168,43 @@ def test_negative_price_on_update_rejected():
         headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 422
+
+def test_empty_name_on_update_rejected():
+    token = get_manager_token("updateemptyname@example.com")
+    restaurant = create_restaurant(token)
+    response = client.put(
+        f"/restaurant/{restaurant['id']}",
+        json={
+            "id": restaurant["id"],
+            "name": "",
+            "city": "Kelowna",
+            "address": {
+                "street": "123 Main St",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "V1Y 1A1"
+            }
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 422
+
+def test_empty_city_on_update_rejected():
+    token = get_manager_token("updateemptycity@example.com")
+    restaurant = create_restaurant(token)
+    response = client.put(
+        f"/restaurant/{restaurant['id']}",
+        json={
+            "id": restaurant["id"],
+            "name": "Test Restaurant",
+            "city": "",
+            "address": {
+                "street": "123 Main St",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "V1Y 1A1"
+            }
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 422
