@@ -85,6 +85,23 @@ class MenuItem_Create(BaseModel):
     price: float
     tags: List[str] = Field(default_factory=list)
 
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Menu item name cannot be empty")
+        if len(v) > 100:
+            raise ValueError("Menu item name cannot be longer than 100 characters")
+        return v
+
+    @field_validator("price")
+    @classmethod
+    def validate_price(cls, v: float) -> float:
+        if v < 0:
+            raise ValueError("Menu item price cannot be negative")
+        return v
+
 # Menu Item Update model for input validation when updating menu item details.
 class MenuItem_Update(BaseModel):
     id: int
