@@ -28,8 +28,8 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
         "name": payload.name.strip(),
         "city": payload.city.strip(),
         "address": payload.address.strip(),
-        "manager_ids": [manager_id], # The logged in user is the initial manager of the restaurant
-        "menu": payload.menu # if empty, the schema takes care of defaulting to empty list of menu items
+        "manager_ids": [manager_id],  # The logged in user is the initial manager of the restaurant
+        "menu": {"items": payload.menu.items}
     }
     restaurants.append(new_restaurant)
     save_restaurants(restaurants)
@@ -62,14 +62,14 @@ def create_menu_item(restaurant_id: int, payload: MenuItem_Create) -> MenuItem:
     restaurants = load_restaurants()
     for restaurant in restaurants:
         if restaurant.get("id") == restaurant_id:
-            new_item_id = max((item.get("id", 0) for item in restaurant["menu"]), default=0) + 1
+            new_item_id = max((item.get("id", 0) for item in restaurant["menu"]["items"]), default=0) + 1
             new_item = {
                 "id": new_item_id,
                 "name": payload.name.strip(),
                 "price": payload.price,
                 "tags": [tag.strip() for tag in payload.tags]
             }
-            restaurant["menu"].append(new_item)
+            restaurant["menu"]["items"].append(new_item)
             save_restaurants(restaurants)
             return MenuItem(**new_item)
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
@@ -79,7 +79,7 @@ def update_menu_item(restaurant_id: int, payload: MenuItem_Update) -> MenuItem:
     restaurants = load_restaurants()
     for restaurant in restaurants:
         if restaurant.get("id") == restaurant_id:
-            for item in restaurant["menu"]:
+            for item in restaurant["menu"]["items"]:
                 if item.get("id") == payload.id:
                     item["name"] = payload.name.strip()
                     item["price"] = payload.price
@@ -96,14 +96,14 @@ def bulk_menu_item_create(restaurant_id: int, payload: MenuItem_Bulk_Create) -> 
         if restaurant.get("id") == restaurant_id:
             new_items = []
             for item_payload in payload.items:
-                new_item_id = max((item.get("id", 0) for item in restaurant["menu"]), default=0) + 1
+                new_item_id = max((item.get("id", 0) for item in restaurant["menu"]["items"]), default=0) + 1
                 new_item = {
                     "id": new_item_id,
                     "name": item_payload.name.strip(),
                     "price": item_payload.price,
                     "tags": [tag.strip() for tag in item_payload.tags]
                 }
-                restaurant["menu"].append(new_item)
+                restaurant["menu"]["items"].append(new_item)
                 new_items.append(MenuItem(**new_item))
             save_restaurants(restaurants)
             return new_items
@@ -116,7 +116,7 @@ def bulk_menu_item_update(restaurant_id: int, payload: MenuItem_Bulk_Update) -> 
         if restaurant.get("id") == restaurant_id:
             updated_items = []
             for item_payload in payload.items:
-                for item in restaurant["menu"]:
+                for item in restaurant["menu"]["items"]:
                     if item.get("id") == item_payload.id:
                         item["name"] = item_payload.name.strip()
                         item["price"] = item_payload.price
