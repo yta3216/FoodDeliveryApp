@@ -16,6 +16,15 @@ from app.schemas.restaurant_schema import (
 )
 from app.repositories.restaurant_repo import load_restaurants, save_restaurants
 
+# Resturant address storage format
+def _address_to_dict(address) -> dict:
+    return{
+        "street": address.street,
+        "city": address.city,
+        "province": address.province,
+        "postal_code": address.postal_code
+    }
+
 # Create a new restaurant.
 def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant:
     restaurants = load_restaurants()
@@ -25,9 +34,9 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
 
     new_restaurant = {
         "id": new_id,
-        "name": payload.name.strip(),
-        "city": payload.city.strip(),
-        "address": payload.address.strip(),
+        "name": payload.name,
+        "city": payload.city,
+        "address": _address_to_dict(payload.address),
         "manager_ids": [manager_id],  # The logged in user is the initial manager of the restaurant
         "menu": {"items": payload.menu.items}
     }
@@ -42,7 +51,7 @@ def update_restaurant_details(payload: Restaurant_Details_Update) -> Restaurant:
         if restaurant.get("id") == payload.id:
             restaurant["name"] = payload.name.strip()
             restaurant["city"] = payload.city.strip()
-            restaurant["address"] = payload.address.strip()
+            restaurant["address"] = _address_to_dict(payload.address)
             save_restaurants(restaurants)
             return Restaurant(**restaurant)
     raise HTTPException(status_code=404, detail=f"Restaurant '{payload.id}' not found")

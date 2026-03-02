@@ -7,6 +7,13 @@ from app.schemas.user_schema import UserRole
 
 client = TestClient(app)
 
+VALID_RESTAURANT_ADDRESS = {
+    "street": "123 Main St",
+    "city": "Kelowna",
+    "province": "BC",
+    "postal_code": "A1A 1A1"
+}
+
 @pytest.fixture
 def setup_restaurant():
     # Create a test user with manager role
@@ -41,7 +48,7 @@ def setup_restaurant():
         json={
             "name": "Test Restaurant",
             "city": "Test City",
-            "address": "123 Test St"
+            "address": VALID_RESTAURANT_ADDRESS
         },
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -57,6 +64,10 @@ def test_create_restaurant(setup_restaurant):
     restaurant = setup_restaurant["restaurant"]
     assert restaurant["name"] == "Test Restaurant"
     assert restaurant["menu"]['items'] == []  # Restaurant should have an associated menu, which starts empty
+    assert restaurant["address"]["street"] == "123 Main St"
+    assert restaurant["address"]["city"] == "Kelowna"
+    assert restaurant["address"]["province"] == "BC"
+    assert restaurant["address"]["postal_code"] == "A1A 1A1"
 
 # test a restaurant creation attempt with the wrong role
 def test_create_restaurant_wrong_role():
@@ -92,7 +103,7 @@ def test_create_restaurant_wrong_role():
         json={
             "name": "Test Restaurant",
             "city": "Test City",
-            "address": "456 Test St"
+            "address": VALID_RESTAURANT_ADDRESS
         },
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -110,7 +121,12 @@ def test_update_restaurant_details(setup_restaurant):
             "id": restaurant["id"],
             "name": "Updated Restaurant",
             "city": "Updated City",
-            "address": "789 Test St"
+            "address": {
+                "street": "456 Updated St",
+                "city": "Toronto",
+                "province": "ON",
+                "postal_code": "B1B 1B1"
+            }
         },
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -284,3 +300,194 @@ def test_bulk_update_menu_items(setup_restaurant):
     assert updated_items[1]["name"] == "Updated Bulk Item 2"
     assert updated_items[1]["price"] == 7.99
     assert updated_items[1]["tags"] == ["test", "bulk", "updated"]
+
+#Address validation tests
+@pytest.fixture
+def manager_token():
+    user = client.post(
+        "/user",
+        json={
+            "email": "addrvalidator@example.com",
+            "password": "testpassword",
+            "name": "Address Validator",
+            "age": 28,
+            "gender": "other",
+            "role": "manager",
+        }
+    )
+    assert user.status_code == 201
+    login = client.post("/user/login", json={"email": "addrvalidator@example.com", "password": "testpassword"})
+    assert login.status_code == 200
+    return login.json()["token"]
+
+# Test valid address - all fields
+def test_create_restaurant_valid_address(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Koi Sushi",
+            "city": "Kelowna",
+            "address": {
+                "street": "456 Centre St",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "T2P 1A1"
+            }
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 201
+    addr = response.json()["address"]
+    assert addr["street"] == "456 Centre St"
+    assert addr["city"] == "Kelowna"
+    assert addr["province"] == "BC"
+    assert addr["postal_code"] == "T2P 1A1"
+
+# Test invalid Postal code format
+def test_create_restaurant_postal_code_normalised(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Koi Sushi",
+            "city": "Kelowna",
+            "address": {
+                "street": "456 Centre St",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "aaaaaa"
+            }
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 422
+
+# Test province code case insensitivity - should be accepted in lowercase and stored in uppercase
+def test_create_restaurant_province_case_insensitive(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Koi Sushi",
+            "city": "Kelowna",
+            "address": {
+                "street": "456 Centre St",
+                "city": "Kelowna",
+                "province": "bc",
+                "postal_code": "T2P 1A1"
+            }
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 201
+    assert response.json()["address"]["province"] == "BC"
+
+# Test Invalid province code
+def test_create_restaurant_invalid_province(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Koi Sushi",
+            "city": "Kelowna",
+            "address": {
+                "street": "456 Centre St",
+                "city": "Kelowna",
+                "province": "XX",
+                "postal_code": "T2P 1A1"
+            }
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 422
+
+# Test street without a leading number
+def test_create_restaurant_street_no_number(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Koi Sushi",
+            "city": "Kelowna",
+            "address": {
+                "street": "Centre St",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "T2P 1A1"
+            }
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 422
+
+# Test empty street
+def test_create_restaurant_empty_street(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Koi Sushi",
+            "city": "Kelowna",
+            "address": {
+                "street": "",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "T2P 1A1"
+            }
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 422
+
+# Test empty city
+def test_create_restaurant_empty_city_in_address(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Koi Sushi",
+            "city": "Kelowna",
+            "address": {
+                "street": "456 Centre St",
+                "city": "",
+                "province": "BC",
+                "postal_code": "T2P 1A1"
+            }
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 422
+
+# Test invalid province code on update
+def test_update_restaurant_invalid_province(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+    response = client.put(
+        f"/restaurant/{restaurant['id']}",
+        json={
+            "name": "Koi Sushi",
+            "city": "Kelowna",
+            "address": {
+                "street": "456 Centre St",
+                "city": "Kelowna",
+                "province": "XX",
+                "postal_code": "T2P 1A1"
+            }
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 422
+
+# Test invalid postal code format on update
+def test_update_restaurant_invalid_postal_code(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+    response = client.put(
+        f"/restaurant/{restaurant['id']}",
+        json={
+            "name": "Koi Sushi",
+            "city": "Kelowna",
+            "address": {
+                "street": "456 Centre St",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "aaaaaa"
+            }
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 422
