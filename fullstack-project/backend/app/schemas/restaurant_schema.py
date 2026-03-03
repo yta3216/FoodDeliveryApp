@@ -230,6 +230,12 @@ class Restaurant_Create(BaseModel):
             raise ValueError("Restaurant city contains invalid characters")
         return v
 
+# Restaurant Search model to search for restaurants by name, city, or menu item.
+class Restaurant_Search(BaseModel):
+    name: str = None
+    city: str = None
+    menu_item: str = None
+
 # Restaurant Details Update model for input validation when updating restaurant details.
 class Restaurant_Details_Update(BaseModel):
     id: int

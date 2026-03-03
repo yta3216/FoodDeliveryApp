@@ -12,7 +12,8 @@ from app.schemas.restaurant_schema import (
     MenuItem_Create,
     MenuItem_Update,
     MenuItem_Bulk_Create,
-    MenuItem_Bulk_Update
+    MenuItem_Bulk_Update,
+    Restaurant_Search
 )
 from app.repositories.restaurant_repo import load_restaurants, save_restaurants
 
@@ -43,6 +44,23 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
     restaurants.append(new_restaurant)
     save_restaurants(restaurants)
     return Restaurant(**new_restaurant)
+
+# Search for restaurants by name, city, or menu item.
+def search_restaurants(payload: Restaurant_Search) -> List[Restaurant]:
+    restaurants = load_restaurants()
+    results = []
+    for restaurant in restaurants:
+        if payload.name and payload.name.lower() not in restaurant.get("name", "").lower():
+            continue
+        if payload.city and payload.city.lower() != restaurant.get("city", "").lower():
+            continue
+        if payload.menu_item:
+            menu_items = [item for item in restaurant.get("menu", {}).get("items", [])]
+            if not any(payload.menu_item.lower() in item.get("name", "").lower() for item in menu_items):
+                continue
+
+        results.append(Restaurant(**restaurant))
+    return results
 
 # Update restaurant details (name, city, address)
 def update_restaurant_details(payload: Restaurant_Details_Update) -> Restaurant:
