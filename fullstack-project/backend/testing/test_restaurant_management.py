@@ -491,3 +491,52 @@ def test_update_restaurant_invalid_postal_code(setup_restaurant):
         headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 422
+
+# Test empty menu name
+def test_create_menu_item_empty_name_rejected(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+
+    response = client.post(
+        f"/restaurant/{restaurant['id']}/menu",
+        json={"name": "   ", "price": 9.99, "tags": []},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 422
+
+# Test negative price
+def test_create_menu_item_negative_price_rejected(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+
+    response = client.post(
+        f"/restaurant/{restaurant['id']}/menu",
+        json={"name": "Invalid Price", "price": -1, "tags": []},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 422
+
+# Test empty tag
+def test_create_menu_item_empty_tag_rejected(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+
+    response = client.post(
+        f"/restaurant/{restaurant['id']}/menu",
+        json={"name": "Salmon roll", "price": 5.00, "tags": [""]},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 422
+
+# Test trimming and normalizing tags
+def test_create_menu_item_tag_normalized(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+
+    response = client.post(
+        f"/restaurant/{restaurant['id']}/menu",
+        json={"name": "Salmon roll", "price": 10.00, "tags": ["Roll"]},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 201
+    assert response.json()["tags"] == ["roll"]
