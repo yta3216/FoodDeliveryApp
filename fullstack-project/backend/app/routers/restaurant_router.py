@@ -39,9 +39,25 @@ router = APIRouter(prefix="/restaurant", tags=["restaurant"])
 def create_restaurant_route(payload: Restaurant_Create, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))):
     return create_restaurant(payload, current_user.id)
 
-# post request to search for restaurants by name, city, or menu item. 
-@router.post("/search", response_model=List[Restaurant])
-def search_restaurants_route(payload: Restaurant_Search):
+# post request to search for restaurants by name, address fields, or menu item.
+# every field is optional and no authentication is required to search for restaurants.
+@router.get("/search", response_model=List[Restaurant])
+def search_restaurants_route(
+    name: str | None = None,
+    city: str | None = None,
+    street: str | None = None,
+    province: str | None = None,
+    postal_code: str | None = None,
+    menu_item: str | None = None
+):
+    payload = Restaurant_Search(
+        name=name,
+        city=city,
+        street=street,
+        province=province,
+        postal_code=postal_code,
+        menu_item=menu_item
+    )
     return search_restaurants(payload)
 
 # put request to update restaurant details (name, city, address)
