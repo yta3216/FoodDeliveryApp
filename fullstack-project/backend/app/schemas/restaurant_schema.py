@@ -101,7 +101,7 @@ class MenuItem_Create(BaseModel):
     @classmethod
     def validate_price(cls,v:float) -> float:
         if v < 0:
-            raise ValueError("Menu item price must be greater than 0")
+            raise ValueError("Menu item price must be greater or equal to 0")
         if v > 1000:
             raise ValueError("Menu item price cannot exceed 1000")
         return round(v,2)
