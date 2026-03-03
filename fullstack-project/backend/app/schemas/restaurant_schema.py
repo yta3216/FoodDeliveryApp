@@ -106,15 +106,18 @@ class MenuItem_Create(BaseModel):
             raise ValueError("Menu item price cannot exceed 1000")
         return round(v,2)
 
-    @field_validator("tags", each_item = True)
+    @field_validator("tags")
     @classmethod
-    def validate_tags(cls,v:str) -> str:
-        v = v.strip()
-        if not v:
-            raise ValueError("Tag cannot be empty")
-        if len(v) > 50:
-            raise ValueError("Tag cannot be longer than 50 characters")
-        return v.lower()
+    def validate_tags(cls, tags: List[str]) -> List[str]:
+        cleaned: List[str] = []
+        for v in tags:
+            v = v.strip()
+            if not v:
+                raise ValueError("Tag cannot be empty")
+            if len(v) > 50:
+                raise ValueError("Tag cannot be longer than 50 characters")
+            cleaned.append(v.lower())
+        return cleaned
 
 # Menu Item Update model for input validation when updating menu item details.
 class MenuItem_Update(BaseModel):
@@ -144,15 +147,18 @@ class MenuItem_Update(BaseModel):
             raise ValueError("Menu item price cannot exceed 1000")
         return round(v,2)
     
-    @field_validator("tags", each_item = True)
+    @field_validator("tags")
     @classmethod
-    def validate_tags(cls,v:str) -> str:
-        v = v.strip()
-        if not v:
-            raise ValueError("Tag cannot be empty")
-        if len(v) > 50:
-            raise ValueError("Tag cannot be longer than 50 characters")
-        return v.lower()
+    def validate_tags(cls, tags: List[str]) -> List[str]:
+        cleaned: List[str] = []
+        for v in tags:
+            v = v.strip()
+            if not v:
+                raise ValueError("Tag cannot be empty")
+            if len(v) > 50:
+                raise ValueError("Tag cannot be longer than 50 characters")
+            cleaned.append(v.lower())
+        return cleaned
     
 # Menu Bulk Create model for input validation when adding multiple menu items to a restaurant's menu.
 class MenuItem_Bulk_Create(BaseModel):
