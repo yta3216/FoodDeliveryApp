@@ -169,13 +169,13 @@ def test_negative_price_on_update_rejected():
     )
     assert response.status_code == 422
 
-def test_empty_name_on_update_rejected():
-    token = get_manager_token("updateemptyname@example.com")
-    restaurant = create_restaurant(token)
-    response = client.put(
-        f"/restaurant/{restaurant['id']}",
+# error messages are returned when invalid info is entered (CF2-FR5)
+
+def test_invalid_field_returns_error_message():
+    token = get_manager_token("errormsg@example.com")
+    response = client.post(
+        "/restaurant",
         json={
-            "id": restaurant["id"],
             "name": "",
             "city": "Kelowna",
             "address": {
@@ -188,23 +188,20 @@ def test_empty_name_on_update_rejected():
         headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 422
+    # check that the error response tells the user which field is wrong
+    errors = response.json()["detail"]
+    fields = [e["loc"][-1] for e in errors]
+    assert "name" in fields
 
-def test_empty_city_on_update_rejected():
-    token = get_manager_token("updateemptycity@example.com")
+def test_invalid_menu_item_returns_error_message():
+    token = get_manager_token("errormsgmenu@example.com")
     restaurant = create_restaurant(token)
-    response = client.put(
-        f"/restaurant/{restaurant['id']}",
-        json={
-            "id": restaurant["id"],
-            "name": "Test Restaurant",
-            "city": "",
-            "address": {
-                "street": "123 Main St",
-                "city": "Kelowna",
-                "province": "BC",
-                "postal_code": "V1Y 1A1"
-            }
-        },
+    response = client.post(
+        f"/restaurant/{restaurant['id']}/menu",
+        json={"name": "", "price": 9.99, "tags": []},
         headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 422
+    errors = response.json()["detail"]
+    fields = [e["loc"][-1] for e in errors]
+    assert "name" in fields
