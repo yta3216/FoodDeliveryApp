@@ -85,6 +85,37 @@ class MenuItem_Create(BaseModel):
     price: float
     tags: List[str] = Field(default_factory=list)
 
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Menu item name cannot be empty")
+        if len(v) > 100:
+            raise ValueError("Menu item name cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("Menu item name contains invalid characters")
+        return v
+
+    @field_validator("price")
+    @classmethod
+    def validate_price(cls,v:float) -> float:
+        if v <= 0:
+            raise ValueError("Menu item price must be greater than 0")
+        if v > 1000:
+            raise ValueError("Menu item price cannot exceed 1000")
+        return round(v,2)
+
+    @field_validator("tags", each_item = True)
+    @classmethod
+    def validate_tags(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Tag cannot be empty")
+        if len(v) > 50:
+            raise ValueError("Tag cannot be longer than 50 characters")
+        return v.lower()
+
 # Menu Item Update model for input validation when updating menu item details.
 class MenuItem_Update(BaseModel):
     id: int
@@ -92,14 +123,59 @@ class MenuItem_Update(BaseModel):
     price: float
     tags: List[str] = Field(default_factory=list)
 
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Menu item name cannot be empty")
+        if len(v) > 100:
+            raise ValueError("Menu item name cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("Menu item name contains invalid characters")
+        return v
+    
+    @field_validator("price")
+    @classmethod
+    def validate_price(cls,v:float) -> float:
+        if v <= 0:
+            raise ValueError("Menu item price must be greater than 0")
+        if v > 1000:
+            raise ValueError("Menu item price cannot exceed 1000")
+        return round(v,2)
+    
+    @field_validator("tags", each_item = True)
+    @classmethod
+    def validate_tags(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Tag cannot be empty")
+        if len(v) > 50:
+            raise ValueError("Tag cannot be longer than 50 characters")
+        return v.lower()
+    
 # Menu Bulk Create model for input validation when adding multiple menu items to a restaurant's menu.
 class MenuItem_Bulk_Create(BaseModel):
     items: List[MenuItem_Create] = Field(default_factory=list)  # List of menu items to add to restaurant's menu.
+
+    @field_validator("items")
+    @classmethod
+    def validate_items(cls,v:list) -> list:
+        if not v:
+            raise ValueError("At least one menu item must be provided")
+        return v
 
 # Menu Bulk Update model for input validation when updating multiple menu items in a restaurant's menu.
 class MenuItem_Bulk_Update(BaseModel):
     items: List[MenuItem_Update] = Field(default_factory=list)  # List of menu items to update in restaurant's menu.
 
+    @field_validator("items")
+    @classmethod
+    def validate_items(cls,v:list) -> list:
+        if not v:
+            raise ValueError("At least one menu item must be provided")
+        return v
+    
 # Menu Create model for when a restaurant menu is initially created.
 class Menu_Create(BaseModel):
     items: List[MenuItem_Create] = []
@@ -124,6 +200,30 @@ class Restaurant_Create(BaseModel):
     address: Address
     menu: Menu_Create = Menu_Create()  # Optional Menu when creating a restaurant
 
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Restaurant name cannot be empty")
+        if len(v) > 100:
+            raise ValueError("Restaurant name cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("Restaurant name contains invalid characters")
+        return v
+    
+    @field_validator("city")
+    @classmethod
+    def validate_city(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Restaurant city cannot be empty")
+        if len(v) > 100:
+            raise ValueError("Restaurant city cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("Restaurant city contains invalid characters")
+        return v
+
 # Restaurant Details Update model for input validation when updating restaurant details.
 class Restaurant_Details_Update(BaseModel):
     id: int
@@ -131,8 +231,45 @@ class Restaurant_Details_Update(BaseModel):
     city: str
     address: Address
 
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Restaurant name cannot be empty")
+        if len(v) > 100:
+            raise ValueError("Restaurant name cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("Restaurant name contains invalid characters")
+        return v
+    
+    @field_validator("city")
+    @classmethod
+    def validate_city(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Restaurant city cannot be empty")
+        if len(v) > 100:
+            raise ValueError("Restaurant city cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("Restaurant city contains invalid characters")
+        return v
+    
 # Restaurant Managers Update model for input validation when updating restaurant managers.
 class Restaurant_Managers_Update(BaseModel):
     id: int
     manager_ids: List[str]
+
+    @field_validator("manager_ids")
+    @classmethod
+    def validate_manager_ids(cls, v: List[str]) -> List[str]:
+        if not v:
+            raise ValueError("At least one manager is required")
+        sanitized = []
+        for mid in v:
+            mid = mid.strip()
+            if not mid:
+                raise ValueError("Manager ID cannot be empty")
+            sanitized.append(mid)
+        return sanitized
 
