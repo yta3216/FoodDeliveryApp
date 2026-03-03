@@ -100,7 +100,7 @@ class MenuItem_Create(BaseModel):
     @field_validator("price")
     @classmethod
     def validate_price(cls,v:float) -> float:
-        if v <= 0:
+        if v < 0:
             raise ValueError("Menu item price must be greater than 0")
         if v > 1000:
             raise ValueError("Menu item price cannot exceed 1000")
@@ -141,7 +141,7 @@ class MenuItem_Update(BaseModel):
     @field_validator("price")
     @classmethod
     def validate_price(cls,v:float) -> float:
-        if v <= 0:
+        if v < 0:
             raise ValueError("Menu item price must be greater than 0")
         if v > 1000:
             raise ValueError("Menu item price cannot exceed 1000")
