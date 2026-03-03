@@ -17,11 +17,13 @@ from app.schemas.restaurant_schema import (
     MenuItem_Create,
     MenuItem_Update,
     MenuItem_Bulk_Create,
-    MenuItem_Bulk_Update
+    MenuItem_Bulk_Update,
+    Restaurant_Search
 )
 
 from app.services.restaurant_service import (
     create_restaurant,
+    search_restaurants,
     update_restaurant_details,
     update_restaurant_managers,
     create_menu_item,
@@ -36,6 +38,11 @@ router = APIRouter(prefix="/restaurant", tags=["restaurant"])
 @router.post("", response_model=Restaurant, status_code=201)
 def create_restaurant_route(payload: Restaurant_Create, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))):
     return create_restaurant(payload, current_user.id)
+
+# post request to search for restaurants by name, city, or menu item. 
+@router.post("/search", response_model=List[Restaurant])
+def search_restaurants_route(payload: Restaurant_Search):
+    return search_restaurants(payload)
 
 # put request to update restaurant details (name, city, address)
 @router.put("/{restaurant_id}", response_model=Restaurant)
