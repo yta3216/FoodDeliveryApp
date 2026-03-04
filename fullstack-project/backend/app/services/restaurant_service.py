@@ -12,7 +12,8 @@ from app.schemas.restaurant_schema import (
     MenuItem_Create,
     MenuItem_Update,
     MenuItem_Bulk_Create,
-    MenuItem_Bulk_Update
+    MenuItem_Bulk_Update,
+    Restaurant_Search
 )
 from app.repositories.restaurant_repo import load_restaurants, save_restaurants
 
@@ -38,11 +39,37 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
         "city": payload.city,
         "address": _address_to_dict(payload.address),
         "manager_ids": [manager_id],  # The logged in user is the initial manager of the restaurant
-        "menu": {"items": payload.menu.items}
+        "menu": {"items": [{
+            "id": idx + 1, **item.model_dump()}
+            for idx, item in enumerate(payload.menu.items)
+        ]}
     }
     restaurants.append(new_restaurant)
     save_restaurants(restaurants)
     return Restaurant(**new_restaurant)
+
+# Search for restaurants by name, address, or menu item.
+def search_restaurants(payload: Restaurant_Search) -> List[Restaurant]:
+    restaurants = load_restaurants()
+    results = []
+    for restaurant in restaurants:
+        if payload.name and payload.name.lower() not in restaurant.get("name", "").lower():
+            continue
+        if payload.city and payload.city.lower() not in restaurant.get("city", "").lower():
+            continue
+        addr = restaurant.get("address", {})
+        if payload.street and payload.street.lower() not in addr.get("street", "").lower():
+            continue
+        if payload.province and payload.province.upper() != addr.get("province", "").upper():
+            continue
+        if payload.postal_code and payload.postal_code.lower() not in addr.get("postal_code", "").lower():
+            continue
+        if payload.menu_item:
+            menu_items = restaurant.get("menu", {}).get("items", [])
+            if not any(payload.menu_item.lower() in item.get("name", "").lower() for item in menu_items):
+                continue
+        results.append(Restaurant(**restaurant))
+    return results
 
 # Update restaurant details (name, city, address)
 def update_restaurant_details(payload: Restaurant_Details_Update) -> Restaurant:
