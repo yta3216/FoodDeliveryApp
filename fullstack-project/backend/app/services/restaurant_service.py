@@ -17,6 +17,31 @@ from app.schemas.restaurant_schema import (
 )
 from app.repositories.restaurant_repo import load_restaurants, save_restaurants
 
+import math
+
+# example city coordinates for canadian cities for distance sorting
+CITY_COORDS = {
+    "kelowna": (49.8880, -119.4960),
+    "vancouver": (49.2827, -123.1207),
+    "victoria": (48.4284, -123.3656),
+    "toronto": (43.6532, -79.3832),
+    "calgary": (51.0447, -114.0719),
+    "edmonton": (53.5461, -113.4938),
+    "montreal": (45.5017, -73.5673),
+    "ottawa": (45.4215, -75.6972),
+    "winnipeg": (49.8951, -97.1384),
+    "halifax": (44.6488, -63.5752),
+}
+
+# formula to calculate distance in km between two lat/lng points
+def _calculate_distance(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
+    r = 6371  # radius of earth in km
+    lat1, lng1, lat2, lng2 = map(math.radians, [lat1, lng1, lat2, lng2])
+    dlat = lat2 - lat1
+    dlng = lng2 - lng1
+    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlng/2)**2
+    return r * 2 * math.asin(math.sqrt(a))
+
 # Resturant address storage format
 def _address_to_dict(address) -> dict:
     return{
