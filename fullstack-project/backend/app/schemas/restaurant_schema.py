@@ -239,6 +239,14 @@ class Restaurant_Search(BaseModel):
     province: str | None = None
     postal_code: str | None = None
     menu_item: str | None = None
+    sort_price: str | None = None
+
+    @field_validator("sort_price")
+    @classmethod
+    def validate_sort_price(cls,v:str | None) -> str | None:
+        if v is not None and v not in ("asc","desc"):
+            raise ValueError("sort_price must be either 'asc' or 'desc'")
+        return v
 
 # Restaurant Details Update model for input validation when updating restaurant details.
 class Restaurant_Details_Update(BaseModel):

@@ -26,6 +26,15 @@ def _address_to_dict(address) -> dict:
         "postal_code": address.postal_code
     }
 
+# Return average price of all menu items for a resturant dict.
+# Returns 0 if resturant has no menu items
+def _calculate_average_price(restaurant: dict) -> float:
+    items = restaurant.get("menu",{}).get("items", [])
+    if not items:
+        return 0.0
+    total_price = sum(item.get("price", 0) for item in items)
+    return total_price / len(items)
+                                          
 # Create a new restaurant.
 def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant:
     restaurants = load_restaurants()
@@ -68,8 +77,15 @@ def search_restaurants(payload: Restaurant_Search) -> List[Restaurant]:
             menu_items = restaurant.get("menu", {}).get("items", [])
             if not any(payload.menu_item.lower() in item.get("name", "").lower() for item in menu_items):
                 continue
-        results.append(Restaurant(**restaurant))
-    return results
+        results.append(restaurant)
+
+    # Sort by desc or asend price of menu items
+    if payload.sort_price == "asc":
+        results.sort(key=_calculate_average_price)
+    elif payload.sort_price == "desc":
+        results.sort(key=_calculate_average_price, reverse=True)
+        
+    return [Restaurant(**restaurant) for restaurant in results]
 
 # Update restaurant details (name, city, address)
 def update_restaurant_details(payload: Restaurant_Details_Update) -> Restaurant:
