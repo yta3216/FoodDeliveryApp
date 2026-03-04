@@ -131,3 +131,43 @@ def test_search_restaurant_by_partial_menu_item():
     assert response.status_code == 200
     assert len(results) == 1    
     assert any("Test Item" in item["name"] for item in results[0]["menu"]["items"])
+
+# test that sorting by distance asc returns the closest restaurant first
+def test_sort_by_distance_asc():
+    # kelowna coords: (49.8880, -119.4960)
+    # vancouver coords: (49.2827, -123.1207)
+    # assume user is in kelowna, so kelowna restaurant should come first
+    setup_restaurant(name="Kelowna Place", city="Kelowna")
+    setup_restaurant(name="Vancouver Place", city="Vancouver")
+
+    response = client.get("/restaurant/search?sort_distance=asc&user_lat=49.8880&user_lng=-119.4960")
+    results = response.json()
+
+    assert response.status_code == 200
+    assert len(results) >= 2
+    cities = [r["city"] for r in results]
+    assert cities.index("Kelowna") < cities.index("Vancouver")
+
+# test that sorting by distance desc returns the furthest restaurant first
+def test_sort_by_distance_desc():
+    setup_restaurant(name="Kelowna Place", city="Kelowna")
+    setup_restaurant(name="Vancouver Place", city="Vancouver")
+
+    response = client.get("/restaurant/search?sort_distance=desc&user_lat=49.8880&user_lng=-119.4960")
+    results = response.json()
+
+    assert response.status_code == 200
+    assert len(results) >= 2
+    cities = [r["city"] for r in results]
+    assert cities.index("Vancouver") < cities.index("Kelowna")
+
+# test that passing invalid sort_distance value returns 422
+def test_sort_by_distance_invalid_value():
+    response = client.get("/restaurant/search?sort_distance=invalid")
+    assert response.status_code == 422
+
+# test that sort_distance without user coords just returns results unsorted
+def test_sort_by_distance_missing_coords():
+    setup_restaurant(name="Kelowna Place", city="Kelowna")
+    response = client.get("/restaurant/search?sort_distance=asc")
+    assert response.status_code == 200
