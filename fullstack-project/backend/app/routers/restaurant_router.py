@@ -49,7 +49,10 @@ def search_restaurants_route(
     province: str | None = None,
     postal_code: str | None = None,
     menu_item: str | None = None,
-    sort_price: str | None = None
+    sort_price: str | None = None,
+    sort_distance: str | None = None,  # "asc" or "desc"
+    user_lat: float | None = None,     # user's latitude
+    user_lng: float | None = None      # user's longitude
 ):
     payload = Restaurant_Search(
         name=name,
@@ -58,7 +61,10 @@ def search_restaurants_route(
         province=province,
         postal_code=postal_code,
         menu_item=menu_item,
-        sort_price=sort_price
+        sort_price=sort_price,
+        sort_distance=sort_distance,
+        user_lat=user_lat,
+        user_lng=user_lng
     )
     return search_restaurants(payload)
 
