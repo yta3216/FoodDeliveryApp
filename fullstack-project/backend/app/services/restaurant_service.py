@@ -109,7 +109,18 @@ def search_restaurants(payload: Restaurant_Search) -> List[Restaurant]:
         results.sort(key=_calculate_average_price)
     elif payload.sort_price == "desc":
         results.sort(key=_calculate_average_price, reverse=True)
-        
+
+    # sort by distance from user if sort_distance and user coords are provided
+    if payload.sort_distance and payload.user_lat is not None and payload.user_lng is not None:
+        def get_distance(restaurant: dict) -> float:
+            city = restaurant.get("city", "").lower()
+            coords = CITY_COORDS.get(city)
+            if coords is None:
+                # unknown city, push to end of results
+                return float("inf")
+            return _calculate_distance(payload.user_lat, payload.user_lng, coords[0], coords[1])
+        results.sort(key=get_distance, reverse=(payload.sort_distance == "desc"))
+
     return [Restaurant(**restaurant) for restaurant in results]
 
 # Update restaurant details (name, city, address)
