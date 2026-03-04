@@ -214,14 +214,24 @@
                 <div class="error-msg" id="postal_code-error">Enter a valid postal code (e.g. V1V 1A1)</div>
             </div>
         </div>
-        <div class = "form-group">
-                <label for = "sort_price"> Sort by Price <span class = "label-optional">(optional)</span></label>
-                <select id = "sort_price">
-                    <option value = "">None</option>
-                    <option value = "asc">Ascending</option>
-                    <option value = "desc">Descending</option>
-                </select>
-            </div>
+
+        <div class="form-group">
+            <label for="sort_price">Sort by Price <span class="label-optional">(optional)</span></label>
+            <select id="sort_price">
+                <option value="">None</option>
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="sort_distance">Sort by Distance <span class="label-optional">(optional)</span></label>
+            <select id="sort_distance">
+                <option value="">None</option>
+                <option value="asc">Closest First</option>
+                <option value="desc">Furthest First</option>
+            </select>
+        </div>
 
         <button type="submit" id="search-btn">Search</button>
     </div>
@@ -314,6 +324,26 @@
         if (postalCode) params.append("postal_code", postalCode);
         const sortPrice = sortPriceEl.value;
         if (sortPrice)  params.append("sort_price", sortPrice);
+
+        // grab distance sort value and get user location if needed
+        const sortDistance = document.getElementById("sort_distance").value;
+        if (sortDistance) {
+            params.append("sort_distance", sortDistance);
+            // ask browser for user's coordinates
+            await new Promise((resolve) => {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        params.append("user_lat", pos.coords.latitude);
+                        params.append("user_lng", pos.coords.longitude);
+                        resolve();
+                    },
+                    () => {
+                        // if user denied location or it failed, it skip coords
+                        resolve();
+                    }
+                );
+            });
+        }
 
         resultsSection.classList.add("visible");
         spinner.classList.add("visible");
