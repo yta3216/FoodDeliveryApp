@@ -4,8 +4,6 @@ Functions use get_cart as a dependency, which will authenticate
 the user, verify they are a customer, and return their cart.
 """
 
-from typing import List
-
 from fastapi import APIRouter, Depends
 
 from app.schemas.user_schema import Customer
@@ -14,9 +12,7 @@ from app.schemas.cart_schema import (
     CartItem,
     CartItem_Create,
     CartItem_Update,
-    CartItem_Delete,
     Cart,
-    Cart_Menu_Update
 )
 from app.services.cart_service import (
     update_cart_menu,
