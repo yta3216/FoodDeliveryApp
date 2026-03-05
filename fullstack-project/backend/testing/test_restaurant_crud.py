@@ -128,7 +128,54 @@ def test_update_restaurant_managers(setup_restaurant):
     updated_restaurant = update_response.json()
     assert updated_restaurant["manager_ids"] == [restaurant["manager_ids"][0], second_manager_id]
 
+# test updating restaurant with a manager who is not in the manager list
+def test_manager_not_in_list(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
 
+    # create a second manager, but not in the manager list
+    
+    unauthorized_manager = client.post(
+        "/user",
+        json={
+            "email": "unauthorizedmanager@example.com",
+            "password": "testpassword",
+            "name": "Unauthorized Manager",
+            "age": 52,
+            "gender": "male",
+            "role": UserRole.RESTAURANT_MANAGER,
+        }
+    )
+
+    # Log in as the manager to get an auth token
+    login_response = client.post(
+        "/user/login",
+        json={
+            "email": unauthorized_manager.json().get("email"),
+            "password": "testpassword",
+        }
+    )
+    assert login_response.status_code == 200
+    other_token = login_response.json()["token"]
+
+    # Attempt to update restaurant details
+    update_response = client.put(
+        f"/restaurant/{restaurant['id']}",
+        json={
+            "id": restaurant["id"],
+            "name": "Updated Restaurant",
+            "city": "Updated City",
+            "address": {
+                "street": "789 Updated St",
+                "city": "Toronto",
+                "province": "ON",
+                "postal_code": "B1B 1B1"
+            }
+        },
+        headers={"Authorization": f"Bearer {other_token}"}
+    )
+    
+    assert update_response.status_code == 403
 
 # ------- MENU OPERATIONS ------- #
 
