@@ -5,7 +5,7 @@ Any updates to the cart details should follow this schema.
 """
 
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # generic cart item schema. we store the MenuItem ID rather than the item itself in the cart to save storage.
 class CartItem(BaseModel):
@@ -28,8 +28,8 @@ class CartItem_Delete(BaseModel):
 
 # generic cart schema
 class Cart(BaseModel):
-    menu_id: int
-    cart_items: List[CartItem]
+    menu_id: int = 0
+    cart_items: List[CartItem] = Field(default_factory=list)
 
 # schema to create cart
 class Cart_Create(BaseModel):
