@@ -3,9 +3,20 @@
 import secrets
 import time
 import uuid
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
+from app.auth import require_role
 from app.repositories.user_repo import load_users, save_users
-from app.schemas.user_schema import User, User_Create, UserRole, LoginResponse, UserPublic, User_Update, ROLE_TO_CLASS
+from app.schemas.user_schema import (
+    User, 
+    User_Create,
+    UserRole,
+    LoginResponse,
+    UserPublic,
+    User_Update,
+    Customer,
+    ROLE_TO_CLASS
+)
+
 RESET_TOKEN_EXPIRY = 900  # 15 minutes before password reset token expires
 SESSION_TOKEN_EXPIRY = 86400  # 24 hours before session token expires
 
@@ -136,3 +147,7 @@ def update_user(user_id: str, payload: User_Update) -> UserPublic:
                 role=role
             )
     raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
+
+# this function authenticates the user and confirms that they are of customer type
+def get_customer(customer: Customer = Depends(require_role(UserRole.CUSTOMER))) -> Customer:
+    return customer

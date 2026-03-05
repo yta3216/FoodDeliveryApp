@@ -22,20 +22,11 @@ class CartItem_Create(BaseModel):
     menu_item_id: int
     qty: int
 
-# schema to update cart item qty
+# schema to update cart item qty. id contained in url
 class CartItem_Update(BaseModel):
-    menu_item_id: int
     new_qty: int
-
-# schema to remove item from cart
-class CartItem_Delete(BaseModel):
-    menu_item_id: int
 
 # generic cart schema
 class Cart(BaseModel):
     menu_id: int = 0
     cart_items: List[CartItem] = Field(default_factory=list)
-
-# update cart menu schema
-class Cart_Menu_Update(BaseModel):
-    menu_id: int
