@@ -2,7 +2,7 @@
 
 from typing import List
 
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 from app.schemas.restaurant_schema import (
     Restaurant, 
     Restaurant_Create, 
@@ -16,6 +16,8 @@ from app.schemas.restaurant_schema import (
     Restaurant_Search
 )
 from app.repositories.restaurant_repo import load_restaurants, save_restaurants
+from app.auth import require_role
+from app.schemas.user_schema import User, UserRole
 
 # Resturant address storage format
 def _address_to_dict(address) -> dict:
@@ -180,3 +182,13 @@ def bulk_menu_item_update(restaurant_id: int, payload: MenuItem_Bulk_Update) -> 
             save_restaurants(restaurants)
             return updated_items
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
+
+# check if current logged in user is a manager of the restaurant. depends on user being a restaurant manager type
+def check_manager(restaurant_id: int, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))) -> User:
+    restaurants = load_restaurants()
+    for restaurant in restaurants:
+        if restaurant.get("id") == restaurant_id:
+            if current_user.id in restaurant.get("manager_ids"):
+                return current_user # user is a manager of the restaurant
+            raise HTTPException(status_code=403, detail="User is not a manager of this restaurant")
+            
