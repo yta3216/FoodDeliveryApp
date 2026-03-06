@@ -2,7 +2,15 @@ import time
 from fastapi import Header, HTTPException
 from fastapi import Depends
 from app.repositories.user_repo import load_users
-from app.schemas.user_schema import User, UserRole
+from app.schemas.user_schema import (
+    User, 
+    UserRole, 
+    Customer, 
+    Admin, 
+    RestaurantManager, 
+    DeliveryDriver, 
+    ROLE_TO_CLASS
+)
 
 
 def get_current_user(authorization: str = Header(...)) -> User:
@@ -21,7 +29,9 @@ def get_current_user(authorization: str = Header(...)) -> User:
             # convert role string to enum
             if isinstance(user.get("role"), str):
                 user["role"] = UserRole(user["role"])
-            return User(**user)
+            # get user class
+            user_class = ROLE_TO_CLASS[user["role"]]
+            return user_class(**user)
     
     raise HTTPException(status_code=401, detail="Invalid or expired session token")
 
