@@ -17,8 +17,10 @@ from app.schemas.cart_schema import (
 )
 from app.services.cart_service import (
     update_cart_restaurant,
+    get_cart,
     empty_cart,
     create_cart_item,
+    get_cart_item,
     update_cart_item,
     delete_cart_item,
 )
@@ -30,6 +32,11 @@ router = APIRouter(prefix="/cart", tags=["cart"])
 def update_cart_restaurant_route(restaurant_id: int, customer: Customer = Depends(get_customer)):
     return update_cart_restaurant(restaurant_id, customer)
 
+# get request to get users cart
+@router.get("", response_model=Cart)
+def get_cart_route(customer: Customer = Depends(get_customer)):
+    return get_cart(customer)
+
 # delete request to empty the cart.
 @router.delete("", status_code=204)
 def empty_cart_route(customer: Customer = Depends(get_customer)):
@@ -39,6 +46,11 @@ def empty_cart_route(customer: Customer = Depends(get_customer)):
 @router.post("/item", response_model=CartItem, status_code=201)
 def create_cart_item_route(payload: CartItem_Create, customer: Customer = Depends(get_customer)):
     return create_cart_item(payload, customer)
+
+# get request to get item from cart
+@router.get("/item/{item_id}", response_model=CartItem)
+def get_cart_item_route(item_id: int, customer: Customer = Depends(get_customer)):
+    return get_cart_item(item_id, customer)
 
 # put request to update qty of an item in cart
 @router.put("/item/{item_id}", response_model=CartItem)

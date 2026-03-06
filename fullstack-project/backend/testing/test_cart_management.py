@@ -158,6 +158,54 @@ def get_fake_cart_item_id(customer: Customer):
 
 # --------------- TESTS -------------- #
 
+# test getting cart successfully
+def test_get_cart(customer_with_cart_and_token):
+    customer = customer_with_cart_and_token["customer"]
+    token = customer_with_cart_and_token["token"]
+
+    # send get request
+    get_response = client.get("/cart", headers={"Authorization": f"Bearer {token}"})
+    # check response
+    assert get_response.status_code == 200
+    assert get_response.json() == customer["cart"]
+
+# test getting cart but user is not customer
+def test_get_cart_wrong_role(manager_with_token):
+    token = manager_with_token["token"]
+    # send update request
+    get_response = client.get("/cart", headers={"Authorization": f"Bearer {token}"})
+    # check result
+    assert get_response.status_code == 403
+
+# test getting cart item
+def test_get_cart_item(customer_with_cart_and_token):
+    customer = customer_with_cart_and_token["customer"]
+    token = customer_with_cart_and_token["token"]
+    cart_item = customer["cart"]["cart_items"][0]
+    cart_item_id = cart_item["menu_item_id"]
+
+    # send get request
+    get_response = client.get(
+        f"/cart/item/{cart_item_id}", 
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    # check response
+    assert get_response.status_code == 200
+    assert get_response.json() == cart_item
+
+# test getting cart item which doesn't exist
+def test_get_cart_item_wrong_id(customer_with_cart_and_token):
+    customer = customer_with_cart_and_token["customer"]
+    token = customer_with_cart_and_token["token"]
+    # get an invalid cart item id
+    wrong_item_id = get_fake_cart_item_id(customer)
+    # get the response, assert that 404 status is returned
+    get_response = client.get(
+        f"/cart/item/{wrong_item_id}",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert get_response.status_code == 404
+
 # test updating cart restaurant id successfully
 def test_update_cart_restaurant(customer_with_token, setup_restaurant_menu):
     customer = customer_with_token["customer"]

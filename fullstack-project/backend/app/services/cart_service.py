@@ -26,6 +26,14 @@ def update_cart_restaurant(restaurant_id: int, current_user: Customer) -> Cart:
             return Cart(**user["cart"])
     raise HTTPException(404, detail=f"User '{current_user.id}' not found")
 
+# get the users cart
+def get_cart(current_user: Customer) -> Cart:
+    users = load_users()
+    for user in users:
+        if user.get("id") == current_user.id:
+            return Cart(**user["cart"])
+    raise HTTPException(404, detail=f"User '{current_user.id}' not found")
+
 # empty the cart (by resetting to default values)
 def empty_cart(current_user: Customer) -> None:
     users = load_users()
@@ -55,7 +63,17 @@ def create_cart_item(payload: CartItem_Create, current_user: Customer) -> CartIt
                 return CartItem(**new_item)
         raise HTTPException(404, detail=f"User '{current_user.id}' not found")
     raise HTTPException(404, detail=f"Item {payload.menu_item_id} not found in restaurant {restaurant_id} menu")
-    
+
+# get an item in cart
+def get_cart_item(item_id: int, current_user: Customer) -> CartItem:
+    users = load_users()
+    for user in users:
+        if user.get("id") == current_user.id:
+            for item in user["cart"]["cart_items"]:
+                if item.get("menu_item_id") == item_id:
+                    return CartItem(**item)
+            raise HTTPException(404, detail=f"Item '{item_id}' not found in user '{current_user.id}' cart")
+    raise HTTPException(404, detail=f"User '{current_user.id}' not found")
 
 # Update qty of an item in cart
 def update_cart_item(item_id: int, payload: CartItem_Update, current_user: Customer) -> CartItem:
