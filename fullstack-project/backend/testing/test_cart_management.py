@@ -3,14 +3,14 @@
 from fastapi.testclient import TestClient
 import pytest
 from app.main import app
-from app.schemas.user_schema import UserRole
+from app.schemas.user_schema import UserRole, Customer
 from app.repositories.user_repo import load_users
 from app.services.restaurant_service import get_restaurant_by_id
 from testing.test_restaurant_crud import setup_restaurant, VALID_RESTAURANT_ADDRESS
 
 client = TestClient(app)
 
-# --------- FIXTURES --------------#
+# --------- FIXTURES & HELPER FUNCTIONS --------------#
 
 # create a customer, which has an empty cart by default, to use in tests
 @pytest.fixture
@@ -146,6 +146,15 @@ def get_customer(id: str):
     for user in users:
         if user.get("id") == id:
             return user
+        
+# get a fake menu item id which is definitely not in users cart
+def get_fake_cart_item_id(customer: Customer):
+    # get max id so we can set a fake id as larger than it
+    max = 0
+    for cart_item in customer["cart"]["cart_items"]:
+        if cart_item["menu_item_id"] > max:
+            max = cart_item["menu_item_id"]
+    return max + 5
 
 # --------------- TESTS -------------- #
 
@@ -257,19 +266,98 @@ def test_add_item_to_cart(customer_with_token, setup_restaurant_menu):
         },
         headers={"Authorization": f"Bearer {token}"}
     )
-    assert update1_response.status_code == 201
-    assert update1_response.json()["menu_item_id"] == item1_id
+    assert update2_response.status_code == 201
+    assert update2_response.json()["menu_item_id"] == item2_id
 
     # get updated customer, check cart size
     customer = get_customer(customer["id"])
     assert len(customer["cart"]["cart_items"]) == item2_id
 
-# test adding items but item id doesn't exist in menu (need to check)
+# test adding items but item id doesn't exist in menu
+# test adding new item to cart successfully
+def test_add_nonexistent_item(customer_with_token, setup_restaurant_menu):
+    customer = customer_with_token["customer"]
+    token = customer_with_token["token"]
+    max_id = 5*len(setup_restaurant_menu["menu"]["items"]) # five times larger than size of menu
+    restaurant_id = setup_restaurant_menu["id"]
 
-# UPDATE QTY of item
-# test successful
-# item id not found in users cart
+    # add item to cart who is not in restaurant menu
+    set_id_response = client.put(
+        f"/cart/{restaurant_id}",
+        headers={"Authorization": f"Bearer {token}"}
+        )
+    assert set_id_response.status_code == 200
 
-# DELETE item from cart
-# successful
-# item id not found
+    update1_response = client.post(
+        "/cart/item",
+        json={
+            "menu_item_id": max_id,
+            "qty": 2
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert update1_response.status_code == 404
+
+# test update qty of item in cart successfully
+def test_successful_qty_change(customer_with_cart_and_token):
+    customer = customer_with_cart_and_token["customer"]
+    token = customer_with_cart_and_token["token"]
+
+    item_id = customer["cart"]["cart_items"][0]["menu_item_id"]
+
+    update_response = client.put(
+        f"/cart/item/{item_id}",
+        json={
+            "new_qty": 5
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert update_response.status_code == 200
+    assert update_response.json()["qty"] == 5
+
+# test update qty if item id not found in users cart
+def test_qty_change_wrong_item(customer_with_cart_and_token):
+    customer = customer_with_cart_and_token["customer"]
+    token = customer_with_cart_and_token["token"]
+
+    wrong_item_id = get_fake_cart_item_id(customer)
+
+    update_response = client.put(
+        f"/cart/item/{wrong_item_id}",
+        json={
+            "new_qty": 7
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert update_response.status_code == 404
+
+# test successful item deletion from cart
+def def_cart_item_removal(customer_with_cart_and_token):
+    customer = customer_with_cart_and_token["customer"]
+    token = customer_with_cart_and_token["token"]
+
+    # get item id to remove
+    item_id = customer["cart"]["cart_items"][0]["menu_item_id"]
+
+    # remove it
+    update_response = client.delete("cart/item/{item_id}", headers={"Authorization": f"Bearer {token}"})
+    assert update_response.status_code == 404
+    
+# test item deletion attempt but item id not found
+    customer = customer_with_cart_and_token["customer"]
+    token = customer_with_cart_and_token["token"]
+
+    wrong_item_id = get_fake_cart_item_id(customer)
+
+    update_response = client.put(
+        f"/cart/item/{wrong_item_id}",
+        json={
+            "new_qty": 7
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert update_response.status_code == 404
+    
