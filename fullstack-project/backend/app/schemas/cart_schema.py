@@ -28,5 +28,5 @@ class CartItem_Update(BaseModel):
 
 # generic cart schema
 class Cart(BaseModel):
-    menu_id: int = 0
+    restaurant_id: int = 0
     cart_items: List[CartItem] = Field(default_factory=list)

@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from .routers.user_router import router as user_router
 from .routers.restaurant_router import router as restaurant_router
+from .routers.cart_router import router as cart_router
 
 app = FastAPI()
 
@@ -31,6 +32,7 @@ app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 
 app.include_router(user_router)
 app.include_router(restaurant_router)
+app.include_router(cart_router)
 
 @app.get("/", tags=["root"])
 async def read_root():
