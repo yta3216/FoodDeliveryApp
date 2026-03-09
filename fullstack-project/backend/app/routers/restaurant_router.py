@@ -49,10 +49,7 @@ def search_restaurants_route(
     province: str | None = None,
     postal_code: str | None = None,
     menu_item: str | None = None,
-    sort_price: str | None = None,
-    sort_distance: str | None = None,
-    user_lat: float | None = None,
-    user_lng: float | None = None
+    sort_price: str | None = None
 ):
     # catch validation errors from the search schema and return 422
     try:
@@ -63,10 +60,7 @@ def search_restaurants_route(
             province=province,
             postal_code=postal_code,
             menu_item=menu_item,
-            sort_price=sort_price,
-            sort_distance=sort_distance,
-            user_lat=user_lat,
-            user_lng=user_lng
+            sort_price=sort_price
         )
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
