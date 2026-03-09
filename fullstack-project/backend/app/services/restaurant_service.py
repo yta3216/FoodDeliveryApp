@@ -13,7 +13,8 @@ from app.schemas.restaurant_schema import (
     MenuItem_Update,
     MenuItem_Bulk_Create,
     MenuItem_Bulk_Update,
-    Restaurant_Search
+    Restaurant_Search,
+    PaginatedRestaurantResults
 )
 from app.repositories.restaurant_repo import load_restaurants, save_restaurants
 from app.auth import require_role
@@ -50,7 +51,7 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
         "city": payload.city,
         "address": _address_to_dict(payload.address),
         "manager_ids": [manager_id],
-        "max_delivery_radius_km": payload.max_delivery_radius_km,
+        "max_delivery_radius_km": payload.max_delivery_radius_km, # use this for delivery radius validation in the future
         "menu": {"items": [{
             "id": idx + 1, **item.model_dump()}
             for idx, item in enumerate(payload.menu.items)
@@ -60,8 +61,8 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
     save_restaurants(restaurants)
     return Restaurant(**new_restaurant)
 
-# Search for restaurants by name, address, or menu item.
-def search_restaurants(payload: Restaurant_Search) -> List[Restaurant]:
+# search for restaurants by name, address, or menu item.
+def search_restaurants(payload: Restaurant_Search) -> PaginatedRestaurantResults:
     restaurants = load_restaurants()
     results = []
     for restaurant in restaurants:
@@ -82,13 +83,27 @@ def search_restaurants(payload: Restaurant_Search) -> List[Restaurant]:
                 continue
         results.append(restaurant)
 
-    # Sort by desc or asend price of menu items
+    # sort by desc or asc price of menu items
     if payload.sort_price == "asc":
         results.sort(key=_calculate_average_price)
     elif payload.sort_price == "desc":
         results.sort(key=_calculate_average_price, reverse=True)
 
-    return [Restaurant(**restaurant) for restaurant in results]
+    # calculate pagination values
+    total = len(results)
+    total_pages = max(1, -(-total // payload.page_size))  # ceiling division
+    start = (payload.page - 1) * payload.page_size
+    end = start + payload.page_size
+    page_results = [Restaurant(**r) for r in results[start:end]]
+
+    return PaginatedRestaurantResults(
+        results=page_results,
+        total=total,
+        page=payload.page,
+        page_size=payload.page_size,
+        total_pages=total_pages
+    )
+
 
 # Update restaurant details (name, city, address)
 def update_restaurant_details(payload: Restaurant_Details_Update) -> Restaurant:
@@ -193,7 +208,6 @@ def get_restaurant_by_id(restaurant_id: int) -> Restaurant:
             return restaurant
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
 
-
 # check if current logged in user is a manager of the restaurant. depends on user being a restaurant manager type
 def check_manager(restaurant_id: int, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))) -> User:
     restaurants = load_restaurants()
@@ -202,4 +216,3 @@ def check_manager(restaurant_id: int, current_user: User = Depends(require_role(
             if current_user.id in restaurant.get("manager_ids"):
                 return current_user # user is a manager of the restaurant
             raise HTTPException(status_code=403, detail="User is not a manager of this restaurant")
-            
