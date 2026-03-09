@@ -52,15 +52,19 @@ def search_restaurants_route(
     menu_item: str | None = None,
     sort_price: str | None = None
 ):
-    payload = Restaurant_Search(
-        name=name,
-        city=city,
-        street=street,
-        province=province,
-        postal_code=postal_code,
-        menu_item=menu_item,
-        sort_price=sort_price
-    )
+    # catch validation errors from the search schema and return 422
+    try:
+        payload = Restaurant_Search(
+            name=name,
+            city=city,
+            street=street,
+            province=province,
+            postal_code=postal_code,
+            menu_item=menu_item,
+            sort_price=sort_price
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
     return search_restaurants(payload)
 
 # put request to update restaurant details (name, city, address)

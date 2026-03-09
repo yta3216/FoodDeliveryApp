@@ -131,3 +131,4 @@ def test_search_restaurant_by_partial_menu_item():
     assert response.status_code == 200
     assert len(results) == 1    
     assert any("Test Item" in item["name"] for item in results[0]["menu"]["items"])
+

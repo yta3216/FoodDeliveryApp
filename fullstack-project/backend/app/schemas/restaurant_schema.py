@@ -194,6 +194,7 @@ class Restaurant(BaseModel):
     city: str
     address: Address
     manager_ids: List[str]  # List of user IDs who are managers of the restaurant
+    max_delivery_radius_km: float = 10.0  # default delivery radius in km
     menu: Menu = Menu()
 
 # Restaurant Create model for input validation when creating a new restaurant.
@@ -204,6 +205,7 @@ class Restaurant_Create(BaseModel):
     name: str
     city: str
     address: Address
+    max_delivery_radius_km: float = 10.0  # how far the restaurant will deliver
     menu: Menu_Create = Menu_Create()  # Optional Menu when creating a restaurant
 
     @field_validator("name")
@@ -254,6 +256,7 @@ class Restaurant_Details_Update(BaseModel):
     name: str
     city: str
     address: Address
+    max_delivery_radius_km: float = 10.0  # how far the restaurant will deliver
 
     @field_validator("name")
     @classmethod
