@@ -1,6 +1,7 @@
 import time
 from fastapi import Header, HTTPException
 from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
 from app.repositories.user_repo import load_users
 from app.schemas.user_schema import (
     User, 
@@ -12,9 +13,11 @@ from app.schemas.user_schema import (
     ROLE_TO_CLASS
 )
 
+# tells swagger ui that the app uses bearer tokens
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 def get_current_user(authorization: str = Header(...)) -> User:
-# Returns  matching user, or 401 if token is invalid
+    # returns matching user, or 401 if token is invalid
     if not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Invalid authorization header format")
     
