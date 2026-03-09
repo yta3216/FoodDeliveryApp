@@ -185,6 +185,15 @@ def bulk_menu_item_update(restaurant_id: int, payload: MenuItem_Bulk_Update) -> 
             return updated_items
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
 
+# get restaurant by id
+def get_restaurant_by_id(restaurant_id: int) -> Restaurant:
+    restaurants = load_restaurants()
+    for restaurant in restaurants:
+        if restaurant.get("id") == restaurant_id:
+            return restaurant
+    raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
+
+
 # check if current logged in user is a manager of the restaurant. depends on user being a restaurant manager type
 def check_manager(restaurant_id: int, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))) -> User:
     restaurants = load_restaurants()

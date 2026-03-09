@@ -3,11 +3,23 @@
 import secrets
 import time
 import uuid
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
+from app.auth import require_role
 from app.repositories.user_repo import load_users, save_users
-from app.schemas.user_schema import User, User_Create, UserRole, LoginResponse, UserPublic, User_Update
+from app.schemas.user_schema import (
+    User, 
+    User_Create,
+    UserRole,
+    LoginResponse,
+    UserPublic,
+    User_Update,
+    Customer,
+    ROLE_TO_CLASS
+)
+
 RESET_TOKEN_EXPIRY = 900  # 15 minutes before password reset token expires
 SESSION_TOKEN_EXPIRY = 86400  # 24 hours before session token expires
+
 
 def create_user(payload: User_Create) -> User:
     users = load_users()
@@ -15,26 +27,25 @@ def create_user(payload: User_Create) -> User:
     if any(user.get("id") == new_id for user in users):
         raise HTTPException(status_code=409, detail="ID collision; retry.")
     
-    # Convert UserRole enum to string value for .json storage
-    role_value = payload.role.value if isinstance(payload.role, UserRole) else payload.role
-    
-    new_user = {
-        "id": new_id,
-        "email": payload.email.strip(),
-        "password": payload.password.strip(),
-        "name": payload.name.strip(),
-        "age": payload.age,
-        "gender": payload.gender.strip(),
-        "role": role_value,
-        "reset_token": None,
-        "reset_token_expiry": None
-    }
-    users.append(new_user)
-    save_users(users)
-    # Convert role back to enum for the returned User object
-    new_user["role"] = UserRole(role_value)
-    return User(**new_user)
+    # use appropriate constructor based on user class.
+    user_class = ROLE_TO_CLASS[payload.role]
 
+    new_user = user_class(
+        id = new_id,
+        email = payload.email.strip(),
+        password = payload.password.strip(),
+        name = payload.name.strip(),
+        age = payload.age,
+        gender = payload.gender.strip(),
+        reset_token = None,
+        reset_token_expiry = None
+    )
+
+    users.append(new_user.model_dump())
+    save_users(users)
+    return new_user
+
+# get User object by user id
 def get_user_by_id(user_id: str) -> User:
     users = load_users()
     for user in users:
@@ -44,6 +55,7 @@ def get_user_by_id(user_id: str) -> User:
             return User(**user)
     raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
 
+# log in user
 def login_user(email: str, password: str) -> LoginResponse:
     users = load_users()
     email = email.strip()
@@ -135,3 +147,7 @@ def update_user(user_id: str, payload: User_Update) -> UserPublic:
                 role=role
             )
     raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
+
+# this function authenticates the user and confirms that they are of customer type
+def get_customer(customer: Customer = Depends(require_role(UserRole.CUSTOMER))) -> Customer:
+    return customer
