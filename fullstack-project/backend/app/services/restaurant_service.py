@@ -47,7 +47,8 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
         "name": payload.name,
         "city": payload.city,
         "address": _address_to_dict(payload.address),
-        "manager_ids": [manager_id],  # The logged in user is the initial manager of the restaurant
+        "manager_ids": [manager_id],
+        "max_delivery_radius_km": payload.max_delivery_radius_km,
         "menu": {"items": [{
             "id": idx + 1, **item.model_dump()}
             for idx, item in enumerate(payload.menu.items)
@@ -95,6 +96,7 @@ def update_restaurant_details(payload: Restaurant_Details_Update) -> Restaurant:
             restaurant["name"] = payload.name.strip()
             restaurant["city"] = payload.city.strip()
             restaurant["address"] = _address_to_dict(payload.address)
+            restaurant["max_delivery_radius_km"] = payload.max_delivery_radius_km
             save_restaurants(restaurants)
             return Restaurant(**restaurant)
     raise HTTPException(status_code=404, detail=f"Restaurant '{payload.id}' not found")

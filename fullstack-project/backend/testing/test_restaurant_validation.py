@@ -499,3 +499,62 @@ def test_update_restaurant_invalid_postal_code(setup_restaurant):
         headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 422
+
+# distance radius test #
+
+# test that a restaurant is created with the default delivery radius if none is provided
+def test_create_restaurant_default_delivery_radius(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Radius Test Place",
+            "city": "Kelowna",
+            "address": {
+                "street": "123 Main St",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "V1Y 1A1"
+            }
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 201
+    assert response.json()["max_delivery_radius_km"] == 10.0
+
+# test that a restaurant is created with a custom delivery radius
+def test_create_restaurant_custom_delivery_radius(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Custom Radius Place",
+            "city": "Kelowna",
+            "address": {
+                "street": "123 Main St",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "V1Y 1A1"
+            },
+            "max_delivery_radius_km": 25.0
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 201
+    assert response.json()["max_delivery_radius_km"] == 25.0
+
+# test that delivery radius is updated when restaurant details are updated
+def test_update_restaurant_delivery_radius(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+    response = client.put(
+        f"/restaurant/{restaurant['id']}",
+        json={
+            "id": restaurant["id"],
+            "name": restaurant["name"],
+            "city": restaurant["city"],
+            "address": restaurant["address"],
+            "max_delivery_radius_km": 50.0
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json()["max_delivery_radius_km"] == 50.0
