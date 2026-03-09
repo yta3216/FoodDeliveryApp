@@ -1,0 +1,15 @@
+[
+  {
+    "id": "43333cba-99a1-47b4-9b4b-efce9103b314",
+    "email": "manager@example.com",
+    "name": "Test Manager",
+    "password": "testpassword",
+    "age": 25,
+    "gender": "male",
+    "role": "manager",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "auth_token": "USeL4dRbv2hvlyPb0EOukSkaHyJDJDTPpbUXww5PF-o",
+    "auth_token_expiry": 1773178124.8219287
+  }
+]

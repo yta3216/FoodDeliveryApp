@@ -173,6 +173,31 @@
         }
 
         .loading-spinner.visible { display: block; }
+
+        /* pagination controls */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .pagination button:hover { background-color: #357abd; }
+        .pagination button:disabled { background-color: #ccc; cursor: default; }
     </style>
 </head>
 <body>
@@ -224,7 +249,9 @@
             </select>
         </div>
 
+        <button type="submit" id="search-btn">Search</button>
 
+    </div>
 
     <div id="results-section">
         <div class="loading-spinner" id="spinner">Searching...</div>
@@ -293,28 +320,16 @@
     postalEl.addEventListener("blur", validatePostalCode);
     postalEl.addEventListener("input", validatePostalCode);
 
-    // Search button handler
-    searchBtn.addEventListener("click", async () => {
-        const cityOk   = validateCity();
-        const postalOk = validatePostalCode();
-        if (!cityOk || !postalOk) return;
+// track current page and search params for pagination
+    let currentPage = 1;
+    let lastParams = new URLSearchParams();
 
-        // Build query string from non-empty fields only
-        const params = new URLSearchParams();
-        const name      = nameEl.value.trim();
-        const menuItem  = menuItemEl.value.trim();
-        const city      = cityEl.value.trim();
-        const province  = provinceEl.value;
-        const postalCode = postalEl.value.trim().toUpperCase();
-
-        if (name)       params.append("name", name);
-        if (menuItem)   params.append("menu_item", menuItem);
-        if (city)       params.append("city", city);
-        if (province)   params.append("province", province);
-        if (postalCode) params.append("postal_code", postalCode);
-        const sortPrice = sortPriceEl.value;
-        if (sortPrice)  params.append("sort_price", sortPrice);
-
+    // shared search function so both the button and pagination can trigger it
+    async function doSearch(page) {
+        currentPage = page;
+        const params = new URLSearchParams(lastParams);
+        params.set("page", page);
+        params.set("page_size", 5);
 
         resultsSection.classList.add("visible");
         spinner.classList.add("visible");
@@ -322,24 +337,52 @@
 
         try {
             const response = await fetch(`/restaurant/search?${params.toString()}`);
-            const restaurants = await response.json();
-            renderResults(restaurants);
+            const data = await response.json();
+            renderResults(data);
         } catch (err) {
             console.error("Search error:", err);
             resultsContainer.innerHTML = `<div class="no-results">Something went wrong. Please try again.</div>`;
         } finally {
             spinner.classList.remove("visible");
         }
+    }
+    // Search button click handler
+    searchBtn.addEventListener("click", async () => {
+        const cityOk   = validateCity();
+        const postalOk = validatePostalCode();
+        if (!cityOk || !postalOk) return;
+
+        // build query string from non-empty fields only
+        lastParams = new URLSearchParams();
+        const name      = nameEl.value.trim();
+        const menuItem  = menuItemEl.value.trim();
+        const city      = cityEl.value.trim();
+        const province  = provinceEl.value;
+        const postalCode = postalEl.value.trim().toUpperCase();
+
+        if (name)       lastParams.append("name", name);
+        if (menuItem)   lastParams.append("menu_item", menuItem);
+        if (city)       lastParams.append("city", city);
+        if (province)   lastParams.append("province", province);
+        if (postalCode) lastParams.append("postal_code", postalCode);
+        const sortPrice = sortPriceEl.value;
+        if (sortPrice)  lastParams.append("sort_price", sortPrice);
+
+        doSearch(1);
     });
 
     // Display search results
-    function renderResults(restaurants) {
+    // display search results and pagination controls
+    function renderResults(data) {
+        const restaurants = data.results;
+        const { total, page, page_size, total_pages } = data;
+
         if (!restaurants.length) {
             resultsContainer.innerHTML = `<div class="no-results">No restaurants found matching your search.</div>`;
             return;
         }
 
-        resultsContainer.innerHTML = `<div class="results-header">${restaurants.length} restaurant${restaurants.length !== 1 ? "s" : ""} found</div>`;
+        resultsContainer.innerHTML = `<div class="results-header">${total} restaurant${total !== 1 ? "s" : ""} found (page ${page} of ${total_pages})</div>`;
 
         restaurants.forEach(r => {
             const addr = r.address;
@@ -373,6 +416,28 @@
             `;
             resultsContainer.appendChild(card);
         });
+
+        // add prev/next pagination buttons
+        const paginationDiv = document.createElement("div");
+        paginationDiv.className = "pagination";
+
+        const prevBtn = document.createElement("button");
+        prevBtn.textContent = "← Previous";
+        prevBtn.disabled = page <= 1;
+        prevBtn.addEventListener("click", () => doSearch(currentPage - 1));
+
+        const pageInfo = document.createElement("span");
+        pageInfo.textContent = `Page ${page} of ${total_pages}`;
+
+        const nextBtn = document.createElement("button");
+        nextBtn.textContent = "Next →";
+        nextBtn.disabled = page >= total_pages;
+        nextBtn.addEventListener("click", () => doSearch(currentPage + 1));
+
+        paginationDiv.appendChild(prevBtn);
+        paginationDiv.appendChild(pageInfo);
+        paginationDiv.appendChild(nextBtn);
+        resultsContainer.appendChild(paginationDiv);
     }
 
     function escapeHtml(str) {

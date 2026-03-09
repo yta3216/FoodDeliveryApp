@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Koi Sushi",
+    "city": "Kelowna",
+    "address": {
+      "street": "123 Main St",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1Y 1A1"
+    },
+    "manager_ids": [
+      "43333cba-99a1-47b4-9b4b-efce9103b314"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "menu": {
+      "items": []
+    }
+  }
+]
