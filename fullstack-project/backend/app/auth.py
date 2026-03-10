@@ -16,12 +16,8 @@ from app.schemas.user_schema import (
 # tells swagger ui that the app uses bearer tokens
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
-def get_current_user(authorization: str = Header(...)) -> User:
+def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     # returns matching user, or 401 if token is invalid
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid authorization header format")
-    
-    token = authorization.removeprefix("Bearer ").strip()
     users = load_users()
 
     for user in users:
