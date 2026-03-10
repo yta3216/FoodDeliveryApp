@@ -24,7 +24,7 @@ def create_order_from_cart(current_user: Customer) -> Order:
         "id": new_id,
         "customer_id": current_user.id,
         "restaurant_id": cart.restaurant_id,
-        "delivery_id": None,
+        "delivery_id": 0,
         "items": [{
             "menu_item_id": item.menu_item_id,
             "qty": item.qty
