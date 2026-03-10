@@ -20,6 +20,6 @@ router = APIRouter(prefix="/order", tags=["order"])
 def create_order_from_cart(current_user: Customer = Depends(get_customer)):
     return create_order_from_cart(current_user)
 
-@router.get("/customer/{customer_id}", response_model=list[Order], status_code=200, dependencies=[Depends(get_customer)])
+@router.get("/customer", response_model=list[Order], status_code=200, dependencies=[Depends(get_customer)])
 def get_orders_for_customer_route(current_user: Customer = Depends(get_customer)):
     return get_orders_for_customer(current_customer=current_user)
