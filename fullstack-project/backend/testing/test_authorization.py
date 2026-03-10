@@ -47,7 +47,7 @@ def test_manager_cannot_view_other_user_details():
 def test_no_token_cannot_view_user_details():
     _, user_id = register_and_login("notoken@example.com")
     response = client.get(f"/user/{user_id}")
-    assert response.status_code == 422  # missing required Authorization header
+    assert response.status_code == 401  # missing required Authorization header
 
 def test_invalid_token_cannot_view_user_details():
     _, user_id = register_and_login("invalidtoken@example.com")
