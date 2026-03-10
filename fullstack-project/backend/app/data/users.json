@@ -9,7 +9,18 @@
     "role": "manager",
     "reset_token": null,
     "reset_token_expiry": null,
-    "auth_token": "USeL4dRbv2hvlyPb0EOukSkaHyJDJDTPpbUXww5PF-o",
-    "auth_token_expiry": 1773178124.8219287
+    "auth_token": "rBqBFuHtvchBMPrERhAIl2f-7NWzh9xGOmbT00TU9mY",
+    "auth_token_expiry": 1773190798.2343645
+  },
+  {
+    "id": "20a1880d-5e5c-486f-994b-279dcc5e9f98",
+    "email": "manager@example.com",
+    "name": "Test Manager",
+    "password": "testpassword",
+    "age": 25,
+    "gender": "male",
+    "role": "manager",
+    "reset_token": null,
+    "reset_token_expiry": null
   }
 ]

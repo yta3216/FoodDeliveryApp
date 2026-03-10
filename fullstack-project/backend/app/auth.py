@@ -1,7 +1,7 @@
 import time
 from fastapi import Header, HTTPException
 from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.repositories.user_repo import load_users
 from app.schemas.user_schema import (
     User, 
@@ -14,10 +14,11 @@ from app.schemas.user_schema import (
 )
 
 # tells swagger ui that the app uses bearer tokens
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
+http_bearer = HTTPBearer()
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(http_bearer)) -> User:
     # returns matching user, or 401 if token is invalid
+    token = credentials.credentials
     users = load_users()
 
     for user in users:
