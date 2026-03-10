@@ -11,10 +11,6 @@ from app.schemas.cart_schema import (
     CartItem_Create,
     Cart
 )
-from app.schemas.order_schema import (
-    Order,
-    OrderItem,
-)
 
 def calculate_cart_total(cart: Cart) -> float:
     restaurant = get_restaurant_by_id(cart.restaurant_id)
@@ -25,24 +21,6 @@ def calculate_cart_total(cart: Cart) -> float:
         if menu_item:
             total += menu_item.get("price", 0.0) * cart_item.qty
     return total
-
-# transition from cart to order. 
-def create_order_from_cart(current_user: Customer) -> Order:
-    users = load_users()
-    for user in users:
-        if user.get("id") == current_user.id:
-            cart = user["cart"]
-            if cart["restaurant_id"] == 0 or len(cart["cart_items"]) == 0:
-                raise HTTPException(204, detail=f"Cart is empty")
-            # creates a new order with the same restaurant id and items as the cart
-            new_order = Order(
-                restaurant_id=cart["restaurant_id"],
-                items=[OrderItem(menu_item_id=item["menu_item_id"], qty=item["qty"]) for item in cart["cart_items"]]
-            )
-            empty_cart(current_user) # empties the cart after creating the order
-            save_users(users)
-            return new_order
-    raise HTTPException(404, detail=f"User '{current_user.id}' not found")
 
 # Set restaurant id
 def update_cart_restaurant(restaurant_id: int, current_user: Customer) -> Cart:
