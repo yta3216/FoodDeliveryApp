@@ -16,5 +16,167 @@
     "menu": {
       "items": []
     }
+  },
+  {
+    "id": 2,
+    "name": "Freddy Fazbear",
+    "city": "Chicago",
+    "address": {
+      "street": "123 Freddy St",
+      "city": "Chicago",
+      "province": "BC",
+      "postal_code": "V1V 1A1"
+    },
+    "manager_ids": [
+      "43333cba-99a1-47b4-9b4b-efce9103b314"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "menu": {
+      "items": []
+    }
+  },
+  {
+    "id": 3,
+    "name": "Freddy Fazbear's Pizza",
+    "city": "Kelowna",
+    "address": {
+      "street": "456 Fazbear Blvd",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1Y 2B2"
+    },
+    "manager_ids": [
+      "43333cba-99a1-47b4-9b4b-efce9103b314"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "menu": {
+      "items": []
+    }
+  },
+  {
+    "id": 4,
+    "name": "Pizzeria1",
+    "city": "Kelowna",
+    "address": {
+      "street": "123 Pizza Blvd",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1Y 2B2"
+    },
+    "manager_ids": [
+      "43333cba-99a1-47b4-9b4b-efce9103b314"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "menu": {
+      "items": []
+    }
+  },
+  {
+    "id": 5,
+    "name": "Pizzeria2",
+    "city": "Kelowna",
+    "address": {
+      "street": "124 Pizza Blvd",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1Y 2B2"
+    },
+    "manager_ids": [
+      "43333cba-99a1-47b4-9b4b-efce9103b314"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "menu": {
+      "items": []
+    }
+  },
+  {
+    "id": 6,
+    "name": "Pizzeria3",
+    "city": "Kelowna",
+    "address": {
+      "street": "125 Pizza Blvd",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1Y 2B2"
+    },
+    "manager_ids": [
+      "43333cba-99a1-47b4-9b4b-efce9103b314"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "menu": {
+      "items": []
+    }
+  },
+  {
+    "id": 7,
+    "name": "Burger1",
+    "city": "Kelowna",
+    "address": {
+      "street": "123 Burger Blvd",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1Y 2B2"
+    },
+    "manager_ids": [
+      "43333cba-99a1-47b4-9b4b-efce9103b314"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "menu": {
+      "items": []
+    }
+  },
+  {
+    "id": 8,
+    "name": "joe's burger",
+    "city": "Kelowna",
+    "address": {
+      "street": "124 Burger Blvd",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1Y 2B2"
+    },
+    "manager_ids": [
+      "43333cba-99a1-47b4-9b4b-efce9103b314"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "menu": {
+      "items": []
+    }
+  },
+  {
+    "id": 9,
+    "name": "Jeffrey's burger",
+    "city": "Kelowna",
+    "address": {
+      "street": "125 Burger Blvd",
+      "city": "Vancouver",
+      "province": "BC",
+      "postal_code": "V1Y 2B2"
+    },
+    "manager_ids": [
+      "43333cba-99a1-47b4-9b4b-efce9103b314"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "menu": {
+      "items": []
+    }
+  },
+  {
+    "id": 10,
+    "name": "Flames's burger",
+    "city": "Calgary",
+    "address": {
+      "street": "125 Burger Blvd",
+      "city": "Calgary",
+      "province": "AB",
+      "postal_code": "V1Y 2B2"
+    },
+    "manager_ids": [
+      "43333cba-99a1-47b4-9b4b-efce9103b314"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "menu": {
+      "items": []
+    }
   }
 ]
