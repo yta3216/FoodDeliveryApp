@@ -2,8 +2,6 @@
 This module defines the API routes for restaurant management.
 """
 
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.schemas.user_schema import User, UserRole
@@ -42,7 +40,7 @@ def create_restaurant_route(payload: Restaurant_Create, current_user: User = Dep
 
 # post request to search for restaurants by name, address fields, or menu item.
 # every field is optional and no authentication is required to search for restaurants.
-@router.get("/search", response_model=List[Restaurant])
+@router.get("/search", response_model=list[Restaurant])
 def search_restaurants_route(
     name: str | None = None,
     city: str | None = None,
@@ -82,12 +80,12 @@ def update_restaurant_managers_route(restaurant_id: int, payload: Restaurant_Man
     return update_restaurant_managers(payload)
 
 # post request to bulk create menu items in the restaurant's menu. only managers can bulk create menu items.
-@router.post("/{restaurant_id}/menu/bulk", response_model=List[MenuItem], status_code=201, dependencies=[Depends(check_manager)])
+@router.post("/{restaurant_id}/menu/bulk", response_model=list[MenuItem], status_code=201, dependencies=[Depends(check_manager)])
 def bulk_create_menu_items_route(restaurant_id: int, payload: MenuItem_Bulk_Create):
     return bulk_menu_item_create(restaurant_id, payload)
 
 # put request to bulk update menu items in the restaurant's menu. only managers can bulk update menu items.
-@router.put("/{restaurant_id}/menu/bulk", response_model=List[MenuItem], dependencies=[Depends(check_manager)])
+@router.put("/{restaurant_id}/menu/bulk", response_model=list[MenuItem], dependencies=[Depends(check_manager)])
 def bulk_update_menu_items_route(restaurant_id: int, payload: MenuItem_Bulk_Update):
     return bulk_menu_item_update(restaurant_id, payload)
 
