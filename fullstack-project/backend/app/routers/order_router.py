@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from app.schemas.order_schema import (
     Order
 )
-from app.schemas.user_schema import Customer
+from app.schemas.user_schema import Customer,User
 from app.services.user_service import (
     get_customer
 )
@@ -13,8 +13,8 @@ from app.services.order_service import (
     create_order_from_cart,
     get_orders_for_customer,
     get_orders_for_restaurant,
+    cancel_order,
 )
-from app.schemas.user_schema import User
 from app.services.restaurant_service import check_manager
 
 
@@ -31,3 +31,8 @@ def get_orders_for_customer_route(current_user: Customer = Depends(get_customer)
 @router.get("/restaurant/{restaurant_id}", response_model=list[Order], status_code=200, dependencies=[Depends(check_manager)])
 def get_orders_for_restaurant_route(restaurant_id: int, current_user: User = Depends(check_manager)):
     return get_orders_for_restaurant(restaurant_id=restaurant_id, manager_id=current_user.id)
+
+# Delete pending order for customer
+@router.delete("/{order_id}", status_code=204, dependencies=[Depends(get_customer)])
+def cancel_order_route(order_id:int, current_user: Customer = Depends(get_customer)):
+    cancel_order(order_id=order_id, current_user=cancel_order)
