@@ -45,3 +45,11 @@ def create_order_from_cart(current_user: Customer) -> Order:
 def get_orders_for_customer(current_customer: Customer) -> list[Order]:
     orders = load_orders()
     return [order for order in orders if order.get("customer_id") == current_customer.id]
+
+def get_orders_for_restaurant(restaurant_id: int, manager_id: int) -> list[Order]:
+    restaurant = get_restaurant_by_id(restaurant_id)
+    if manager_id not in restaurant.get("manager_ids", []):
+        raise HTTPException(status_code=403, detail="Unauthorized to view orders for this restaurant.")
+    
+    orders = load_orders()
+    return [order for order in orders if order.get("restaurant_id") == restaurant_id]
