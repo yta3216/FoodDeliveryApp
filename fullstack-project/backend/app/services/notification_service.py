@@ -3,7 +3,6 @@ This module defines notification class and its methods.
 """
 
 from datetime import datetime
-from typing import Any
 from fastapi import HTTPException
 
 from app.repositories.notification_repo import load_notifications, save_notifications
@@ -60,4 +59,4 @@ class Notification():
     async def send_to_users(self, user_ids: list[str]) -> None:
         self.save()
         for user_id in user_ids:
-            await connection_manager.send_message(user_id, self.to_dict)
+            await connection_manager.send_message(user_id, self.to_json)

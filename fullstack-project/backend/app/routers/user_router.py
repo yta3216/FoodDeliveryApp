@@ -3,6 +3,7 @@ This module defines the API routes for user management.
 """
 
 from fastapi import APIRouter, status, Depends, HTTPException
+from app.schemas.notification_schema import Notification_Response
 from app.schemas.user_schema import (
     User,
     UserPublic,
@@ -74,7 +75,7 @@ def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged
     return {"detail": "Password updated."}
 
 # logged in user wants to retrieve their notifications.
-@router.get("/{user_id}/notifications")
+@router.get("/{user_id}/notifications", response_model=list[Notification_Response])
 def get_notifications_route(user_id: str, current_user: User = Depends(get_current_user)):
     if current_user.id != user_id:
         raise HTTPException(status_code=403, detail="You are not authorized to view this user's notifications")
