@@ -33,6 +33,8 @@ from app.services.restaurant_service import (
     bulk_menu_item_update,
     check_manager
 )
+from app.services.order_service import get_orders_for_restaurant
+from app.schemas.order_schema import Order
 
 router = APIRouter(prefix="/restaurant", tags=["restaurant"])
 
@@ -100,6 +102,11 @@ def bulk_update_menu_items_route(restaurant_id: int, payload: MenuItem_Bulk_Upda
 @router.post("/{restaurant_id}/menu", response_model=MenuItem, status_code=201, dependencies=[Depends(check_manager)])
 def create_menu_item_route(restaurant_id: int, payload: MenuItem_Create):
     return create_menu_item(restaurant_id, payload)
+
+# get orders for a particular restaurant. only managers may view this.
+@router.get("/{restaurant_id}/orders", response_model=list[Order])
+def restaurant_orders_route(restaurant_id: int, current_user: User = Depends(check_manager)):
+    return get_orders_for_restaurant(restaurant_id=restaurant_id, manager_id=current_user.id)
 
 # put request to update a menu item in the restaurant's menu. only managers can update menu items.
 @router.put("/{restaurant_id}/menu/{menu_item_id}", response_model=MenuItem, dependencies=[Depends(check_manager)])
