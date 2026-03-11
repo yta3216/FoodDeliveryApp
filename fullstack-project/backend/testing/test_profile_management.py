@@ -86,4 +86,4 @@ def test_update_requires_authentication():
             "role": "customer"
         }
     )
-    assert response.status_code == 422  # missing authorization header
+    assert response.status_code == 401  # missing authorization header

@@ -241,6 +241,8 @@ class Restaurant_Search(BaseModel):
     postal_code: str | None = None
     menu_item: str | None = None
     sort_price: str | None = None
+    page: int = 1       # which page to return, starts at 1
+    page_size: int = 5  # how many results per page
 
     @field_validator("sort_price")
     @classmethod
@@ -248,6 +250,28 @@ class Restaurant_Search(BaseModel):
         if v is not None and v not in ("asc","desc"):
             raise ValueError("sort_price must be either 'asc' or 'desc'")
         return v
+
+    @field_validator("page")
+    @classmethod
+    def validate_page(cls, v: int) -> int:
+        if v < 1:
+            raise ValueError("page must be 1 or greater")
+        return v
+
+    @field_validator("page_size")
+    @classmethod
+    def validate_page_size(cls, v: int) -> int:
+        if v < 1 or v > 50:
+            raise ValueError("page_size must be between 1 and 50")
+        return v
+
+# paginated response wrapper so the frontend knows the total results and page info
+class PaginatedRestaurantResults(BaseModel):
+    results: List[Restaurant]
+    total: int        # total number of matching restaurants
+    page: int         # current page
+    page_size: int    # results per page
+    total_pages: int  # total number of pages
 
 # Restaurant Details Update model for input validation when updating restaurant details.
 class Restaurant_Details_Update(BaseModel):

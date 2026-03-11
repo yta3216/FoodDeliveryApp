@@ -68,8 +68,8 @@ def test_search_restaurant_by_name():
     results = response.json()
     
     assert response.status_code == 200
-    assert len(results) == 1    
-    assert results[0]["name"] == "Test Restaurant"
+    assert len(results["results"]) == 1    
+    assert results["results"][0]["name"] == "Test Restaurant"
 
 # test searching for a restaurant by city
 def test_search_restaurant_by_city():
@@ -78,8 +78,8 @@ def test_search_restaurant_by_city():
     results = response.json()
     
     assert response.status_code == 200
-    assert len(results) == 1    
-    assert results[0]["address"]["city"] == "Kelowna"
+    assert len(results["results"]) == 1    
+    assert results["results"][0]["address"]["city"] == "Kelowna"
 
 # test searching for a restaurant by menu item
 def test_search_restaurant_by_menu_item():
@@ -88,8 +88,8 @@ def test_search_restaurant_by_menu_item():
     results = response.json()
     
     assert response.status_code == 200
-    assert len(results) == 1    
-    assert any(item["name"] == "Test Item 2" for item in results[0]["menu"]["items"])
+    assert len(results["results"]) == 1    
+    assert any(item["name"] == "Test Item 2" for item in results["results"][0]["menu"]["items"])
 
 # test searching for a restaurant by name that does not exist
 def test_search_restaurant_no_results():
@@ -98,7 +98,7 @@ def test_search_restaurant_no_results():
     results = response.json()
     
     assert response.status_code == 200
-    assert len(results) == 0
+    assert len(results["results"]) == 0
 
 # test searching for a restaurant with multiple results
 def test_search_restaurant_multiple_results():
@@ -109,8 +109,8 @@ def test_search_restaurant_multiple_results():
     results = response.json()
     
     assert response.status_code == 200
-    assert len(results) == 2
-    assert all(result["name"] == "Test Restaurant" for result in results)
+    assert len(results["results"]) == 2
+    assert all(result["name"] == "Test Restaurant" for result in results["results"])
 
 # test searching for a restaurant by partial name
 def test_search_restaurant_by_partial_name():
@@ -119,8 +119,8 @@ def test_search_restaurant_by_partial_name():
     results = response.json()
     
     assert response.status_code == 200
-    assert len(results) == 1    
-    assert results[0]["name"] == "Test Restaurant"
+    assert len(results["results"]) == 1    
+    assert results["results"][0]["name"] == "Test Restaurant"
 
 # test searching for a restaurant by partial menu item name
 def test_search_restaurant_by_partial_menu_item():
@@ -129,6 +129,69 @@ def test_search_restaurant_by_partial_menu_item():
     results = response.json()
     
     assert response.status_code == 200
-    assert len(results) == 1    
-    assert any("Test Item" in item["name"] for item in results[0]["menu"]["items"])
+    assert len(results["results"]) == 1    
+    assert any("Test Item" in item["name"] for item in results["results"][0]["menu"]["items"])
 
+# test that pagination metadata is returned correctly
+def test_pagination_metadata_returned():
+    setup_restaurant()
+    response = client.get("/restaurant/search?name=Test Restaurant")
+    results = response.json()
+
+    assert response.status_code == 200
+    assert "results" in results
+    assert "total" in results
+    assert "page" in results
+    assert "page_size" in results
+    assert "total_pages" in results
+
+# test that page_size limits the number of results returned
+def test_page_size_limits_results():
+    for i in range(5):
+        setup_restaurant(name=f"Pagination Test {i}", city="Kelowna")
+    response = client.get("/restaurant/search?city=Kelowna&page_size=2")
+    results = response.json()
+
+    assert response.status_code == 200
+    assert len(results["results"]) == 2
+    assert results["page_size"] == 2
+
+# test that page 2 returns a different set of results than page 1
+def test_page_2_returns_different_results():
+    for i in range(5):
+        setup_restaurant(name=f"Pagination Test {i}", city="Kelowna")
+    response_p1 = client.get("/restaurant/search?city=Kelowna&page=1&page_size=2")
+    response_p2 = client.get("/restaurant/search?city=Kelowna&page=2&page_size=2")
+
+    page1_ids = [r["id"] for r in response_p1.json()["results"]]
+    page2_ids = [r["id"] for r in response_p2.json()["results"]]
+
+    assert response_p1.status_code == 200
+    assert response_p2.status_code == 200
+    assert page1_ids != page2_ids
+
+# test that total_pages is calculated correctly
+def test_total_pages_calculated_correctly():
+    for i in range(5):
+        setup_restaurant(name=f"Pagination Test {i}", city="Kelowna")
+    response = client.get("/restaurant/search?city=Kelowna&page_size=2")
+    results = response.json()
+
+    assert response.status_code == 200
+    assert results["total"] == 5
+    assert results["total_pages"] == 3  # ceil(5/2) = 3
+
+# test that page 0 is rejected
+def test_page_zero_rejected():
+    response = client.get("/restaurant/search?page=0")
+    assert response.status_code == 422
+
+# test that page_size of 0 is rejected
+def test_page_size_zero_rejected():
+    response = client.get("/restaurant/search?page_size=0")
+    assert response.status_code == 422
+
+# test that page_size over 50 is rejected
+def test_page_size_over_50_rejected():
+    response = client.get("/restaurant/search?page_size=51")
+    assert response.status_code == 422

@@ -99,4 +99,4 @@ def test_cancel_order_no_auth(placed_order):
     order_id = placed_order["order"]["id"]
 
     response = client.delete(f"/order/{order_id}")
-    assert response.status_code == 422
+    assert response.status_code == 401

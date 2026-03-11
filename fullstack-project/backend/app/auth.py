@@ -1,6 +1,7 @@
 import time
 from fastapi import Header, HTTPException
 from fastapi import Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.repositories.user_repo import load_users
 from app.schemas.user_schema import (
     User, 
@@ -12,13 +13,12 @@ from app.schemas.user_schema import (
     ROLE_TO_CLASS
 )
 
+# tells swagger ui that the app uses bearer tokens
+http_bearer = HTTPBearer()
 
-def get_current_user(authorization: str = Header(...)) -> User:
-# Returns  matching user, or 401 if token is invalid
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid authorization header format")
-    
-    token = authorization.removeprefix("Bearer ").strip()
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(http_bearer)) -> User:
+    # returns matching user, or 401 if token is invalid
+    token = credentials.credentials
     users = load_users()
 
     for user in users:
