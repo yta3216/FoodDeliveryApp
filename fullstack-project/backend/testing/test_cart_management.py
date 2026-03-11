@@ -137,7 +137,9 @@ def customer_with_cart_and_token(customer_with_token, setup_restaurant_menu):
 
     return {
         "customer": customer,
-        "token": token
+        "token": token,
+        "restaurant_id": restaurant_id,
+        "customer_id": customer["id"]
     }
 
 # get user (for when data is updated)

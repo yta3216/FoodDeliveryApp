@@ -12,6 +12,16 @@ from app.schemas.cart_schema import (
     Cart
 )
 
+def calculate_cart_total(cart: Cart) -> float:
+    restaurant = get_restaurant_by_id(cart.restaurant_id)
+    menu_items = {item["id"]: item for item in restaurant["menu"]["items"]}
+    total = 0.0
+    for cart_item in cart.cart_items:
+        menu_item = menu_items.get(cart_item.menu_item_id)
+        if menu_item:
+            total += menu_item.get("price", 0.0) * cart_item.qty
+    return total
+
 # Set restaurant id
 def update_cart_restaurant(restaurant_id: int, current_user: Customer) -> Cart:
     # update user cart
