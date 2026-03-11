@@ -71,5 +71,24 @@ def cancel_order(order_id: int, current_user: Customer) -> Order:
         
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
+# Manager accepts/declines pending order
+def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
+    orders = load_orders()
+
+    for order in orders:
+        if order.get("id") == order_id:
+            restaurant = get_restaurant_by_id(order.get("restaurant_id"))
+            if manager_id not in restaurant.get("manager_ids",[]):
+                raise HTTPException(status_code=403, detail = "You are not authroized to manage orders for this resturant")
+            
+            current_status = order.get("status")
+            if current_status != "pending":
+                raise HTTPException(status_code=400, detail=f"Order cannot be updated - current status is '{current_status}'.")
+            
+            order["status"] = new_status
+            save_orders(orders)
+            return Order(**order)
+
+    raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
     
