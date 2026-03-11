@@ -35,11 +35,8 @@ app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 app.include_router(user_router)
 app.include_router(restaurant_router)
 app.include_router(cart_router)
-<<<<<<< CF8-FR2
 app.include_router(websocket_router)
-=======
 app.include_router(order_router)
->>>>>>> main
 
 @app.get("/", tags=["root"])
 async def read_root():
