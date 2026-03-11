@@ -6,7 +6,7 @@ a cart to an order.
 Any updates to the order details should follow this schema.
 """
 
-from typing import List
+from typing import List, Literal
 from pydantic import BaseModel, Field
 
 # generic order item schema.
@@ -35,3 +35,7 @@ class Order(BaseModel):
     tax: float = 0.0
     subtotal: float = 0.0
     date_created: str = None
+
+# schema for manager to accept/reject pending order
+class OrderStatusUpdate(BaseModel):
+    status: Literal["accepted","rejected"]
