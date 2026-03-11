@@ -7,7 +7,11 @@ import uvicorn
 from .routers.user_router import router as user_router
 from .routers.restaurant_router import router as restaurant_router
 from .routers.cart_router import router as cart_router
+<<<<<<< CF8-FR2
 from .routers.websocket_router import router as websocket_router
+=======
+from .routers.order_router import router as order_router
+>>>>>>> main
 
 app = FastAPI()
 
@@ -34,7 +38,11 @@ app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 app.include_router(user_router)
 app.include_router(restaurant_router)
 app.include_router(cart_router)
+<<<<<<< CF8-FR2
 app.include_router(websocket_router)
+=======
+app.include_router(order_router)
+>>>>>>> main
 
 @app.get("/", tags=["root"])
 async def read_root():
