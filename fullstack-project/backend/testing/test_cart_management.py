@@ -97,16 +97,19 @@ def setup_restaurant_menu(setup_restaurant):
         },
         headers={"Authorization": f"Bearer {token}"}
     )
-    return get_restaurant_by_id(restaurant['id'])
+    return {
+        "restaurant": get_restaurant_by_id(restaurant['id']),
+        "token": token
+    }
 
 # a customer with two items in their cart
 @pytest.fixture
 def customer_with_cart_and_token(customer_with_token, setup_restaurant_menu):
     customer = customer_with_token["customer"]
     token = customer_with_token["token"]
-    item1_id = setup_restaurant_menu["menu"]["items"][0]["id"]
-    item2_id = setup_restaurant_menu["menu"]["items"][1]["id"]
-    restaurant_id = setup_restaurant_menu["id"]
+    item1_id = setup_restaurant_menu["restaurant"]["menu"]["items"][0]["id"]
+    item2_id = setup_restaurant_menu["restaurant"]["menu"]["items"][1]["id"]
+    restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
     # add items to cart
     set_id_response = client.put(
@@ -212,7 +215,7 @@ def test_get_cart_item_wrong_id(customer_with_cart_and_token):
 def test_update_cart_restaurant(customer_with_token, setup_restaurant_menu):
     customer = customer_with_token["customer"]
     token = customer_with_token["token"]
-    restaurant_id = setup_restaurant_menu["id"]
+    restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
     # send update request
     update_response = client.put(
@@ -227,7 +230,7 @@ def test_update_cart_restaurant(customer_with_token, setup_restaurant_menu):
 def test_update_cart_restaurant_wrong_role(manager_with_token, setup_restaurant_menu):
     wrong_role = manager_with_token["customer"]
     token = manager_with_token["token"]
-    restaurant_id = setup_restaurant_menu["id"]
+    restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
     # send update request
     update_response = client.put(
@@ -286,9 +289,9 @@ def test_emptying_cart_wrong_role(manager_with_token):
 def test_add_item_to_cart(customer_with_token, setup_restaurant_menu):
     customer = customer_with_token["customer"]
     token = customer_with_token["token"]
-    item1_id = setup_restaurant_menu["menu"]["items"][0]["id"]
-    item2_id = setup_restaurant_menu["menu"]["items"][1]["id"]
-    restaurant_id = setup_restaurant_menu["id"]
+    item1_id = setup_restaurant_menu["restaurant"]["menu"]["items"][0]["id"]
+    item2_id = setup_restaurant_menu["restaurant"]["menu"]["items"][1]["id"]
+    restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
     # add items to cart
     set_id_response = client.put(
@@ -328,8 +331,8 @@ def test_add_item_to_cart(customer_with_token, setup_restaurant_menu):
 def test_add_nonexistent_item(customer_with_token, setup_restaurant_menu):
     customer = customer_with_token["customer"]
     token = customer_with_token["token"]
-    max_id = 5*len(setup_restaurant_menu["menu"]["items"]) # five times larger than size of menu
-    restaurant_id = setup_restaurant_menu["id"]
+    max_id = 5*len(setup_restaurant_menu["restaurant"]["menu"]["items"]) # five times larger than size of menu
+    restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
     # add item to cart who is not in restaurant menu
     set_id_response = client.put(
