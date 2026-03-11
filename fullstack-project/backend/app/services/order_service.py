@@ -65,7 +65,7 @@ def cancel_order(order_id: int, current_user: Customer) -> Order:
                 raise HTTPException(status_code=403, detail= "Your are not authroized to cancel this order.")
             if order.get("status") != "pending":
                 raise HTTPException(status_code=400, detail= f"Order cannot be cancelled, order is already '{order.get('status')}'.")
-            orders["status"] = "cancelled"
+            order["status"] = "cancelled"
             save_orders(orders)
             return Order(**order)
         

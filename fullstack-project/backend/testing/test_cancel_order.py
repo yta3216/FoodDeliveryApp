@@ -29,7 +29,8 @@ def test_cancel_order(placed_order):
     token = placed_order["token"]
 
     response = client.delete(f"/order/{order_id}", headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 204
+    assert response.status_code == 200
+    assert response.json()["status"] == "cancelled"
 
 # test that cancelled order is removed from the customer's orders list
 def test_cancel_order_removed_from_orders(placed_order):
@@ -41,7 +42,9 @@ def test_cancel_order_removed_from_orders(placed_order):
     get_response = client.get("/order/customer", headers={"Authorization": f"Bearer {token}"})
     assert get_response.status_code == 200
     orders = get_response.json()
-    assert not any(order["id"] == order_id for order in orders)
+    cancelled = next((o for o in orders if o["id"] == order_id), None)
+    assert cancelled is not None
+    assert cancelled["status"] == "cancelled"
 
 # test cancelling an order that doesn't exist
 def test_cancel_nonexistent_order(customer_with_token):
