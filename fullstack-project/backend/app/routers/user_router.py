@@ -23,8 +23,9 @@ from app.services.user_service import (
     reset_password,
     update_password_when_logged_in,
     update_user,
+    get_notifications
 )
-from app.auth import get_current_user, require_role
+from app.auth import get_current_user
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -71,3 +72,14 @@ def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged
         raise HTTPException(status_code=403, detail="You are not authorized to change this user's password")
     update_password_when_logged_in(user_id, payload.old_password, payload.new_password)
     return {"detail": "Password updated."}
+
+# logged in user wants to retrieve their notifications.
+@router.get("/{user_id}/notifications")
+def get_notifications_route(user_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="You are not authorized to view this user's notifications")
+    return get_notifications(user_id)
+
+# TODO: get single notification
+
+# TODO: mark notification as read

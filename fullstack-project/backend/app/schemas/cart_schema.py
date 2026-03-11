@@ -9,7 +9,6 @@ Cart() object, restoring values to their defaults.
 Any updates to the cart details should follow this schema.
 """
 
-from typing import List
 from pydantic import BaseModel, Field
 
 # generic cart item schema. we store the MenuItem ID rather than the item itself in the cart to save storage.
@@ -29,4 +28,4 @@ class CartItem_Update(BaseModel):
 # generic cart schema
 class Cart(BaseModel):
     restaurant_id: int = 0
-    cart_items: List[CartItem] = Field(default_factory=list)
+    cart_items: list[CartItem] = Field(default_factory=list)

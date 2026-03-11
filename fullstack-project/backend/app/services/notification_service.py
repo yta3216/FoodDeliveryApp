@@ -7,35 +7,46 @@ from typing import Any
 from fastapi import HTTPException
 
 from app.repositories.notification_repo import load_notifications, save_notifications
+from app.realtime.connection_manager import ConnectionManager
+from app.schemas.notification_schema import Notification_Response
 
-# Generic notification class
+connection_manager = ConnectionManager()
+
+# Generic notification class. Not defined as BaseModel because the creation is strictly internal.
 class Notification():
  
     # create notification.
-    def __init__(self, message: str):
-        notifs = load_notifications()
-        self.id = self.get_next_id_from_list(notifs)
+    def __init__(self, message: str, user_ids: list[str]):
+        self.id = self.get_next_id()
+        self.user_ids = user_ids
         self.message = message
         self.is_read = True
         self.time = datetime.now().strftime('%Y/%m/%d %H:%M') # YYYY/MM/DD HH:MM
     
-    # convert to dictionary, store type
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "type": self.__class__.__name__,
-            "id": self.id,
-            "message": self.message,
-            "is_read": self.is_read,
-            "time": self.time
-        }
-
-    # pass in the loaded notifications so we don't load them twice
-    @staticmethod
-    def get_next_id_from_list(notifs: list[dict[str, Any]]) -> int:
+    # get next notif id. pass in the loaded notifications so we don't load them twice
+    def get_next_id() -> int:
+        notifs = load_notifications()
         if len(notifs) == 0:
             return 1
         return max(notif["id"] for notif in notifs) + 1
+
+    # convert to the respective fastapi schema
+    def to_json(self) -> Notification_Response:
+        return Notification_Response(
+            id=self.id,
+            user_ids=self.user_ids,
+            message=self.message,
+            is_read=self.is_read,
+            time=self.time
+        )
+
+    # save the new notification
+    def save(self) -> None:
+        notifs = load_notifications()
+        notifs.append(self.to_dict())
+        save_notifications(notifs)
     
+    # mark notification as read
     def read_notification(self) -> None:
         notifs = load_notifications()
         for notif in notifs:
@@ -44,18 +55,9 @@ class Notification():
                 save_notifications(notifs)
                 return None
         raise HTTPException(status_code=404, detail=f"Notification '{self.id}' not found")
-
-# Class for order notifications
-class OrderNotification(Notification):
-    user_ids: list[str]
-
-    # create notification
-    def __init__(self, message: str, user_ids: list[str]):
-        super().__init__(message)
-        self.user_ids = user_ids
     
-    # convert to dictionary for saving
-    def to_dict(self) -> dict[str, Any]:
-        notif_dict = super().to_dict()
-        notif_dict["user_ids"] = self.user_ids
-        return notif_dict
+    # send the notification to the list of users. this causes the notification to be saved.
+    async def send_to_users(self, user_ids: list[str]) -> None:
+        self.save()
+        for user_id in user_ids:
+            await connection_manager.send_message(user_id, self.to_dict)

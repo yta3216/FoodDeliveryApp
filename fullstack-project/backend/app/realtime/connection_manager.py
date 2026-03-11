@@ -5,6 +5,8 @@ It follows the "Singleton" design pattern, as there should be only one instance 
 
 from fastapi import WebSocket
 
+from app.schemas.notification_schema import Notification_Response
+
 class ConnectionManager:
     _instance = None
 
@@ -28,10 +30,10 @@ class ConnectionManager:
         if user_id in self.active_connections:
             self.active_connections.remove(websocket)
 
-    # send message to a user
-    async def send_message(self, user_id: str, message: dict):
+    # send notification to a user
+    async def send_message(self, user_id: str, notification: Notification_Response):
         if user_id not in self.active_connections:
             return
         for websocket in self.active_connections[user_id]:
-            await websocket.send_json(message)
+            await websocket.send_json(notification)
         
