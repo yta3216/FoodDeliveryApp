@@ -48,7 +48,7 @@ def manager_with_token():
     test_manager = client.post(
         "/user",
         json={
-            "email": "customer1@example.com",
+            "email": "manager1@example.com",
             "password": "testpassword",
             "name": "Test Customer",
             "age": 19,

@@ -35,4 +35,4 @@ def get_orders_for_restaurant_route(restaurant_id: int, current_user: User = Dep
 # Delete pending order for customer
 @router.delete("/{order_id}", status_code=204, dependencies=[Depends(get_customer)])
 def cancel_order_route(order_id:int, current_user: Customer = Depends(get_customer)):
-    cancel_order(order_id=order_id, current_user=cancel_order)
+    cancel_order(order_id=order_id, current_user=current_user)

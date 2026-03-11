@@ -66,7 +66,8 @@ def cancel_order(order_id: int, current_user: Customer) -> None:
             if order.get("status") != "pending":
                 raise HTTPException(status_code=400, detail= f"Order cannot be cancelled, order is already '{order.get('status')}'.")
             orders.remove(order)
-            save_orders(order)
+            print(type(orders), orders)
+            save_orders(orders)
             return
         
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
