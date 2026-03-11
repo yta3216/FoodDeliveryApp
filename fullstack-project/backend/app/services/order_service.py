@@ -8,7 +8,7 @@ from app.repositories.order_repo import load_orders, save_orders
 from app.services.restaurant_service import get_restaurant_by_id
 from app.schemas.user_schema import Customer
 from app.services.cart_service import calculate_cart_total, empty_cart, get_cart
-from app.schemas.order_schema import Order
+from app.schemas.order_schema import Order, OrderItemsUpdate
 
 def create_order_from_cart(current_user: Customer) -> Order:
     cart = get_cart(current_user)
@@ -91,4 +91,23 @@ def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
 
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
-    
+# update items on a pending order make sure its blocked if the order is already confirmed
+def update_order_items(order_id: int, payload: OrderItemsUpdate, current_user: Customer) -> Order:
+    orders = load_orders()
+
+    for order in orders:
+        if order.get("id") == order_id:
+            # make sure this order belongs to the customer making the request
+            if order.get("customer_id") != current_user.id:
+                raise HTTPException(status_code=403, detail="You are not authorized to edit this order.")
+
+            # block edits once the order is no longer pending
+            if order.get("status") != "pending":
+                raise HTTPException(status_code=400, detail=f"Order is locked and cannot be edited — current status is '{order.get('status')}'.")
+
+            # replace the items list with what the customer sent
+            order["items"] = [{"menu_item_id": item.menu_item_id, "qty": item.qty} for item in payload.items]
+            save_orders(orders)
+            return Order(**order)
+
+    raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
