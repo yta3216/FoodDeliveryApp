@@ -3,11 +3,11 @@
 from pathlib import Path
 import json
 import os
-from typing import List, Dict, Any
+from typing import Any
 
 ORDER_DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "orders.json"
 
-def load_orders() -> List[Dict[str, Any]]:
+def load_orders() -> list[dict[str, Any]]:
     if not ORDER_DATA_PATH.exists():
         return []
     with ORDER_DATA_PATH.open("r", encoding="utf-8") as f:
@@ -17,7 +17,7 @@ def load_orders() -> List[Dict[str, Any]]:
         else:
             return json.loads(content)
 
-def save_orders(items: List[Dict[str, Any]]) -> None:
+def save_orders(items: list[dict[str, Any]]) -> None:
     tmp = ORDER_DATA_PATH.with_suffix(".tmp")
     with tmp.open("w", encoding="utf-8") as f:
         json.dump(items, f, ensure_ascii=False, indent=2)

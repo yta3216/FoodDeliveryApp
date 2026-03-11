@@ -267,7 +267,7 @@ class Restaurant_Search(BaseModel):
 
 # paginated response wrapper so the frontend knows the total results and page info
 class PaginatedRestaurantResults(BaseModel):
-    results: List[Restaurant]
+    results: list[Restaurant]
     total: int        # total number of matching restaurants
     page: int         # current page
     page_size: int    # results per page

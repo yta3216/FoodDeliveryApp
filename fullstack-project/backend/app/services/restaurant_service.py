@@ -1,7 +1,5 @@
 """ This module implements business logic for restaurant management. """
 
-from typing import List
-
 from fastapi import Depends, HTTPException
 from app.schemas.restaurant_schema import (
     Restaurant, 
@@ -161,7 +159,7 @@ def update_menu_item(restaurant_id: int, payload: MenuItem_Update) -> MenuItem:
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
 
 # Bulk create menu items and add them to the restaurant's menu.
-def bulk_menu_item_create(restaurant_id: int, payload: MenuItem_Bulk_Create) -> List[MenuItem]:
+def bulk_menu_item_create(restaurant_id: int, payload: MenuItem_Bulk_Create) -> list[MenuItem]:
     restaurants = load_restaurants()
     for restaurant in restaurants:
         if restaurant.get("id") == restaurant_id:
@@ -181,7 +179,7 @@ def bulk_menu_item_create(restaurant_id: int, payload: MenuItem_Bulk_Create) -> 
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
 
 # Bulk update menu items in the restaurant's menu.
-def bulk_menu_item_update(restaurant_id: int, payload: MenuItem_Bulk_Update) -> List[MenuItem]:
+def bulk_menu_item_update(restaurant_id: int, payload: MenuItem_Bulk_Update) -> list[MenuItem]:
     restaurants = load_restaurants()
     for restaurant in restaurants:
         if restaurant.get("id") == restaurant_id:

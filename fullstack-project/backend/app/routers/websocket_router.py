@@ -4,14 +4,14 @@ This module defines the endpoints for real-time updates from the server.
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException
 
-from app.auth import get_current_user
+from app.auth import get_current_user_with_ws
 from app.realtime.connection_manager import ConnectionManager
 
 router = APIRouter(prefix="/ws", tags=["websocket"])
 connection_manager = ConnectionManager()
 
 @router.websocket("/{user_id}")
-async def websocket_endpoint(user_id: str, websocket: WebSocket, current_user = Depends(get_current_user)):
+async def websocket_endpoint(user_id: str, websocket: WebSocket, current_user = Depends(get_current_user_with_ws)):
     if current_user.id != user_id:
         raise HTTPException(status_code=403, detail="You are not authorized to connect this user")
     await connection_manager.connect(user_id, websocket)
