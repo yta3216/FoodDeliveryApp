@@ -50,7 +50,7 @@ def manager_with_token():
         json={
             "email": "manager1@example.com",
             "password": "testpassword",
-            "name": "Test Customer",
+            "name": "Test Manager",
             "age": 19,
             "gender": "female",
             "role": UserRole.RESTAURANT_MANAGER.value
