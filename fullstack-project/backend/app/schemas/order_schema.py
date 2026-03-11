@@ -39,3 +39,7 @@ class Order(BaseModel):
 # schema for manager to accept/reject pending order
 class OrderStatusUpdate(BaseModel):
     status: Literal["accepted","rejected"]
+
+# schema for customer to update items on a pending order
+class OrderItemsUpdate(BaseModel):
+    items: list[OrderItem] = Field(default_factory=list)
