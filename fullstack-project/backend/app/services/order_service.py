@@ -56,7 +56,7 @@ def get_orders_for_restaurant(restaurant_id: int, manager_id: int) -> list[Order
 
 # Cancel a pending order. Can be cancelled only by the customer that placed the order
 # Cancelled orders are removed from orders.json
-def cancel_order(order_id: int, current_user: Customer) -> None:
+def cancel_order(order_id: int, current_user: Customer) -> Order:
     orders = load_orders()
 
     for order in orders:
@@ -65,10 +65,11 @@ def cancel_order(order_id: int, current_user: Customer) -> None:
                 raise HTTPException(status_code=403, detail= "Your are not authroized to cancel this order.")
             if order.get("status") != "pending":
                 raise HTTPException(status_code=400, detail= f"Order cannot be cancelled, order is already '{order.get('status')}'.")
-            orders.remove(order)
-            print(type(orders), orders)
+            orders["status"] = "cancelled"
             save_orders(orders)
-            return
+            return Order(**order)
         
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
+
+
     

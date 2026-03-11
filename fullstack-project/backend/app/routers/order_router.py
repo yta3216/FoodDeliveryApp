@@ -33,6 +33,6 @@ def get_orders_for_restaurant_route(restaurant_id: int, current_user: User = Dep
     return get_orders_for_restaurant(restaurant_id=restaurant_id, manager_id=current_user.id)
 
 # Delete pending order for customer
-@router.delete("/{order_id}", status_code=204, dependencies=[Depends(get_customer)])
+@router.delete("/{order_id}", response_model=Order, status_code=200, dependencies=[Depends(get_customer)])
 def cancel_order_route(order_id:int, current_user: Customer = Depends(get_customer)):
-    cancel_order(order_id=order_id, current_user=current_user)
+    return cancel_order(order_id=order_id, current_user=current_user)
