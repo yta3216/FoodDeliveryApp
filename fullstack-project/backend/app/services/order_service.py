@@ -76,7 +76,7 @@ def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
     orders = load_orders()
 
     for order in orders:
-        if order.get("id") == order.id:
+        if order.get("id") == order_id:
             restaurant = get_restaurant_by_id(order.get("restaurant_id"))
             if manager_id not in restaurant.get("manager_ids",[]):
                 raise HTTPException(status_code=403, detail = "You are not authroized to manage orders for this resturant")
