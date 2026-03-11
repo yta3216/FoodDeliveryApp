@@ -2,10 +2,13 @@
 
 import secrets
 import time
+from typing import Any
 import uuid
 from fastapi import HTTPException, Depends
 from app.auth import require_role
 from app.repositories.user_repo import load_users, save_users
+from app.repositories.notification_repo import load_notifications
+from app.schemas.notification_schema import Notification_Response
 from app.schemas.user_schema import (
     User, 
     User_Create,
@@ -147,6 +150,15 @@ def update_user(user_id: str, payload: User_Update) -> UserPublic:
                 role=role
             )
     raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
+
+# load notifications for the provided user.
+def get_notifications(user_id: str) -> list[Notification_Response]:
+    notifs = load_notifications()
+    user_notifs = [Notification_Response]
+    for notif in notifs:
+        if user_id in notif["user_ids"]:
+            user_notifs.append(notif)
+    return user_notifs
 
 # this function authenticates the user and confirms that they are of customer type
 def get_customer(customer: Customer = Depends(require_role(UserRole.CUSTOMER))) -> Customer:

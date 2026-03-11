@@ -5,7 +5,6 @@ This includes the menu details as well.
 Any updates to the restaurant details should follow this schema.
 """
 import re
-from typing import List
 from pydantic import BaseModel, Field, field_validator
 
 #Address model for validating address input when creating or updating restaurant details.
@@ -73,17 +72,17 @@ class MenuItem(BaseModel):
     id: int
     name: str
     price: float
-    tags: List[str] = Field(default_factory=list)  # Optional tags for the menu item (spicy, vegetarian, etc.)
+    tags: list[str] = Field(default_factory=list)  # Optional tags for the menu item (spicy, vegetarian, etc.)
 
 # Menu object which contains a list of menu items.
 class Menu(BaseModel):
-    items: List[MenuItem] = []
+    items: list[MenuItem] = []
 
 # Menu Item Create model for input validation when creating a new menu item.
 class MenuItem_Create(BaseModel):
     name: str
     price: float
-    tags: List[str] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
 
     @field_validator("name")
     @classmethod
@@ -108,8 +107,8 @@ class MenuItem_Create(BaseModel):
 
     @field_validator("tags")
     @classmethod
-    def validate_tags(cls, tags: List[str]) -> List[str]:
-        cleaned: List[str] = []
+    def validate_tags(cls, tags: list[str]) -> list[str]:
+        cleaned: list[str] = []
         for v in tags:
             v = v.strip()
             if not v:
@@ -124,7 +123,7 @@ class MenuItem_Update(BaseModel):
     id: int
     name: str
     price: float
-    tags: List[str] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
 
     @field_validator("name")
     @classmethod
@@ -149,8 +148,8 @@ class MenuItem_Update(BaseModel):
     
     @field_validator("tags")
     @classmethod
-    def validate_tags(cls, tags: List[str]) -> List[str]:
-        cleaned: List[str] = []
+    def validate_tags(cls, tags: list[str]) -> list[str]:
+        cleaned: list[str] = []
         for v in tags:
             v = v.strip()
             if not v:
@@ -162,7 +161,7 @@ class MenuItem_Update(BaseModel):
     
 # Menu Bulk Create model for input validation when adding multiple menu items to a restaurant's menu.
 class MenuItem_Bulk_Create(BaseModel):
-    items: List[MenuItem_Create] = Field(default_factory=list)  # List of menu items to add to restaurant's menu.
+    items: list[MenuItem_Create] = Field(default_factory=list)  # list of menu items to add to restaurant's menu.
 
     @field_validator("items")
     @classmethod
@@ -173,7 +172,7 @@ class MenuItem_Bulk_Create(BaseModel):
 
 # Menu Bulk Update model for input validation when updating multiple menu items in a restaurant's menu.
 class MenuItem_Bulk_Update(BaseModel):
-    items: List[MenuItem_Update] = Field(default_factory=list)  # List of menu items to update in restaurant's menu.
+    items: list[MenuItem_Update] = Field(default_factory=list)  # list of menu items to update in restaurant's menu.
 
     @field_validator("items")
     @classmethod
@@ -184,7 +183,7 @@ class MenuItem_Bulk_Update(BaseModel):
     
 # Menu Create model for when a restaurant menu is initially created.
 class Menu_Create(BaseModel):
-    items: List[MenuItem_Create] = []
+    items: list[MenuItem_Create] = []
 
 # Restaurant model
 # Each restaurant is associated with a single menu
@@ -193,7 +192,7 @@ class Restaurant(BaseModel):
     name: str
     city: str
     address: Address
-    manager_ids: List[str]  # List of user IDs who are managers of the restaurant
+    manager_ids: list[str]  # list of user IDs who are managers of the restaurant
     max_delivery_radius_km: float = 10.0  # default delivery radius in km
     menu: Menu = Menu()
 
@@ -268,7 +267,7 @@ class Restaurant_Search(BaseModel):
 
 # paginated response wrapper so the frontend knows the total results and page info
 class PaginatedRestaurantResults(BaseModel):
-    results: List[Restaurant]
+    results: list[Restaurant]
     total: int        # total number of matching restaurants
     page: int         # current page
     page_size: int    # results per page
@@ -309,11 +308,11 @@ class Restaurant_Details_Update(BaseModel):
 # Restaurant Managers Update model for input validation when updating restaurant managers.
 class Restaurant_Managers_Update(BaseModel):
     id: int
-    manager_ids: List[str]
+    manager_ids: list[str]
 
     @field_validator("manager_ids")
     @classmethod
-    def validate_manager_ids(cls, v: List[str]) -> List[str]:
+    def validate_manager_ids(cls, v: list[str]) -> list[str]:
         if not v:
             raise ValueError("At least one manager is required")
         sanitized = []

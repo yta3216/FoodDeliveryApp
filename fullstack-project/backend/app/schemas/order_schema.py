@@ -6,7 +6,7 @@ a cart to an order.
 Any updates to the order details should follow this schema.
 """
 
-from typing import List, Literal
+from typing import Literal
 from pydantic import BaseModel, Field
 
 # generic order item schema.
@@ -29,7 +29,7 @@ class Order(BaseModel):
     customer_id: str
     restaurant_id: int = 0
     delivery_id: int = 0
-    items: List[OrderItem] = Field(default_factory=list)
+    items: list[OrderItem] = Field(default_factory=list)
     status: str = "pending"
     delivery_fee: float = 0.0
     tax: float = 0.0
