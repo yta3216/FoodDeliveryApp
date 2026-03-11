@@ -216,3 +216,5 @@ def check_manager(restaurant_id: int, current_user: User = Depends(require_role(
             if current_user.id in restaurant.get("manager_ids"):
                 return current_user # user is a manager of the restaurant
             raise HTTPException(status_code=403, detail="User is not a manager of this restaurant")
+
+    raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
