@@ -28,12 +28,12 @@ class ConnectionManager:
     # disconnect a websocket
     def disconnect(self, user_id: str, websocket: WebSocket):
         if user_id in self.active_connections:
-            self.active_connections.remove(websocket)
+            self.active_connections[user_id].remove(websocket)
 
     # send notification to a user
     async def send_message(self, user_id: str, notification: Notification_Response):
         if user_id not in self.active_connections:
             return
         for websocket in self.active_connections[user_id]:
-            await websocket.send_json(notification)
+            await websocket.send_json(notification.model_dump())
         

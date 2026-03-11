@@ -14,9 +14,9 @@ connection_manager = ConnectionManager()
 async def websocket_endpoint(user_id: str, websocket: WebSocket, current_user = Depends(get_current_user)):
     if current_user.id != user_id:
         raise HTTPException(status_code=403, detail="You are not authorized to connect this user")
-    await connection_manager.connect(websocket)
+    await connection_manager.connect(user_id, websocket)
     try:
         while True:
-            await websocket.receive_text
+            await websocket.receive_text()
     except WebSocketDisconnect:
-        connection_manager.disconnect(user_id, WebSocket)
+        connection_manager.disconnect(user_id, websocket)
