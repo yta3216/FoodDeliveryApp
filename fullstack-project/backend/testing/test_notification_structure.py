@@ -6,11 +6,8 @@ from fastapi.testclient import TestClient
 from fastapi import HTTPException
 import pytest
 from app.main import app
-from app.repositories.notification_repo import load_notifications, save_notifications
-from app.schemas.notification_schema import Notification_Response
-from app.services.notification_service import (
-    Notification
-)
+from app.repositories.notification_repo import load_notifications
+from app.services.notification_service import Notification
 
 client = TestClient(app)
 

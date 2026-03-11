@@ -56,7 +56,9 @@ class Notification():
         raise HTTPException(status_code=404, detail=f"Notification '{self.id}' not found")
     
     # send the notification to the list of users. this causes the notification to be saved.
-    async def send_to_users(self, user_ids: list[str]) -> None:
+    async def send_to_users(self) -> None:
         self.save()
-        for user_id in user_ids:
+        if len(self.user_ids) == 0:
+            raise HTTPException(status_code=400, detail="Notification must have at least one recipient")
+        for user_id in self.user_ids:
             await connection_manager.send_message(user_id, self.to_model())
