@@ -7,11 +7,8 @@ import uvicorn
 from .routers.user_router import router as user_router
 from .routers.restaurant_router import router as restaurant_router
 from .routers.cart_router import router as cart_router
-<<<<<<< CF8-FR2
 from .routers.websocket_router import router as websocket_router
-=======
 from .routers.order_router import router as order_router
->>>>>>> main
 
 app = FastAPI()
 
