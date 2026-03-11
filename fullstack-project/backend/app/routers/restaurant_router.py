@@ -17,7 +17,8 @@ from app.schemas.restaurant_schema import (
     MenuItem_Update,
     MenuItem_Bulk_Create,
     MenuItem_Bulk_Update,
-    Restaurant_Search
+    Restaurant_Search,
+    PaginatedRestaurantResults
 )
 
 from app.auth import require_role
@@ -44,7 +45,7 @@ def create_restaurant_route(payload: Restaurant_Create, current_user: User = Dep
 
 # post request to search for restaurants by name, address fields, or menu item.
 # every field is optional and no authentication is required to search for restaurants.
-@router.get("/search", response_model=List[Restaurant])
+@router.get("/search", response_model=PaginatedRestaurantResults)
 def search_restaurants_route(
     name: str | None = None,
     city: str | None = None,
@@ -52,7 +53,9 @@ def search_restaurants_route(
     province: str | None = None,
     postal_code: str | None = None,
     menu_item: str | None = None,
-    sort_price: str | None = None
+    sort_price: str | None = None,
+    page: int = 1,
+    page_size: int = 5
 ):
     # catch validation errors from the search schema and return 422
     try:
@@ -63,7 +66,9 @@ def search_restaurants_route(
             province=province,
             postal_code=postal_code,
             menu_item=menu_item,
-            sort_price=sort_price
+            sort_price=sort_price,
+            page=page,
+            page_size=page_size
         )
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))

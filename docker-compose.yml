@@ -6,3 +6,4 @@ services:
       - "8000:8000"
     volumes:
       - ./fullstack-project/backend:/app
+      - ./fullstack-project/frontend:/frontend
