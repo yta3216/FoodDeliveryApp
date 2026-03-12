@@ -129,3 +129,8 @@ def test_update_status_for_nonexistent_order(setup_restaurant_menu):
         headers={"Authorization": f"Bearer {manager_token}"},
     )
     assert response.status_code == 404
+
+# test sending notification for order status change
+def test_send_status_notification():
+    # TODO
+    assert True

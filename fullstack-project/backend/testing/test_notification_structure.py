@@ -27,6 +27,11 @@ def test_create(notification):
     assert notification.user_ids == ["user1", "user2"]
     assert notification.is_read == False
 
+# test creation with empty user list
+    with pytest.raises(HTTPException) as e:
+        notification = Notification("test message 2", [])
+    assert e.value.status_code == 400
+
 # test getting id with both an empty database an one with an entry
 @pytest.mark.parametrize(
         "existing_db, expected_id",

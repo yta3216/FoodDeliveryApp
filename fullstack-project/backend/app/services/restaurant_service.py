@@ -206,6 +206,14 @@ def get_restaurant_by_id(restaurant_id: int) -> Restaurant:
             return restaurant
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
 
+# return the managers of the restaurant
+def get_managers(restaurant_id: int) -> list[str]:
+    restaurants = load_restaurants()
+    for restaurant in restaurants:
+        if restaurant.get("id") == restaurant_id:
+            return restaurant["manager_ids"]
+    raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
+
 # check if current logged in user is a manager of the restaurant. depends on user being a restaurant manager type
 def check_manager(restaurant_id: int, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))) -> User:
     restaurants = load_restaurants()

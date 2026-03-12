@@ -5,9 +5,10 @@ import datetime
 from fastapi import HTTPException
 
 from app.repositories.order_repo import load_orders, save_orders
-from app.services.restaurant_service import get_restaurant_by_id
+from app.services.restaurant_service import get_restaurant_by_id, get_managers
 from app.schemas.user_schema import Customer
 from app.services.cart_service import calculate_cart_total, empty_cart, get_cart
+from app.services.notification_service import Notification
 from app.schemas.order_schema import Order
 
 def create_order_from_cart(current_user: Customer) -> Order:
@@ -40,6 +41,8 @@ def create_order_from_cart(current_user: Customer) -> Order:
     save_orders(orders)
     empty_cart(current_user)
 
+    send_status_notification(new_order)
+
     return new_order
 
 def get_orders_for_customer(current_customer: Customer) -> list[Order]:
@@ -62,11 +65,12 @@ def cancel_order(order_id: int, current_user: Customer) -> Order:
     for order in orders:
         if order.get("id") == order_id:
             if order.get("customer_id") != current_user.id:
-                raise HTTPException(status_code=403, detail= "Your are not authroized to cancel this order.")
+                raise HTTPException(status_code=403, detail= "Your are not authorized to cancel this order.")
             if order.get("status") != "pending":
                 raise HTTPException(status_code=400, detail= f"Order cannot be cancelled, order is already '{order.get('status')}'.")
             order["status"] = "cancelled"
             save_orders(orders)
+            send_status_notification(order)
             return Order(**order)
         
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
@@ -79,7 +83,7 @@ def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
         if order.get("id") == order_id:
             restaurant = get_restaurant_by_id(order.get("restaurant_id"))
             if manager_id not in restaurant.get("manager_ids",[]):
-                raise HTTPException(status_code=403, detail = "You are not authroized to manage orders for this resturant")
+                raise HTTPException(status_code=403, detail = "You are not authorized to manage orders for this resturant")
             
             current_status = order.get("status")
             if current_status != "pending":
@@ -87,8 +91,18 @@ def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
             
             order["status"] = new_status
             save_orders(orders)
+            send_status_notification(order)
             return Order(**order)
 
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
-    
+# send order status update notification
+def send_status_notification(order: dict) -> None:
+    customer_id = order["customer_id"]
+    restaurant_id = order["restaurant_id"]
+    manager_ids = get_managers(restaurant_id)
+    # TODO: add delivery driver id to notified users.
+    notified_users = [customer_id].extend(manager_ids)
+    restaurant_name = get_restaurant_by_id(restaurant_id).name
+    notification = Notification(f"Order {order["id"]} from {restaurant_name} set to status: {order["status"]}", notified_users)
+    notification.send_to_users()

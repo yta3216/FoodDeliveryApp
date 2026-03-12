@@ -16,6 +16,8 @@ class Notification():
  
     # create notification. save method must be used as well for it to be saved.
     def __init__(self, message: str, user_ids: list[str]):
+        if len(user_ids) == 0:
+            raise HTTPException(status_code=400, detail="Notification must have at least one recipient")
         self.id = self._get_next_id()
         self.message = message
         self.user_ids = user_ids
@@ -58,7 +60,5 @@ class Notification():
     # send the notification to the list of users. this causes the notification to be saved.
     async def send_to_users(self) -> None:
         self.save()
-        if len(self.user_ids) == 0:
-            raise HTTPException(status_code=400, detail="Notification must have at least one recipient")
         for user_id in self.user_ids:
             await connection_manager.send_message(user_id, self.to_model())

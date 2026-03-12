@@ -20,3 +20,4 @@ async def websocket_endpoint(user_id: str, websocket: WebSocket, current_user = 
             await websocket.receive_text()
     except WebSocketDisconnect:
         connection_manager.disconnect(user_id, websocket)
+        
