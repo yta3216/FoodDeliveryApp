@@ -102,8 +102,7 @@ async def send_status_notification(order: dict) -> None:
     restaurant_id = order["restaurant_id"]
     manager_ids = get_managers(restaurant_id)
     # TODO: add delivery driver id to notified users.
-    notified_users = [customer_id].extend(manager_ids)
-    restaurant_name = get_restaurant_by_id(restaurant_id).name
+    notified_users = [customer_id] + manager_ids
+    restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
     notification = Notification(f"Order {order["id"]} from {restaurant_name} set to status: {order["status"]}", notified_users)
     await notification.send_to_users()
-    
