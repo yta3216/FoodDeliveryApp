@@ -162,4 +162,4 @@ async def test_send_status_notification(mocker):
         headers={"Authorization": f"Bearer {token}"}
     ) as websocket:        
         await send_status_notification(order)
-        assert websocket.receive_json()["message"] == f"Order {order["id"]} from {restaurant_name} set to status: {order["status"]}"
+        assert websocket.receive_json()["message"] == f"Order {order['id']} from {restaurant_name} set to status: {order['status']}"
