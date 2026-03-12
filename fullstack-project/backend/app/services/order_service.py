@@ -11,7 +11,7 @@ from app.services.cart_service import calculate_cart_total, empty_cart, get_cart
 from app.services.notification_service import Notification
 from app.schemas.order_schema import Order
 
-def create_order_from_cart(current_user: Customer) -> Order:
+async def create_order_from_cart(current_user: Customer) -> Order:
     cart = get_cart(current_user)
     if cart.restaurant_id == 0:
         raise HTTPException(status_code=400, detail="Cart is empty.")
@@ -41,7 +41,7 @@ def create_order_from_cart(current_user: Customer) -> Order:
     save_orders(orders)
     empty_cart(current_user)
 
-    send_status_notification(new_order)
+    await send_status_notification(new_order)
 
     return new_order
 
@@ -59,7 +59,7 @@ def get_orders_for_restaurant(restaurant_id: int, manager_id: int) -> list[Order
 
 # Cancel a pending order. Can be cancelled only by the customer that placed the order
 # Cancelled orders are removed from orders.json
-def cancel_order(order_id: int, current_user: Customer) -> Order:
+async def cancel_order(order_id: int, current_user: Customer) -> Order:
     orders = load_orders()
 
     for order in orders:
@@ -70,13 +70,13 @@ def cancel_order(order_id: int, current_user: Customer) -> Order:
                 raise HTTPException(status_code=400, detail= f"Order cannot be cancelled, order is already '{order.get('status')}'.")
             order["status"] = "cancelled"
             save_orders(orders)
-            send_status_notification(order)
+            await send_status_notification(order)
             return Order(**order)
         
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
 # Manager accepts/declines pending order
-def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
+async def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
     orders = load_orders()
 
     for order in orders:
@@ -91,13 +91,13 @@ def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
             
             order["status"] = new_status
             save_orders(orders)
-            send_status_notification(order)
+            await send_status_notification(order)
             return Order(**order)
 
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
 # send order status update notification
-def send_status_notification(order: dict) -> None:
+async def send_status_notification(order: dict) -> None:
     customer_id = order["customer_id"]
     restaurant_id = order["restaurant_id"]
     manager_ids = get_managers(restaurant_id)
@@ -105,4 +105,5 @@ def send_status_notification(order: dict) -> None:
     notified_users = [customer_id].extend(manager_ids)
     restaurant_name = get_restaurant_by_id(restaurant_id).name
     notification = Notification(f"Order {order["id"]} from {restaurant_name} set to status: {order["status"]}", notified_users)
-    notification.send_to_users()
+    await notification.send_to_users()
+    
