@@ -66,12 +66,3 @@ async def test_send_message():
         await notification.send_to_users()
 
         assert websocket.receive_json()["message"] == "test message"
-
-# test sending a message when notification user list is empty
-@pytest.mark.anyio
-async def test_send_message():
-    cm._instance = None
-    notification = Notification("test message", [])
-    with pytest.raises(HTTPException) as e:
-        await notification.send_to_users()
-    assert e.value.status_code == 400

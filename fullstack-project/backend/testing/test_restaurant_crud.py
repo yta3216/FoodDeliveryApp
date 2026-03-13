@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 import pytest
 from app.main import app
 from app.schemas.user_schema import UserRole
+from app.services.restaurant_service import get_managers
 
 client = TestClient(app)
 
@@ -68,6 +69,13 @@ def test_create_restaurant(setup_restaurant):
     assert restaurant["address"]["city"] == "Kelowna"
     assert restaurant["address"]["province"] == "BC"
     assert restaurant["address"]["postal_code"] == "A1A 1A1"
+
+# test getting the list of managers
+def test_get_managers(mocker):
+    sample_id = 79
+    mock_load = mocker.patch("app.services.restaurant_service.load_restaurants")
+    mock_load.return_value = [{"id": sample_id, "manager_ids": ["manager1", "manager2"]}]
+    assert get_managers(sample_id) == ["manager1", "manager2"]
 
 # test a typical restaurant update
 def test_update_restaurant_details(setup_restaurant):
