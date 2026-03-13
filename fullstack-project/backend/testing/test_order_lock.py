@@ -1,4 +1,6 @@
-""" tests for orders locked after confirmation. """
+"""
+tests for orders locked after confirmation uses mocking for order/restaurant data to keep fixtures lean.
+"""
 
 import pytest
 from fastapi.testclient import TestClient
@@ -8,13 +10,22 @@ from app.schemas.user_schema import UserRole
 client = TestClient(app)
 
 
-# fixtures
+# fixtures 
 @pytest.fixture
-def customer_with_order():
-    """creates a manager, restaurant, menu item, customer, cart, and order all in one."""
+def mock_orders(mocker):
+    """mocks load_orders and save_orders so tests don't touch the json files."""
+    orders = []
+    mocker.patch("app.services.order_service.load_orders", side_effect=lambda: list(orders))
+    mocker.patch("app.services.order_service.save_orders", side_effect=lambda data: (orders.clear(), orders.extend(data)))
+    return orders
 
-    # create manager and log in
-    client.post("/user", json={
+
+@pytest.fixture
+def order_setup(mocker, mock_orders):
+    """creates real users for auth tokens, then seeds a fake pending order."""
+
+    # create manager
+    manager_resp = client.post("/user", json={
         "email": "lock_manager@example.com",
         "password": "password",
         "name": "Lock Manager",
@@ -22,34 +33,12 @@ def customer_with_order():
         "gender": "male",
         "role": UserRole.RESTAURANT_MANAGER.value,
     })
-    manager_login = client.post("/user/login", json={"email": "lock_manager@example.com", "password": "password"})
-    manager_token = manager_login.json()["token"]
+    assert manager_resp.status_code == 201
+    manager_id = manager_resp.json()["id"]
+    manager_token = client.post("/user/login", json={"email": "lock_manager@example.com", "password": "password"}).json()["token"]
 
-    # create restaurant
-    restaurant_resp = client.post("/restaurant", json={
-        "name": "Lock Test Restaurant",
-        "city": "Vancouver",
-        "address": {
-            "street": "123 Lock St",
-            "city": "Vancouver",
-            "province": "BC",
-            "postal_code": "V6B1A1"
-        }
-    }, headers={"Authorization": f"Bearer {manager_token}"})
-    assert restaurant_resp.status_code == 201
-    restaurant_id = restaurant_resp.json()["id"]
-
-    # create a menu item
-    menu_resp = client.post(f"/restaurant/{restaurant_id}/menu", json={
-        "name": "Lock Burger",
-        "price": 9.99,
-        "tags": ["test"]
-    }, headers={"Authorization": f"Bearer {manager_token}"})
-    assert menu_resp.status_code == 201
-    menu_item_id = menu_resp.json()["id"]
-
-    # create customer and log in
-    client.post("/user", json={
+    # create customer
+    customer_resp = client.post("/user", json={
         "email": "lock_customer@example.com",
         "password": "password",
         "name": "Lock Customer",
@@ -57,31 +46,46 @@ def customer_with_order():
         "gender": "female",
         "role": UserRole.CUSTOMER.value,
     })
-    customer_login = client.post("/user/login", json={"email": "lock_customer@example.com", "password": "password"})
-    customer_token = customer_login.json()["token"]
+    assert customer_resp.status_code == 201
+    customer_id = customer_resp.json()["id"]
+    customer_token = client.post("/user/login", json={"email": "lock_customer@example.com", "password": "password"}).json()["token"]
 
-    # set cart restaurant and add item
-    client.put(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
-    client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 2}, headers={"Authorization": f"Bearer {customer_token}"})
+    # mock restaurant lookup so manager can accept/reject without a real restaurant
+    restaurant_id = 1
+    menu_item_id = 1
+    mocker.patch("app.services.order_service.get_restaurant_by_id", return_value={
+        "id": restaurant_id,
+        "manager_ids": [manager_id],
+    })
 
-    # place order
-    order_resp = client.post("/order", headers={"Authorization": f"Bearer {customer_token}"})
-    assert order_resp.status_code == 201
+    # seed a fake pending order directly into the mocked orders list
+    mock_orders.append({
+        "id": 1,
+        "customer_id": customer_id,
+        "restaurant_id": restaurant_id,
+        "delivery_id": 0,
+        "items": [{"menu_item_id": menu_item_id, "qty": 2}],
+        "status": "pending",
+        "delivery_fee": 0.0,
+        "tax": 0.0,
+        "subtotal": 9.99,
+        "date_created": "2026-01-01T00:00:00+00:00",
+    })
 
     return {
         "customer_token": customer_token,
         "manager_token": manager_token,
-        "order": order_resp.json(),
+        "order_id": 1,
         "menu_item_id": menu_item_id,
     }
 
 
 # tests
 # customer can edit items on a pending order
-def test_customer_can_edit_pending_order(customer_with_order):
-    order_id = customer_with_order["order"]["id"]
-    customer_token = customer_with_order["customer_token"]
-    menu_item_id = customer_with_order["menu_item_id"]
+def test_customer_can_edit_pending_order(order_setup):
+    order_id = order_setup["order_id"]
+    customer_token = order_setup["customer_token"]
+    menu_item_id = order_setup["menu_item_id"]
 
     response = client.patch(
         f"/order/{order_id}/items",
@@ -93,11 +97,11 @@ def test_customer_can_edit_pending_order(customer_with_order):
 
 
 # confirmed order cannot be edited — core lock behaviour
-def test_confirmed_order_cannot_be_edited(customer_with_order):
-    order_id = customer_with_order["order"]["id"]
-    customer_token = customer_with_order["customer_token"]
-    manager_token = customer_with_order["manager_token"]
-    menu_item_id = customer_with_order["menu_item_id"]
+def test_confirmed_order_cannot_be_edited(order_setup):
+    order_id = order_setup["order_id"]
+    customer_token = order_setup["customer_token"]
+    manager_token = order_setup["manager_token"]
+    menu_item_id = order_setup["menu_item_id"]
 
     accept = client.patch(
         f"/order/{order_id}/status",
@@ -115,11 +119,11 @@ def test_confirmed_order_cannot_be_edited(customer_with_order):
 
 
 # rejected order also cannot be edited
-def test_rejected_order_cannot_be_edited(customer_with_order):
-    order_id = customer_with_order["order"]["id"]
-    customer_token = customer_with_order["customer_token"]
-    manager_token = customer_with_order["manager_token"]
-    menu_item_id = customer_with_order["menu_item_id"]
+def test_rejected_order_cannot_be_edited(order_setup):
+    order_id = order_setup["order_id"]
+    customer_token = order_setup["customer_token"]
+    manager_token = order_setup["manager_token"]
+    menu_item_id = order_setup["menu_item_id"]
 
     client.patch(
         f"/order/{order_id}/status",
@@ -136,9 +140,9 @@ def test_rejected_order_cannot_be_edited(customer_with_order):
 
 
 # a different customer cannot edit someone else's order
-def test_other_customer_cannot_edit_order(customer_with_order):
-    order_id = customer_with_order["order"]["id"]
-    menu_item_id = customer_with_order["menu_item_id"]
+def test_other_customer_cannot_edit_order(order_setup):
+    order_id = order_setup["order_id"]
+    menu_item_id = order_setup["menu_item_id"]
 
     client.post("/user", json={
         "email": "other_lock_customer@example.com",
@@ -148,8 +152,7 @@ def test_other_customer_cannot_edit_order(customer_with_order):
         "gender": "male",
         "role": UserRole.CUSTOMER.value,
     })
-    login = client.post("/user/login", json={"email": "other_lock_customer@example.com", "password": "password"})
-    other_token = login.json()["token"]
+    other_token = client.post("/user/login", json={"email": "other_lock_customer@example.com", "password": "password"}).json()["token"]
 
     response = client.patch(
         f"/order/{order_id}/items",
@@ -160,9 +163,9 @@ def test_other_customer_cannot_edit_order(customer_with_order):
 
 
 # editing a nonexistent order returns 404
-def test_edit_nonexistent_order(customer_with_order):
-    customer_token = customer_with_order["customer_token"]
-    menu_item_id = customer_with_order["menu_item_id"]
+def test_edit_nonexistent_order(order_setup):
+    customer_token = order_setup["customer_token"]
+    menu_item_id = order_setup["menu_item_id"]
 
     response = client.patch(
         "/order/999999/items",
@@ -173,10 +176,10 @@ def test_edit_nonexistent_order(customer_with_order):
 
 
 # manager cannot use the items edit route (customers only)
-def test_manager_cannot_edit_order_items(customer_with_order):
-    order_id = customer_with_order["order"]["id"]
-    manager_token = customer_with_order["manager_token"]
-    menu_item_id = customer_with_order["menu_item_id"]
+def test_manager_cannot_edit_order_items(order_setup):
+    order_id = order_setup["order_id"]
+    manager_token = order_setup["manager_token"]
+    menu_item_id = order_setup["menu_item_id"]
 
     response = client.patch(
         f"/order/{order_id}/items",
