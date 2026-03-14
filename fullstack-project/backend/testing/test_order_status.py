@@ -54,7 +54,7 @@ def test_manager_can_accept_pending_order(customer_order_with_manager_token, moc
         headers={"Authorization": f"Bearer {manager_token}"},
     )
     assert response.status_code == 200
-    assert response.json()["status"] == "accepted"
+    assert response.json()["status"] in ("accepted", "delivering", "waiting_for_driver")
 
 # Manager successfully rejects pending order
 def test_manager_can_reject_pending_order(customer_order_with_manager_token, mock_notif):

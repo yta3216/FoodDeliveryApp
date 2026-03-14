@@ -27,7 +27,9 @@ from app.schemas.user_schema import UserRole
 router = APIRouter(prefix="/order", tags=["order"])
 
 @router.post("", response_model=Order, status_code=201, dependencies=[Depends(get_customer)])
-async def create_order_from_cart_route(payload: OrderCreate, current_user: Customer = Depends(get_customer)):
+async def create_order_from_cart_route(current_user: Customer = Depends(get_customer), payload: OrderCreate = None):
+    if payload is None:
+        payload = OrderCreate()
     return await create_order_from_cart(current_user, payload)
 
 @router.get("/customer", response_model=list[Order], status_code=200, dependencies=[Depends(get_customer)])
