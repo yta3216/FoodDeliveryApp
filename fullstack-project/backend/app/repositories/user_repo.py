@@ -1,4 +1,4 @@
-"""This file handles user data storage in the application."""
+"""This module handles user data storage in the application."""
 
 from pathlib import Path
 import json

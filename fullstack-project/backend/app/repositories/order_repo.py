@@ -1,4 +1,4 @@
-""" This file handles order data storage in the application. """
+""" This module handles order data storage in the application. """
 
 from pathlib import Path
 import json

@@ -1,4 +1,4 @@
-""" This file handles restaurant data storage in the application. """
+""" This module handles restaurant data storage in the application. """
 
 from pathlib import Path
 import json

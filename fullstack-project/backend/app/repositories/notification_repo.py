@@ -1,4 +1,4 @@
-""" This file handles notification data storage in the application. """
+""" This module handles notification data storage in the application. """
 
 from pathlib import Path
 import json

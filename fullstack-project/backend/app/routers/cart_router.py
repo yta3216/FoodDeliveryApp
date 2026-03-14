@@ -1,5 +1,5 @@
 """
-This file defines the API routes for restaurant management.
+This module defines the API routes for restaurant management.
 Functions use get_cart as a dependency, which will authenticate
 the user, verify they are a customer, and return their cart.
 """

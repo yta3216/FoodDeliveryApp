@@ -59,34 +59,74 @@ def login_user_route(payload: LoginRequest):
 @router.get("/{user_id}", response_model=UserPublic)
 def get_user_route(user_id: str, current_user: User = Depends(get_current_user)):
     """
-    Retrieves the data of any user
+    Retrieves the data of a user. Admin accounts can access any user; other users can only access their own account.
+
+    Parameters:
+    *   **user_id** (str): the identifier of the user to be retrieved
+    
+    Returns:
+    *   **UserPublic**: the requested user's data
     """
     if current_user.role != UserRole.ADMIN and current_user.id != user_id:
         raise HTTPException(status_code=403, detail="You are not authorized to view this user's details")
     return get_user_by_id(user_id)
 
-# update user details - users can only update their own account
 @router.put("/{user_id}", response_model=UserPublic)
 def update_user_route(user_id: str, payload: User_Update, current_user: User = Depends(get_current_user)):
+    """
+    Updates the data of a user. Admin accounts can access any user; other users can only access their own account.
+
+    Parameters:
+    *   **user_id** (str): the identifier of the user to be updated
+    *   **payload** (User_Update): the updated user account details
+
+    Returns:
+    *   **User_Public**: the newly updated user details
+    """
     if current_user.role != UserRole.ADMIN and current_user.id != user_id:
         raise HTTPException(status_code=403, detail="You are not authorized to edit this user's details")
     return update_user(user_id, payload)
 
-# password reset request - non-logged in user wants to reset password
 @router.post("/password-reset/request")
 def password_reset_request(payload: Password_Reset_Request):
+    """
+    Requests a password reset link for a non-logged in user. Does not return any data indicating if email exists or not.
+    Reset links are printed to the terminal to simulate an email for now.
+
+    Parameters:
+    *   **payload** (Password_Reset_Request): the email of the account to be updated
+    
+    Returns: None
+    """
     reset_password_request(payload.email)
     return {"detail": "If the email exists, a password reset link has been sent."}
 
-# once user has received reset token, they can use it to reset their password
 @router.post("/reset-password")
 def perform_reset_password(payload: Password_Reset):
+    """
+    Resets the password of a user who has recently requested a password reset.
+
+    Parameters:
+    *   **payload** (Password_Reset): the password reset token and desired new password
+
+    Returns:
+    *   **dict[str, str]: a message stating that password reset was successful
+    """
     reset_password(payload.new_password, payload.reset_token)
     return {"detail": "Password reset successful."}
 
-# logged in user wants to update their password
 @router.put("/{user_id}/password")
 def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged_In, current_user: User = Depends(get_current_user)):
+    """
+    Resets the password of a logged-in user.
+
+    Parameters:
+    *   **user_id** (str): the identifier for the account to be updated. must match the logged in user's id
+    *   **payload** (Password_Reset): the password reset token and desired new password
+
+    Returns:
+    *   **dict[str, str]: a message stating that the user's password was updated
+    """
     if current_user.id != user_id:
         raise HTTPException(status_code=403, detail="You are not authorized to change this user's password")
     update_password_when_logged_in(user_id, payload.old_password, payload.new_password)
@@ -95,6 +135,15 @@ def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged
 # logged in user wants to retrieve their notifications.
 @router.get("/{user_id}/notifications", response_model=list[Notification_Response])
 def get_notifications_route(user_id: str, current_user: User = Depends(get_current_user)):
+    """
+    Retrieves all notifications ever sent to the logged-in user.
+
+    Parameters:
+    *   **user_id** (str): the identifier of the account to retrieve notifications for. must match the logged in user's id
+
+    Returns:
+    *   **list[Notification_Response]**: a list of the notifications associated with the logged-in user
+    """
     if current_user.id != user_id:
         raise HTTPException(status_code=403, detail="You are not authorized to view this user's notifications")
     return get_notifications(user_id)
