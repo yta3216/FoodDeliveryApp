@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "user_ids": [
+      "ed0bfdf2-7b3a-4cc8-93be-bef1183c3642",
+      "11a1fb98-92d7-4870-89d5-1c7c499350b8"
+    ],
+    "message": "Order 1 from Test Restaurant set to status: pending",
+    "is_read": false,
+    "time": "2026/03/13 23:51"
+  },
+  {
+    "id": 2,
+    "user_ids": [
+      "ed0bfdf2-7b3a-4cc8-93be-bef1183c3642",
+      "11a1fb98-92d7-4870-89d5-1c7c499350b8"
+    ],
+    "message": "Order 1 from Test Restaurant set to status: delivering",
+    "is_read": false,
+    "time": "2026/03/13 23:54"
+  },
+  {
+    "id": 3,
+    "user_ids": [
+      "ed0bfdf2-7b3a-4cc8-93be-bef1183c3642",
+      "11a1fb98-92d7-4870-89d5-1c7c499350b8"
+    ],
+    "message": "Order 1 from Test Restaurant set to status: delivered",
+    "is_read": false,
+    "time": "2026/03/14 00:01"
+  }
+]

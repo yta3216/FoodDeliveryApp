@@ -41,6 +41,8 @@ class Admin(User):
 
 class DeliveryDriver(User):
     role: UserRole = UserRole.DELIVERY_DRIVER
+    vehicle: str = "bike"           # bike or car
+    driver_status: str = "available" # available, delivering, unavailable
 
 # Map user roles to appropriate classes for creation
 ROLE_TO_CLASS = {

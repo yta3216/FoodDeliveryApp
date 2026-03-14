@@ -31,11 +31,20 @@ class Order(BaseModel):
     delivery_id: int = 0
     items: list[OrderItem] = Field(default_factory=list)
     status: str = "pending"
+    distance_km: float = 0.0        # distance from customer to restaurant
     delivery_fee: float = 0.0
     tax: float = 0.0
     subtotal: float = 0.0
     date_created: str = None
 
-# schema for manager to accept/reject pending order
+# schema for manager to accept / reject pending order
 class OrderStatusUpdate(BaseModel):
-    status: Literal["accepted","rejected"]
+    status: Literal["accepted", "rejected"]
+
+# schema for customer to update items on a pending order
+class OrderItemsUpdate(BaseModel):
+    items: list[OrderItem] = Field(default_factory=list)
+
+# schema for customer to create an order, includes distance from restaurant
+class OrderCreate(BaseModel):
+    distance_km: float = 0.0
