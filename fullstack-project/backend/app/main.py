@@ -10,7 +10,17 @@ from .routers.cart_router import router as cart_router
 from .routers.websocket_router import router as websocket_router
 from .routers.order_router import router as order_router
 
-app = FastAPI()
+description = """
+*Why bother cooking your own meals...*
+
+Just a few clicks and food from your favourite restaurant will be at your doorstep!
+"""
+
+app = FastAPI(
+    title = "Food Delivery App",
+    description = description,
+    summary = "Food delivery with exceptional service!"
+)
 
 origins = [
     "http://localhost:8000",

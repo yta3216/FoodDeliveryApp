@@ -1,5 +1,8 @@
 """
 This module defines the API routes for restaurant management.
+Most functions use check_manager as a dependency, which will
+authenticate the user and verify they are a manager of the
+specified restaurant.
 """
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -36,13 +39,19 @@ from app.schemas.order_schema import Order
 
 router = APIRouter(prefix="/restaurant", tags=["restaurant"])
 
-# post request to create a new restaurant. Uses logged in user as the initial manager. Only managers can create restaurants.
 @router.post("", response_model=Restaurant, status_code=201)
 def create_restaurant_route(payload: Restaurant_Create, current_user: User = Depends(require_role((UserRole.RESTAURANT_MANAGER)))):
+    """
+    **Creates a new restaurant, assigning the logged-in user as a manger for the new restaurant.**
+    
+    Parameters:
+    *   **payload** (Restaurant_Create): the details of the restaurant to be created
+
+    Returns:
+    *   **Restaurant**: the newly created restaurant
+    """
     return create_restaurant(payload, current_user.id)
 
-# post request to search for restaurants by name, address fields, or menu item.
-# every field is optional and no authentication is required to search for restaurants.
 @router.get("/search", response_model=PaginatedRestaurantResults)
 def search_restaurants_route(
     name: str | None = None,
@@ -55,7 +64,21 @@ def search_restaurants_route(
     page: int = 1,
     page_size: int = 5
 ):
-    # catch validation errors from the search schema and return 422
+    """
+    **Searches restaurants by various optional fields. Does not require authentication.**
+    
+    Parameters: *(all optional)*
+    *   **name** (str): restaurant name
+    *   **city** (str): restaurant city
+    *   **street** (str): restaurant street
+    *   **province** (str): restaurant province
+    *   **postal_code** (str): restaurant postal code
+    *   **menu_item** (str): menu item name
+    *   **sort_price** (str): "asc" or "desc" for ascending or descending results
+
+    Returns:
+    *   **PaginatedRestaurantResults**: a paginated response of restaurants satisfying this criteria
+    """
     try:
         payload = Restaurant_Search(
             name=name,
@@ -72,43 +95,106 @@ def search_restaurants_route(
         raise HTTPException(status_code=422, detail=str(e))
     return search_restaurants(payload)
 
-# put request to update restaurant details (name, city, address)
 @router.put("/{restaurant_id}", response_model=Restaurant, dependencies=[Depends(check_manager)])
 def update_restaurant_details_route(restaurant_id: int, payload: Restaurant_Details_Update):
+    """
+    **Updates a restaurant's details such as name, city, or address. Must be one of the restaurant managers to use.**
+    
+    Parameters:
+    *   **restaurant_id** (int): the identifier of the restaurant to be updated
+    *   **payload** (Restaurant_Details_Update): the updated restaurant details
+
+    Returns:
+    *   **Restaurant**: the modified restaurant
+    """
     if restaurant_id != payload.id:
         raise HTTPException(status_code=400, detail="Restaurant ID in path and body must match")
     return update_restaurant_details(payload)
 
-# put request to update restaurant managers. only managers can update restaurant managers.
 @router.put("/{restaurant_id}/managers", response_model=Restaurant, dependencies=[Depends(check_manager)])
 def update_restaurant_managers_route(restaurant_id: int, payload: Restaurant_Managers_Update):
+    """
+    **Updates a restaurant's list of managers. Must be one of the restaurant managers to use.**
+    
+    Parameters:
+    *   **restaurant_id** (int): the identifier of the restaurant to be updated
+    *   **payload** (Restaurant_Managers_Update): the new complete list of restaurant managers
+
+    Returns:
+    *   **Restaurant**: the modified restaurant
+    """
     if restaurant_id != payload.id:
         raise HTTPException(status_code=400, detail="Restaurant ID in path and body must match")
     return update_restaurant_managers(payload)
 
-# post request to bulk create menu items in the restaurant's menu. only managers can bulk create menu items.
 @router.post("/{restaurant_id}/menu/bulk", response_model=list[MenuItem], status_code=201, dependencies=[Depends(check_manager)])
 def bulk_create_menu_items_route(restaurant_id: int, payload: MenuItem_Bulk_Create):
+    """
+    **Adds multiple new items to a restaurant's menu at once. Must be one of the restaurant managers to use.**
+    
+    Parameters:
+    *   **restaurant_id** (int): the identifier of the restaurant to be updated
+    *   **payload** (MenuItem_Bulk_Create): all new menu items
+
+    Returns:
+    *   **list[MenuItem]**: a list of the newly created menu items
+    """
     return bulk_menu_item_create(restaurant_id, payload)
 
-# put request to bulk update menu items in the restaurant's menu. only managers can bulk update menu items.
 @router.put("/{restaurant_id}/menu/bulk", response_model=list[MenuItem], dependencies=[Depends(check_manager)])
 def bulk_update_menu_items_route(restaurant_id: int, payload: MenuItem_Bulk_Update):
+    """
+    **Updates multiple existing menu items for a given restaurant. Must be one of the restaurant managers to use.**
+    
+    Parameters:
+    *   **restaurant_id** (int): the identifier of the restaurant to be updated
+    *   **payload** (MenuItem_Bulk_Update): all modifications to existing items
+
+    Returns:
+    *   **list[MenuItem]**: a list of the newly updated menu items
+    """
     return bulk_menu_item_update(restaurant_id, payload)
 
-# post request to create a new menu item and add it to the restaurant's menu. only managers can add menu items.
 @router.post("/{restaurant_id}/menu", response_model=MenuItem, status_code=201, dependencies=[Depends(check_manager)])
 def create_menu_item_route(restaurant_id: int, payload: MenuItem_Create):
+    """
+    **Creates a new menu item to add to restaurant's menu. Must be one of the restaurant managers to use.**
+    
+    Parameters:
+    *   **restaurant_id** (int): the identifier of the restaurant associated with the new item
+    *   **payload** (MenuItem_Create): the new menu item details
+
+    Returns:
+    *   **MenuItem**: the newly created menu item
+    """
     return create_menu_item(restaurant_id, payload)
 
-# get orders for a particular restaurant. only managers may view this.
 @router.get("/{restaurant_id}/orders", response_model=list[Order])
 def restaurant_orders_route(restaurant_id: int, current_user: User = Depends(check_manager)):
+    """
+    **Retrieves all orders for a particular restaurant. Must be one of the restaurant managers to use.**
+
+    Parameters:
+    *   **restaurant_id** (int): the identifier of the restaurant to be updated
+
+    Returns:
+    *   **list[Order]**: all orders for the given restaurant
+    """
     return get_orders_for_restaurant(restaurant_id=restaurant_id, manager_id=current_user.id)
 
-# put request to update a menu item in the restaurant's menu. only managers can update menu items.
 @router.put("/{restaurant_id}/menu/{menu_item_id}", response_model=MenuItem, dependencies=[Depends(check_manager)])
 def update_menu_item_route(restaurant_id: int, menu_item_id: int, payload: MenuItem_Update):
+    """
+    **Updates a menu item in the restaurant's menu. Must be one of the restaurant managers to use.**
+
+    Parameters:
+    *   **restaurant_id
+    *   **menu_item_id** (int): the identifier of the menu item to be updated
+    *   **payload** (MenuItem_Update): the updated menu item details
+
+    Returns:
+    *   **MenuItem**: the updated menu item
+    """
     if menu_item_id != payload.id:
         raise HTTPException(status_code=400, detail="Menu item ID in path and body must match")
     return update_menu_item(restaurant_id, payload)
