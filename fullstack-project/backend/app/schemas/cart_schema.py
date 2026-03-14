@@ -11,21 +11,44 @@ Any updates to the cart details should follow this schema.
 
 from pydantic import BaseModel, Field
 
-# generic cart item schema. we store the MenuItem ID rather than the item itself in the cart to save storage.
 class CartItem(BaseModel):
+    """
+    **Defines the attributes of a generic cart item.**
+
+    Attributes:
+    *   **menu_item_id** (int): the identifier of this item on its associated menu
+    *   **qty** (int): the amount of this item in the cart
+    """
     menu_item_id: int
     qty: int
 
-# schema to add an item to cart
 class CartItem_Create(BaseModel):
+    """
+    **Defines the attributes required for cart item creation.**
+
+    Attributes:
+    *   **menu_item_id** (int): the identifier of this item on its associated menu
+    *   **qty** (int): the amount of this item in the cart
+    """
     menu_item_id: int
     qty: int
 
-# schema to update cart item qty. id contained in url
 class CartItem_Update(BaseModel):
+    """
+    **Defines the attributes required to update an item in the cart. Item ID is passed by URL.**
+
+    Attributes:
+    *   **new_qty** (int): the new quantity of this item in the cart
+    """
     new_qty: int
 
-# generic cart schema
 class Cart(BaseModel):
+    """
+    **Defines the attributes required to create a cart.**
+
+    Attributes:
+    *   **restaurant_id** (int): the identifier of the restaurant which this cart orders from.
+    *   **cart_items** (list[CartItem]): intitial items to be added to the cart *(optional)*.
+    """
     restaurant_id: int = 0
     cart_items: list[CartItem] = Field(default_factory=list)

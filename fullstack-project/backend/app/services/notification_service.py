@@ -57,6 +57,7 @@ class Notification():
     
     # send the notification to the list of users. this causes the notification to be saved.
     async def send_to_users(self) -> None:
+        self.time = datetime.now().strftime('%Y/%m/%d %H:%M') # YYYY/MM/DD HH:MM
         self.save()
         if len(self.user_ids) == 0:
             raise HTTPException(status_code=400, detail="Notification must have at least one recipient")

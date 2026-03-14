@@ -35,13 +35,18 @@ def _calculate_average_price(restaurant: dict) -> float:
         return 0.0
     total_price = sum(item.get("price", 0) for item in items)
     return total_price / len(items)
-                                          
-# Create a new restaurant.
-def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant:
-    restaurants = load_restaurants()
+
+# generate new id for the restaurant. pass loaded restaurants in so that they aren't loaded twice
+def get_new_id(restaurants) -> int:
     new_id = max((restaurant.get("id", 0) for restaurant in restaurants), default=0) + 1 # generate unique ID for the new restaurant
     if any(restaurant.get("id") == new_id for restaurant in restaurants):
         raise HTTPException(status_code=409, detail="ID collision; retry.") # just in case, though should not be possible
+    return new_id
+
+# Create a new restaurant.
+def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant:
+    restaurants = load_restaurants()
+    new_id = get_new_id(restaurants)
 
     new_restaurant = {
         "id": new_id,

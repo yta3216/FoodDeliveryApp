@@ -13,7 +13,7 @@ connection_manager = ConnectionManager()
 @router.websocket("/{user_id}")
 async def websocket_endpoint(user_id: str, websocket: WebSocket, current_user = Depends(get_current_user_with_ws)):
     """
-    Adds the logged in user to the list of currently connected users and allows them to receive real-time notifications.
+    **Adds the logged in user to the list of currently connected users and allows them to receive real-time notifications.**
 
     Parameters:
     *   **user_id** (str): the identifier forof the user attempting to connect. must match the logged-in user's identifier.

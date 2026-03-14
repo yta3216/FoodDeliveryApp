@@ -33,7 +33,7 @@ router = APIRouter(prefix="/user", tags=["user"])
 @router.post("", response_model=UserPublic, status_code=201)
 def create_user_route(payload: User_Create):
     """
-    Creates a new user in the system.
+    **Creates a new user in the system.**
 
     Parameters:
     *   **payload** (User_Create): the data for the new user
@@ -46,7 +46,7 @@ def create_user_route(payload: User_Create):
 @router.post("/login", response_model=LoginResponse)
 def login_user_route(payload: LoginRequest):
     """
-    Logs a user into the system.
+    **Logs a user into the system.**
 
     Parameters:
     *   **payload** (LoginRequest): the provided email and password in the login attempt
@@ -59,7 +59,7 @@ def login_user_route(payload: LoginRequest):
 @router.get("/{user_id}", response_model=UserPublic)
 def get_user_route(user_id: str, current_user: User = Depends(get_current_user)):
     """
-    Retrieves the data of a user. Admin accounts can access any user; other users can only access their own account.
+    **Retrieves the data of a user. Admin accounts can access any user; other users can only access their own account.**
 
     Parameters:
     *   **user_id** (str): the identifier of the user to be retrieved
@@ -74,7 +74,7 @@ def get_user_route(user_id: str, current_user: User = Depends(get_current_user))
 @router.put("/{user_id}", response_model=UserPublic)
 def update_user_route(user_id: str, payload: User_Update, current_user: User = Depends(get_current_user)):
     """
-    Updates the data of a user. Admin accounts can access any user; other users can only access their own account.
+    **Updates the data of a user. Admin accounts can access any user; other users can only access their own account.**
 
     Parameters:
     *   **user_id** (str): the identifier of the user to be updated
@@ -90,8 +90,8 @@ def update_user_route(user_id: str, payload: User_Update, current_user: User = D
 @router.post("/password-reset/request")
 def password_reset_request(payload: Password_Reset_Request):
     """
-    Requests a password reset link for a non-logged in user. Does not return any data indicating if email exists or not.
-    Reset links are printed to the terminal to simulate an email for now.
+    **Requests a password reset link for a non-logged in user. Does not return any data indicating if email exists or not.**
+    *Reset links are printed to the terminal to simulate an email for now.*
 
     Parameters:
     *   **payload** (Password_Reset_Request): the email of the account to be updated
@@ -104,7 +104,7 @@ def password_reset_request(payload: Password_Reset_Request):
 @router.post("/reset-password")
 def perform_reset_password(payload: Password_Reset):
     """
-    Resets the password of a user who has recently requested a password reset.
+    **Resets the password of a user who has recently requested a password reset.**
 
     Parameters:
     *   **payload** (Password_Reset): the password reset token and desired new password
@@ -118,7 +118,7 @@ def perform_reset_password(payload: Password_Reset):
 @router.put("/{user_id}/password")
 def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged_In, current_user: User = Depends(get_current_user)):
     """
-    Resets the password of a logged-in user.
+    **Resets the password of a logged-in user.**
 
     Parameters:
     *   **user_id** (str): the identifier for the account to be updated. must match the logged in user's id
@@ -136,7 +136,7 @@ def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged
 @router.get("/{user_id}/notifications", response_model=list[Notification_Response])
 def get_notifications_route(user_id: str, current_user: User = Depends(get_current_user)):
     """
-    Retrieves all notifications ever sent to the logged-in user.
+    **Retrieves all notifications ever sent to the logged-in user.**
 
     Parameters:
     *   **user_id** (str): the identifier of the account to retrieve notifications for. must match the logged in user's id

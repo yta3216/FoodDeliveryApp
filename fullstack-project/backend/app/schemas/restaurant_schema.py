@@ -7,7 +7,6 @@ Any updates to the restaurant details should follow this schema.
 import re
 from pydantic import BaseModel, Field, field_validator
 
-#Address model for validating address input when creating or updating restaurant details.
 # Helpers for address input contraints
 _NAME_RE = re.compile(r"^[\w\s\-',\.&]+$",re.UNICODE)  # Allows letters, numbers, spaces, and common punctuation
 _STREET_RE = re.compile(r"^\d+\s+\S+",re.UNICODE)  # Allows letters, numbers, spaces, and common punctuation
@@ -16,6 +15,15 @@ _POSTAL_CODE_RE = re.compile(r"^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$") # Canadian 
 PROVINCES = {"AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"}
 
 class Address(BaseModel):
+    """
+    **Defines the attributes of an address.**
+
+    Attributes:
+    *   **street** (str): restaurant's street address. must start with number followed by street name
+    *   **city** (str): restaurant's city
+    *   **province** (str): restaurant's province, written as a 2 letter abbreviation
+    *   **postal_code** (str): restaurant's postal code. must follow the format A1A 1A1
+    """
     street: str
     city: str
     province: str
@@ -67,19 +75,39 @@ class Address(BaseModel):
             v = v[:3]+ " " + v[3:]
         return v
     
-# Menu item model
 class MenuItem(BaseModel):
+    """
+    **Defines the attributes of a generic menu item.**
+
+    Attributes:
+    *   **id** (int): the identifier of the menu item
+    *   **name** (str): the name of the menu item
+    *   **price** (float): the price of the menu item
+    *   **tags** list[str]: tags for the item (spicy, vegetarian, etc.) *(optional)*
+    """
     id: int
     name: str
     price: float
-    tags: list[str] = Field(default_factory=list)  # Optional tags for the menu item (spicy, vegetarian, etc.)
+    tags: list[str] = Field(default_factory=list)
 
-# Menu object which contains a list of menu items.
 class Menu(BaseModel):
+    """
+    **Defines the attributes of a menu object.**
+
+    Attributes:
+    *   **items** (list[MenuItem]): a list of the items in this menu
+    """
     items: list[MenuItem] = []
 
-# Menu Item Create model for input validation when creating a new menu item.
 class MenuItem_Create(BaseModel):
+    """
+    **Defines the attributes required to create a menu item.**
+
+    Attributes:
+    *   **name** (str): the name of the new menu item
+    *   **price** (float): the price of the new menu item
+    *   **tags** list[str]: tags for the item (spicy, vegetarian, etc.) *(optional)*
+    """
     name: str
     price: float
     tags: list[str] = Field(default_factory=list)
@@ -118,8 +146,16 @@ class MenuItem_Create(BaseModel):
             cleaned.append(v.lower())
         return cleaned
 
-# Menu Item Update model for input validation when updating menu item details.
 class MenuItem_Update(BaseModel):
+    """
+    **Defines the attributes required to update a menu item.**
+    
+    Attributes:
+    *   **id** (int): the identifier of the menu item to be updated
+    *   **name** (str): the name of the updated menu item
+    *   **price** (float): the price of the updated menu item
+    *   **tags** list[str]: updated tags for the item (spicy, vegetarian, etc.) *(optional)*
+    """
     id: int
     name: str
     price: float
@@ -159,9 +195,14 @@ class MenuItem_Update(BaseModel):
             cleaned.append(v.lower())
         return cleaned
     
-# Menu Bulk Create model for input validation when adding multiple menu items to a restaurant's menu.
 class MenuItem_Bulk_Create(BaseModel):
-    items: list[MenuItem_Create] = Field(default_factory=list)  # list of menu items to add to restaurant's menu.
+    """
+    **Defines the attributes required to add several items to a restaurant menu at once.**
+
+    Attributes:
+    *   **items** (list[MenuItem_Create]): list of new menu items to add to restaurant's menu
+    """
+    items: list[MenuItem_Create] = Field(default_factory=list)
 
     @field_validator("items")
     @classmethod
@@ -170,9 +211,14 @@ class MenuItem_Bulk_Create(BaseModel):
             raise ValueError("At least one menu item must be provided")
         return v
 
-# Menu Bulk Update model for input validation when updating multiple menu items in a restaurant's menu.
 class MenuItem_Bulk_Update(BaseModel):
-    items: list[MenuItem_Update] = Field(default_factory=list)  # list of menu items to update in restaurant's menu.
+    """
+    **Defines the attributes required to modify several items to a restaurant menu at once.**
+
+    Attributes:
+    *   **items** (list[MenuItem_Create]): list of existing menu items to update
+    """
+    items: list[MenuItem_Update] = Field(default_factory=list)
 
     @field_validator("items")
     @classmethod
@@ -183,17 +229,34 @@ class MenuItem_Bulk_Update(BaseModel):
     
 # Menu Create model for when a restaurant menu is initially created.
 class Menu_Create(BaseModel):
+    """
+    **Defines the attributes required to create a menu for a restaurant.**
+
+    Attributes:
+    *   **items** (list[MenuItem_Create]): list of menu items that will comprise the restaurant's new menu
+    """
     items: list[MenuItem_Create] = []
 
-# Restaurant model
-# Each restaurant is associated with a single menu
 class Restaurant(BaseModel):
+    """
+    **Defines the attributes of a generic restaurant model.
+    Restaurants are associated with one menu.**
+
+    Attributes:
+    *   **id** (int): the restaurant's identifier
+    *   **name** (name): the restaurant's name
+    *   **city** (str): the city the restaurant is located in
+    *   **address** (Address): the full address of the restaurant
+    *   **mnager_ids** (list[str]): list of user IDs who are managers of the restaurant
+    *   **max_delivery_radius_km** (float): the maximum radius that a restaurant will deliver to. default=10
+    *   **menu** (Menu): the restaurant's menu
+    """
     id: int
     name: str
     city: str
     address: Address
-    manager_ids: list[str]  # list of user IDs who are managers of the restaurant
-    max_delivery_radius_km: float = 10.0  # default delivery radius in km
+    manager_ids: list[str]
+    max_delivery_radius_km: float = 10.0
     menu: Menu = Menu()
 
 # Restaurant Create model for input validation when creating a new restaurant.
@@ -201,6 +264,16 @@ class Restaurant(BaseModel):
 # It also does not include the 'menu' field since it is created when the restaurant is created.
 # It also does not include the 'manager_ids' field since the only manager on creation is the logged in user.
 class Restaurant_Create(BaseModel):
+    """
+    **Defines the attributes required to create a restaurant. Initial manager id is just the current user.**
+
+    Attributes:
+    *   **name** (name): the restaurant's name
+    *   **city** (str): the city the restaurant is located in
+    *   **address** (Address): the full address of the restaurant
+    *   **max_delivery_radius_km** (float): the maximum radius that a restaurant will deliver to. default=10
+    *   **menu** (Menu): the restaurant's menu, empty if not provided
+    """
     name: str
     city: str
     address: Address
@@ -231,9 +304,21 @@ class Restaurant_Create(BaseModel):
             raise ValueError("Restaurant city contains invalid characters")
         return v
 
-# Restaurant Search model to search for restaurants by name, address, or menu item.
-# Address fields are stored separately to allow for more specific searching and filtering.
 class Restaurant_Search(BaseModel):
+    """
+    **Defines the available search criteria. All attributes are optional.**
+
+    Attributes:
+    *   **name** (str)
+    *   **city** (str)
+    *   **street** (str)
+    *   **province** (str)
+    *   **postal_code** (str)
+    *   **menu_item** (str): name of a menu item
+    *   **sort_price** (str): "asc" (sorts ascending) or "desc" (sorts descending)
+    *   **page** (str): which page to return from paginated results. starts at 1
+    *   **name** (str): how many results should be returned per page (1-50)
+    """
     name: str | None = None
     city: str | None = None
     street: str | None = None
@@ -265,21 +350,39 @@ class Restaurant_Search(BaseModel):
             raise ValueError("page_size must be between 1 and 50")
         return v
 
-# paginated response wrapper so the frontend knows the total results and page info
 class PaginatedRestaurantResults(BaseModel):
-    results: list[Restaurant]
-    total: int        # total number of matching restaurants
-    page: int         # current page
-    page_size: int    # results per page
-    total_pages: int  # total number of pages
+    """
+    **Defines the attributes of search pagination for the frontend.**
 
-# Restaurant Details Update model for input validation when updating restaurant details.
+    Attributes:
+    *   **results** (list[Restaurant]): list of matching restaurants
+    *   **total** (int): total number of matching restaurants
+    *   **page** (int): current page number
+    *   **page_size** (int): number of results returned per page
+    *   **total_pages** (int): total number of pages returned
+    """
+    results: list[Restaurant]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+
 class Restaurant_Details_Update(BaseModel):
+    """
+    **Defines the attributes required to update restaurant details.**
+
+    Atributes:
+    *   **id** (int): identifier of restaurant to be updated
+    *   **name** (str): updated restaurant name
+    *   **city** (str): updated restaurant city
+    *   **address** (Address): updated restaurant address
+    *   **max_delivery_radius_km** (float): maximum distance that the restaurant will accept orders from.
+    """
     id: int
     name: str
     city: str
     address: Address
-    max_delivery_radius_km: float = 10.0  # how far the restaurant will deliver
+    max_delivery_radius_km: float = 10.0
 
     @field_validator("name")
     @classmethod
@@ -305,8 +408,14 @@ class Restaurant_Details_Update(BaseModel):
             raise ValueError("Restaurant city contains invalid characters")
         return v
     
-# Restaurant Managers Update model for input validation when updating restaurant managers.
 class Restaurant_Managers_Update(BaseModel):
+    """
+    **Defines the attributes required to update the list of restaurant managers.**
+
+    Attributes:
+    *   **id** (int): the identifier of the restaurant whose managers will be updated
+    *   **manager_ids** (list[str]): new list of manager ids for this restaurant
+    """
     id: int
     manager_ids: list[str]
 
