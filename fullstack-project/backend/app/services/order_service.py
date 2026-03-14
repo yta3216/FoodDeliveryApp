@@ -76,8 +76,8 @@ async def cancel_order(order_id: int, current_user: Customer) -> Order:
         
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
-# Manager accepts / declines pending order
-# if accepted, tries to assign a driver — if none available, order goes to waiting_for_driver
+# Manager accepts or declines pending order
+# if accepted, tries to assign a driver: if none available, order goes to waiting_for_driver
 async def update_order_status(order_id: int, new_status: str, manager_id: int) -> Order:
     from app.services.delivery_service import (
         create_delivery, assign_driver_to_order, find_available_driver, get_required_vehicle
@@ -106,13 +106,13 @@ async def update_order_status(order_id: int, new_status: str, manager_id: int) -
             driver = find_available_driver(required_vehicle)
 
             if driver:
-                # driver found: create delivery and set to delivering
+                # driver found: create delivery and set to preparing
                 delivery = create_delivery(order_id, driver["id"], distance_km)
                 assign_driver_to_order(driver["id"])
-                order["status"] = "delivering"
+                order["status"] = "preparing"
                 order["delivery_id"] = delivery.id
             else:
-                # no driver available — wait in queue
+                # no driver available: wait in queue
                 order["status"] = "waiting_for_driver"
 
             save_orders(orders)
@@ -121,7 +121,7 @@ async def update_order_status(order_id: int, new_status: str, manager_id: int) -
 
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
-# update items on a pending order — blocked if the order is already confirmed
+# update items on a pending order: blocked if the order is already confirmed
 def update_order_items(order_id: int, payload: OrderItemsUpdate, current_user: Customer) -> Order:
     orders = load_orders()
 
@@ -131,7 +131,7 @@ def update_order_items(order_id: int, payload: OrderItemsUpdate, current_user: C
             if order.get("customer_id") != current_user.id:
                 raise HTTPException(status_code=403, detail="You are not authorized to edit this order.")
 
-            # block edits once the order is no longer pending (i.e. confirmed by manager)
+            # block edits once the order is no longer pending
             if order.get("status") != "pending":
                 raise HTTPException(status_code=400, detail=f"Order is locked and cannot be edited — current status is '{order.get('status')}'.")
 

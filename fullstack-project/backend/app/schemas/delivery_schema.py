@@ -11,3 +11,4 @@ class Delivery(BaseModel):
     started_at: float = 0.0         # unix timestamp when driver marks delivering
     delivered_at: float = 0.0       # unix timestamp when driver marks delivered
     actual_minutes: float = 0.0     # calculated when delivered
+    delay_minutes: float = 0.0      # actual_minutes - eta_minutes, negative = early, positive = late

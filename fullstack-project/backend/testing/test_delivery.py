@@ -107,7 +107,7 @@ def test_manager_accept_assigns_driver(delivery_setup):
         headers={"Authorization": f"Bearer {manager_token}"},
     )
     assert response.status_code == 200
-    assert response.json()["status"] == "delivering"
+    assert response.json()["status"] == "preparing"
 
 
 # when no driver is available, order goes to waiting_for_driver
@@ -212,6 +212,11 @@ def test_driver_can_start_delivery(delivery_setup):
     assert response.status_code == 200
     assert response.json()["eta_minutes"] > 0
     assert response.json()["started_at"] > 0
+    customer_token = delivery_setup["customer_token"]
+    order_resp = client.get("/order/customer", headers={"Authorization": f"Bearer {customer_token}"})
+    orders = [o for o in order_resp.json() if o["id"] == order_id]
+    assert orders[0]["status"] == "delivering"
+    assert response.json()["started_at"] > 0
 
 
 # driver can complete delivery and actual time is recorded
@@ -237,6 +242,7 @@ def test_driver_can_complete_delivery(delivery_setup):
     assert response.status_code == 200
     assert response.json()["delivered_at"] > 0
     assert response.json()["actual_minutes"] >= 0
+    assert "delay_minutes" in response.json()
 
 
 # customer can view delivery info for their order

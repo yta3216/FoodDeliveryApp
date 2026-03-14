@@ -33,7 +33,7 @@ def find_available_driver(required_vehicle: str) -> dict | None:
     ]
     if not candidates:
         return None
-    # pick the one who has been available the longest — we use id as tiebreaker
+    # pick the one who has been available the longest: we use id as tiebreaker
     # in a real system we'd track available_since timestamp but for now lowest id = longest tenured
     return candidates[0]
 
@@ -71,8 +71,9 @@ def create_delivery(order_id: int, driver_id: str, distance_km: float) -> Delive
     return Delivery(**new_delivery)
 
 
-# called when driver marks order as delivering — starts the timer and calculates eta
+# called when driver marks order as delivering: starts the timer and calculates eta
 def start_delivery(order_id: int, driver_id: str) -> Delivery:
+    from app.repositories.order_repo import load_orders, save_orders
     deliveries = load_deliveries()
     for delivery in deliveries:
         if delivery.get("order_id") == order_id:
@@ -87,12 +88,20 @@ def start_delivery(order_id: int, driver_id: str) -> Delivery:
             delivery["started_at"] = now
             delivery["eta_minutes"] = calculate_eta(distance_km, vehicle)
             save_deliveries(deliveries)
+
+            # flip order status from preparing to delivering
+            orders = load_orders()
+            for order in orders:
+                if order.get("id") == order_id:
+                    order["status"] = "delivering"
+                    break
+            save_orders(orders)
+
             return Delivery(**delivery)
 
     raise HTTPException(status_code=404, detail=f"Delivery for order '{order_id}' not found.")
 
-
-# called when driver marks order as delivered — stops the timer and records actual time
+# called when driver marks order as delivered: stops the timer and records actual time
 def complete_delivery(order_id: int, driver_id: str) -> Delivery:
     deliveries = load_deliveries()
     for delivery in deliveries:
@@ -105,8 +114,11 @@ def complete_delivery(order_id: int, driver_id: str) -> Delivery:
                 raise HTTPException(status_code=400, detail="Delivery already completed.")
 
             now = time.time()
+            actual_minutes = round((now - delivery["started_at"]) / 60, 2)
             delivery["delivered_at"] = now
-            delivery["actual_minutes"] = round((now - delivery["started_at"]) / 60, 2)
+            delivery["actual_minutes"] = actual_minutes
+            # positive = late, negative = early
+            delivery["delay_minutes"] = round(actual_minutes - delivery.get("eta_minutes", 0.0), 2)
             save_deliveries(deliveries)
 
             # set driver status back to available
@@ -120,7 +132,6 @@ def complete_delivery(order_id: int, driver_id: str) -> Delivery:
             return Delivery(**delivery)
 
     raise HTTPException(status_code=404, detail=f"Delivery for order '{order_id}' not found.")
-
 
 # get delivery info for a specific order — for customer to view
 def get_delivery_by_order(order_id: int) -> Delivery:
