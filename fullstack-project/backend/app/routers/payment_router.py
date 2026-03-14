@@ -18,4 +18,5 @@ router = APIRouter(prefix="/payment", tags=["payment"])
 async def checkout_route(
     payment: PaymentRequest,
     current_user: Customer = Depends(get_customer)
-):return await process_payment(payment, current_user)
+):
+    return await process_payment(payment, current_user)

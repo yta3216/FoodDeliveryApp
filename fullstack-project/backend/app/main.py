@@ -9,6 +9,7 @@ from .routers.restaurant_router import router as restaurant_router
 from .routers.cart_router import router as cart_router
 from .routers.websocket_router import router as websocket_router
 from .routers.order_router import router as order_router
+from .routers.payment_router import router as payment_router
 
 app = FastAPI()
 
@@ -37,6 +38,7 @@ app.include_router(restaurant_router)
 app.include_router(cart_router)
 app.include_router(websocket_router)
 app.include_router(order_router)
+app.include_router(payment_router)
 
 @app.get("/", tags=["root"])
 async def read_root():

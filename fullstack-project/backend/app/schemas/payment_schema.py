@@ -12,7 +12,7 @@ class PaymentRequest(BaseModel):
     expiry_month: int
     expiry_year: int
     cvv: str
-    cardholder: str
+    cardholder_name: str
 
 class PaymentResponse(BaseModel):
     payment_status: str
