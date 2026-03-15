@@ -326,7 +326,6 @@ def get_restaurant_by_id(restaurant_id: int) -> Restaurant:
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
 
 def get_managers(restaurant_id: int) -> list[str]:
-def get_managers(restaurant_id: int) -> list[str]:
     """
     Retrieves a list of manager (user) IDs for an associated restaurant.
 
@@ -338,8 +337,7 @@ def get_managers(restaurant_id: int) -> list[str]:
     Raises:
         HTTPException (status_code = 404): restaurant_id not found in restaurants.json
     """
-
-restaurants = load_restaurants()
+    restaurants = load_restaurants()
     for restaurant in restaurants:
         if restaurant.get("id") == restaurant_id:
             return restaurant["manager_ids"]
