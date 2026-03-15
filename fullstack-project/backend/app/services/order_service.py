@@ -5,12 +5,13 @@ import datetime
 from fastapi import HTTPException
 
 from app.repositories.order_repo import load_orders, save_orders
-from app.services.restaurant_service import get_restaurant_by_id
+from app.services.restaurant_service import get_restaurant_by_id, get_managers
 from app.schemas.user_schema import Customer
 from app.services.cart_service import calculate_cart_total, empty_cart, get_cart
+from app.services.notification_service import Notification
 from app.schemas.order_schema import Order
 
-def create_order_from_cart(current_user: Customer) -> Order:
+async def create_order_from_cart(current_user: Customer) -> Order:
     """
     Converts the customer's cart into an order, meaning that they intend to checkout and pay for it.
 
@@ -53,6 +54,8 @@ def create_order_from_cart(current_user: Customer) -> Order:
     save_orders(orders)
     empty_cart(current_user)
 
+    await send_status_notification(new_order)
+
     return new_order
 
 def get_orders_for_customer(current_customer: Customer) -> list[Order]:
@@ -91,7 +94,7 @@ def get_orders_for_restaurant(restaurant_id: int, manager_id: int) -> list[Order
     orders = load_orders()
     return [order for order in orders if order.get("restaurant_id") == restaurant_id]
 
-def cancel_order(order_id: int, current_user: Customer) -> Order:
+async def cancel_order(order_id: int, current_user: Customer) -> Order:
     """
     Cancels a pending order. Can only be cancelled by the customer that placed the order.
     Cancelled orders are removed from orders.json.
@@ -118,11 +121,12 @@ def cancel_order(order_id: int, current_user: Customer) -> Order:
                 raise HTTPException(status_code=400, detail= f"Order cannot be cancelled, order is already '{order.get('status')}'.")
             order["status"] = "cancelled"
             save_orders(orders)
+            await send_status_notification(order)
             return Order(**order)
         
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
-def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
+async def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
     """
     Acepts or declines a pending order for a restaurant which the provided manager manages.
 
@@ -153,8 +157,18 @@ def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
             
             order["status"] = new_status
             save_orders(orders)
+            await send_status_notification(order)
             return Order(**order)
 
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
-    
+# send order status update notification
+async def send_status_notification(order: dict) -> None:
+    customer_id = order["customer_id"]
+    restaurant_id = order["restaurant_id"]
+    manager_ids = get_managers(restaurant_id)
+    # TODO: add delivery driver id to notified users.
+    notified_users = [customer_id] + manager_ids
+    restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
+    notification = Notification(f"Order {order['id']} from {restaurant_name} set to status: {order['status']}", notified_users)
+    await notification.send_to_users()

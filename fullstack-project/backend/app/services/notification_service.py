@@ -35,6 +35,8 @@ class Notification():
         Returns:
             Notification: the newly created notification object
         """
+        if len(user_ids) == 0:
+            raise HTTPException(status_code=400, detail="Notification must have at least one recipient")
         self.id = self._get_next_id()
         self.message = message
         self.user_ids = user_ids
@@ -118,7 +120,5 @@ class Notification():
         """
         self.time = datetime.now().strftime('%Y/%m/%d %H:%M')
         self.save()
-        if len(self.user_ids) == 0:
-            raise HTTPException(status_code=400, detail="Notification must have at least one recipient")
         for user_id in self.user_ids:
             await connection_manager.send_message(user_id, self.to_model())
