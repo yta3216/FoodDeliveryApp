@@ -58,7 +58,6 @@ def get_new_id(restaurants) -> int:
         raise HTTPException(status_code=409, detail="ID collision; retry.")
     return new_id
 
-# Create a new restaurant.
 def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant:
     """
     Creates a new restaurant and saves it to restaurants.json.
@@ -96,7 +95,7 @@ def search_restaurants(payload: Restaurant_Search) -> PaginatedRestaurantResults
     May be sorted ascending, descending, or not sorted at all, depending on what is specified in payload.
 
     Parameters:
-        payload (Restaurant_Search): the search critera, which may include name, address, menu item, etc.
+        payload (Restaurant_Search): the search criteria, which may include name, address, menu item, etc.
     
     Returns:
         PaginatedSearchResults: the restaurant search results in paginated form
@@ -141,7 +140,6 @@ def search_restaurants(payload: Restaurant_Search) -> PaginatedRestaurantResults
     )
 
 
-# Update restaurant details (name, city, address)
 def update_restaurant_details(payload: Restaurant_Details_Update) -> Restaurant:
     """
     Updates the restaurant's details such as name, city, address, or maximum delivery radius.
@@ -327,15 +325,26 @@ def get_restaurant_by_id(restaurant_id: int) -> Restaurant:
             return restaurant
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
 
-# return the managers of the restaurant
 def get_managers(restaurant_id: int) -> list[str]:
-    restaurants = load_restaurants()
+def get_managers(restaurant_id: int) -> list[str]:
+    """
+    Retrieves a list of manager (user) IDs for an associated restaurant.
+
+    Parameters:
+        restaurant_id (int): the identifier of the restaurant to be retrieved
+        
+    Returns:
+        list[str]: the list of user IDs who are managers of the restaurant
+    Raises:
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json
+    """
+
+restaurants = load_restaurants()
     for restaurant in restaurants:
         if restaurant.get("id") == restaurant_id:
             return restaurant["manager_ids"]
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
 
-# check if current logged in user is a manager of the restaurant. depends on user being a restaurant manager type
 def check_manager(restaurant_id: int, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))) -> User:
     """
     Checks that the current logged in user has role "manager" and is a manager of the restaurant with the provided id.
@@ -356,6 +365,6 @@ def check_manager(restaurant_id: int, current_user: User = Depends(require_role(
     for restaurant in restaurants:
         if restaurant.get("id") == restaurant_id:
             if current_user.id in restaurant.get("manager_ids"):
-                return current_user # user is a manager of the restaurant
+                return current_user
             raise HTTPException(status_code=403, detail="User is not a manager of this restaurant")
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")

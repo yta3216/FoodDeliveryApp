@@ -102,11 +102,11 @@ def login_user(email: str, password: str) -> LoginResponse:
             if user.get("password") != password:
                 raise HTTPException(status_code=401, detail="Invalid email or password")
             
-            token = secrets.token_urlsafe(32) # generate a secure session token
+            token = secrets.token_urlsafe(32)
             user["auth_token"] = token
             user["auth_token_expiry"] = time.time() + SESSION_TOKEN_EXPIRY
             save_users(users)
-            role = UserRole(user["role"]) if isinstance(user.get("role"), str) else user["role"] # convert role to enum
+            role = UserRole(user["role"]) if isinstance(user.get("role"), str) else user["role"]
             return LoginResponse(
                 token = token,
                 user_id= user.get("id"),
