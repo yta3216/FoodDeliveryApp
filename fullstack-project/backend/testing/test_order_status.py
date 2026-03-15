@@ -4,19 +4,22 @@ from fastapi.testclient import TestClient
 import pytest
 from app.main import app
 from app.schemas.user_schema import UserRole
+from app.routers.websocket_router import connection_manager as cm
 from testing.test_cart_management import (
     customer_with_cart_and_token,
     customer_with_token,
     setup_restaurant_menu,
     manager_with_token,
 )
+from app.services.notification_service import Notification
+from app.services.order_service import send_status_notification
 from testing.test_restaurant_crud import setup_restaurant
+from testing.test_authorization import register_and_login
 
 client = TestClient(app)
 
 
 @pytest.fixture
-
 # customer creates pending order
 def customer_order_with_manager_token(customer_with_cart_and_token, setup_restaurant_menu):
     customer_token = customer_with_cart_and_token["token"]
@@ -32,8 +35,16 @@ def customer_order_with_manager_token(customer_with_cart_and_token, setup_restau
         "manager_token": manager_token,
         "restaurant_id": restaurant_id,
     }
+
+# mock notification
+@pytest.fixture
+def mock_notif(mocker):
+    mock_notif = mocker.patch("app.services.order_service.Notification.send_to_users")
+    mock_notif.return_value = None
+    return mock_notif
+
 # Manager successfully accepts pending order
-def test_manager_can_accept_pending_order(customer_order_with_manager_token):
+def test_manager_can_accept_pending_order(customer_order_with_manager_token, mock_notif):
     order_id = customer_order_with_manager_token["order"]["id"]
     manager_token = customer_order_with_manager_token["manager_token"]
 
@@ -46,7 +57,7 @@ def test_manager_can_accept_pending_order(customer_order_with_manager_token):
     assert response.json()["status"] == "accepted"
 
 # Manager successfully rejects pending order
-def test_manager_can_reject_pending_order(customer_order_with_manager_token):
+def test_manager_can_reject_pending_order(customer_order_with_manager_token, mock_notif):
     order_id = customer_order_with_manager_token["order"]["id"]
     manager_token = customer_order_with_manager_token["manager_token"]
 
@@ -59,7 +70,7 @@ def test_manager_can_reject_pending_order(customer_order_with_manager_token):
     assert response.json()["status"] == "rejected"
 
 # manager cannot accept an order which has already been accepted
-def test_cannot_accept_already_accepted_order(customer_order_with_manager_token):
+def test_cannot_accept_already_accepted_order(customer_order_with_manager_token, mock_notif):
     order_id = customer_order_with_manager_token["order"]["id"]
     manager_token = customer_order_with_manager_token["manager_token"]
 
@@ -77,7 +88,7 @@ def test_cannot_accept_already_accepted_order(customer_order_with_manager_token)
     assert response.status_code == 400
 
 # Customer cannot accept order
-def test_customer_cannot_accept_order(customer_order_with_manager_token):
+def test_customer_cannot_accept_order(customer_order_with_manager_token, mock_notif):
     order_id = customer_order_with_manager_token["order"]["id"]
     customer_token = customer_order_with_manager_token["customer_token"]
 
@@ -89,7 +100,7 @@ def test_customer_cannot_accept_order(customer_order_with_manager_token):
     assert response.status_code == 403
 
 # test another manager tries update order of another managers orders
-def test_manager_of_different_restaurant_cannot_update_order(customer_order_with_manager_token):
+def test_manager_of_different_restaurant_cannot_update_order(customer_order_with_manager_token, mock_notif):
     order_id = customer_order_with_manager_token["order"]["id"]
 
     other_manager = client.post(
@@ -120,7 +131,7 @@ def test_manager_of_different_restaurant_cannot_update_order(customer_order_with
     assert response.status_code == 403
 
 # test updating status of order that DNE
-def test_update_status_for_nonexistent_order(setup_restaurant_menu):
+def test_update_status_for_nonexistent_order(setup_restaurant_menu, mock_notif):
     manager_token = setup_restaurant_menu["token"]
 
     response = client.patch(
@@ -129,3 +140,26 @@ def test_update_status_for_nonexistent_order(setup_restaurant_menu):
         headers={"Authorization": f"Bearer {manager_token}"},
     )
     assert response.status_code == 404
+
+# test sending notification for order status change
+@pytest.mark.anyio
+async def test_send_status_notification(mocker):
+    cm._instance = None
+    token, user_id = register_and_login("testuser789@testing.com")
+    restaurant_name = "Test Restaurant"
+    mock_get_managers = mocker.patch("app.services.order_service.get_managers")
+    mock_get_managers.return_value = [user_id] # just send it to the user again for testing purposes
+    mock_get_restaurant = mocker.patch("app.services.order_service.get_restaurant_by_id")
+    mock_get_restaurant.return_value = {"name": restaurant_name}
+    order = {
+        "id": 5,
+        "customer_id": user_id,
+        "restaurant_id": 9,
+        "status": "pending"
+    }
+    with client.websocket_connect(
+        f"/ws/{user_id}", 
+        headers={"Authorization": f"Bearer {token}"}
+    ) as websocket:        
+        await send_status_notification(order)
+        assert websocket.receive_json()["message"] == f"Order {order['id']} from {restaurant_name} set to status: {order['status']}"
