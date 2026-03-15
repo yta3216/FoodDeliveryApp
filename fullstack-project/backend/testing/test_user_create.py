@@ -6,6 +6,7 @@ from app.main import app
 
 client = TestClient(app)
 
+# testing a general user creation 
 def test_create_user():
     response=client.post(
         "/user", 
