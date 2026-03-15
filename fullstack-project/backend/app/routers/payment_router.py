@@ -19,4 +19,19 @@ async def checkout_route(
     payment: PaymentRequest,
     current_user: Customer = Depends(get_customer)
 ):
+    """
+    **Submits payment for the customer's current cart. Creates an order only if payment succeeds.**
+
+    Parameters:
+    *   **payment** (PaymentRequest): the card details submitted by the customer
+    *   **current_user** (Customer): the authenticated user with role *customer*. automatically passed as argument
+
+    Returns:
+    *   **PaymentResponse**: contains payment_status, message, and the created order on success
+    
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *customer*
+    *   **HTTPException** (status_code = 400): if payment validation fails or cart is empty. no order is created
+    """
     return await process_payment(payment, current_user)

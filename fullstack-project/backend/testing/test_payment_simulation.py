@@ -194,7 +194,6 @@ def test_successful_checkout_correct_subtotal(customer_with_cart_and_token, setu
     token = customer_with_cart_and_token["token"]
     restaurant = setup_restaurant_menu["restaurant"]
 
-    # item1 qty=2 @ 9.99, item2 qty=1 @ 10.99 → expected = 30.97
     item1_price = restaurant["menu"]["items"][0]["price"]
     item2_price = restaurant["menu"]["items"][1]["price"]
     expected_subtotal = round((item1_price * 2) + (item2_price * 1), 2)

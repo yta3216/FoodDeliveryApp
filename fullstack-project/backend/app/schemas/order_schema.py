@@ -39,3 +39,4 @@ class Order(BaseModel):
 # schema for manager to accept/reject pending order
 class OrderStatusUpdate(BaseModel):
     status: Literal["accepted","rejected"]
+
