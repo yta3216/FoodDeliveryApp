@@ -30,8 +30,9 @@ router = APIRouter(prefix="/cart", tags=["cart"])
 @router.put("/{restaurant_id}", response_model=Cart, dependencies=[Depends(get_restaurant_by_id)])
 def update_cart_restaurant_route(restaurant_id: int, customer: Customer = Depends(get_customer)):
     """
-    **Updates the restaurant id associated with a logged-in customer's cart.**
-    
+    **Updates the restaurant associated with a user's cart, used when they want to change the restaurant they're ordering from.  
+    The cart is emptied if the new restaurant is different than the old one, as the items are no longer applicable.**
+
     Parameters:
     *   **restaurant_id** (int): the new restaurant id for customer's cart
     

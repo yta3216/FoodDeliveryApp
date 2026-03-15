@@ -25,12 +25,20 @@ SESSION_TOKEN_EXPIRY = 86400  # 24 hours before session token expires
 
 
 def create_user(payload: User_Create) -> User:
+    """
+    Creates a new user with unique id and saves to users.json. Uses appropriate subclass constructor based on role.
+
+    Parameters:
+        payload (User_Create): the details of the user to be created
+    
+    Returns:
+        User: the newly created user
+    """
     users = load_users()
-    new_id = str(uuid.uuid4()) # generate unique ID for the new user
+    new_id = str(uuid.uuid4())
     if any(user.get("id") == new_id for user in users):
         raise HTTPException(status_code=409, detail="ID collision; retry.")
     
-    # use appropriate constructor based on user class.
     user_class = ROLE_TO_CLASS[payload.role]
 
     new_user = user_class(
@@ -48,18 +56,35 @@ def create_user(payload: User_Create) -> User:
     save_users(users)
     return new_user
 
-# get User object by user id
 def get_user_by_id(user_id: str) -> User:
+    """
+    Retrieves a user by the provided user id.
+
+    Parameters:
+        user_id (str): the identifier of the user to be retrieved
+    
+    Returns:
+        User: the details of the user with matching id
+    """
     users = load_users()
     for user in users:
         if user.get("id") == user_id:
-            if isinstance(user.get("role"), str): # ensure role is properly converted to UserRole enum
+            if isinstance(user.get("role"), str):
                 user["role"] = UserRole(user["role"]) 
             return User(**user)
     raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
 
-# log in user
 def login_user(email: str, password: str) -> LoginResponse:
+    """
+    Authenticates and logs in the user based on the provided email and password.
+
+    Parameters:
+        email (str): user's email
+        password (str): user's password
+    
+    Returns:
+        LoginReponse: the user's details post-login
+    """
     users = load_users()
     email = email.strip()
     password = password.strip()
@@ -84,31 +109,49 @@ def login_user(email: str, password: str) -> LoginResponse:
             )
     raise HTTPException(status_code=401, detail="Invalid email or password")
 
-# Used when a non-logged in user has forgotten their password and needs to reset it.
 def reset_password_request(user_email: str) -> None:
+    """
+    Requests a password reset for a given email, used when the user has forgotten their password.
+    A password reset token is attached to the account and will expire after a set amount of time. 
+    A password reset link is printed to the terminal to simulate the link being sent via email.
+    Nothing is returned for security purposes, to not reveal the existence of the email in the db.
+
+    Parameters:
+        user_email (str): the email of the user who wishes to reset their password
+
+    Returns: None
+    """
     users = load_users()
     for user in users:
         if user.get("email") == user_email:
-            token = secrets.token_urlsafe(32)  # generate a secure random token
+            token = secrets.token_urlsafe(32)
             user["reset_token"] = token
-            user["reset_token_expiry"] = time.time() + RESET_TOKEN_EXPIRY  # set expiry timestamp
+            user["reset_token_expiry"] = time.time() + RESET_TOKEN_EXPIRY
             save_users(users)
 
-            # simulate sending email by printing the reset link to the console
             print(f"\nPassword reset link:")
             print(f"http://localhost:8000/user/reset-password?token={token}\n")
 
             return None
-    return None  # don't want to reveal whether the email exists or not, so we do not return any information here.
+    return None
 
-# Used when a non-logged in user has requested a password reset and has input their new password.
 def reset_password(new_password: str, reset_token: str) -> None:
+    """
+    Resets the password for a user who has a valid token from a password reset request.
+    Reset token is cleared after password is reset.
+
+    Parameters:
+        new_password (str): the new password
+        reset_token (str): the reset token obtained from the password reset request
+
+    Returns: None
+    """
     users = load_users()
     for user in users:
         if user.get("reset_token") == reset_token:
             if user.get("reset_token_expiry", 0) < time.time():
                 raise HTTPException(status_code=400, detail="Reset token has expired")
-            # update user password and clear reset token and expiry
+
             user["password"] = new_password.strip()
             user["reset_token"] = None
             user["reset_token_expiry"] = None
@@ -116,8 +159,17 @@ def reset_password(new_password: str, reset_token: str) -> None:
             return None
     raise HTTPException(status_code=400, detail="Invalid reset token")
 
-# Used when a logged in user wants to change their password.
 def update_password_when_logged_in(user_id: str, old_password: str, new_password: str) -> None:
+    """
+    Updates the password of a user who remembers their existing password.
+
+    Parameters:
+        user_id (str): the identifier of the user account whose password will be updated
+        old_password (str): the user's current password
+        new_password (str): the user's requested new password
+
+    Returns: None
+    """
     users = load_users()
     for user in users:
         if user.get("id") == user_id:
@@ -130,10 +182,20 @@ def update_password_when_logged_in(user_id: str, old_password: str, new_password
 
 
 def update_user(user_id: str, payload: User_Update) -> UserPublic:
+    """
+    Updates a user's account details.
+
+    Parameters:
+        user_id (str): the identifier of the user account to be updated
+        payload (User_Update): the requested updates to user details
+
+    Returns:
+        UserPublic: the user's updated details with password hidden for security
+    """
     users = load_users()
     for idx, user in enumerate(users):
         if user.get("id") == user_id:
-            # only update allowed fields, role and password are not changeable here
+
             user["name"] = payload.name.strip()
             user["email"] = payload.email.strip()
             user["age"] = payload.age
@@ -151,8 +213,16 @@ def update_user(user_id: str, payload: User_Update) -> UserPublic:
             )
     raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
 
-# load notifications for the provided user.
 def get_notifications(user_id: str) -> list[Notification_Response]:
+    """
+    Retrieves all notifications in notifications.json with the provided user as a recipient.
+
+    Parameters:
+        user_id (str): the identifier for the user whose notifications will be retrieved
+
+    Returns:
+        list[Notification_Response]: the user's notifications
+    """
     notifs = load_notifications()
     user_notifs = [Notification_Response]
     for notif in notifs:
@@ -160,6 +230,14 @@ def get_notifications(user_id: str) -> list[Notification_Response]:
             user_notifs.append(notif)
     return user_notifs
 
-# this function authenticates the user and confirms that they are of customer type
 def get_customer(customer: Customer = Depends(require_role(UserRole.CUSTOMER))) -> Customer:
+    """
+    Authenticates the user and confirms that they are of customer type.
+
+    Parameters:
+        customer (Customer): the currently logged-in user, must have role "customer". automatically passed as an argument
+
+    Returns:   
+        Customer: the logged-in customer's data
+    """
     return customer

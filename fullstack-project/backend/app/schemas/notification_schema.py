@@ -13,7 +13,7 @@ class Notification_Response(BaseModel):
     *   **user_ids** (list[str]): the identifiers of the users who should receive this notification
     *   **message** (str): the message of the notification
     *   **is_read** (bool): true if message has been read, false if not
-    *   **time** (str): time that notification was sent, or time it was created if not sent yet
+    *   **time** (str): time that notification was sent, or time it was created if not sent yet (YYYY/MM/DD HH:MM)
     """
     id: int
     user_ids: list[str]

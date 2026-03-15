@@ -42,7 +42,7 @@ router = APIRouter(prefix="/restaurant", tags=["restaurant"])
 @router.post("", response_model=Restaurant, status_code=201)
 def create_restaurant_route(payload: Restaurant_Create, current_user: User = Depends(require_role((UserRole.RESTAURANT_MANAGER)))):
     """
-    **Creates a new restaurant, assigning the logged-in user as a manger for the new restaurant.**
+    **Creates a new restaurant, assigning the logged-in manager as the intial manger for the new restaurant.**
     
     Parameters:
     *   **payload** (Restaurant_Create): the details of the restaurant to be created
