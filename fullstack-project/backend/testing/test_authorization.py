@@ -18,7 +18,7 @@ def register_and_login(email, password="Password123", role="customer"):
     return data.get("token"), data.get("user_id")
 
 
-# view user details
+#----------- test viewing user details --------------#
 
 def test_user_can_view_own_details():
     token, user_id = register_and_login("viewown@example.com")
@@ -55,7 +55,7 @@ def test_invalid_token_cannot_view_user_details():
     assert response.status_code == 401
 
 
-# editing user details
+# ------------- test editing user details -------------------#
 
 def test_customer_cannot_edit_other_user():
     token1, _ = register_and_login("editcustomer1@example.com")

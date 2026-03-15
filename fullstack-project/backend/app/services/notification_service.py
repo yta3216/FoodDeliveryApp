@@ -11,28 +11,63 @@ from app.schemas.notification_schema import Notification_Response
 
 connection_manager = ConnectionManager()
 
-# Generic notification class. Not defined as BaseModel because the creation is strictly internal.
 class Notification():
- 
-    # create notification. save method must be used as well for it to be saved.
+    """
+    Defines the attributes and behaviour of notifications in the system.
+
+    Attributes:
+        id (int): the identifier for the notification
+        message (str): the body text to be sent in the notification
+        user_ids (list[str]): list of users who will receive this notification when sent
+        is_read (bool): true if notification has been read, false otherwise
+        time (str): time (YYYY/MM/DD HH:MM) that notification was sent, or time created if not yet sent
+    """
     def __init__(self, message: str, user_ids: list[str]):
+        """
+        Creates a new notification object. It is not saved to the database until it is sent.
+        id and time are set automatically, and is_read is initially set to False. Time has format YYYY/MM/DD HH:MM.
+
+        Parameters:
+            message (str): the body text to be sent in the notification
+            user_ids (list[str]): list of users who will receive this notification when sent
+        
+        Returns:
+            Notification: the newly created notification object
+
+        Raises:
+            HTTPException (status_code = 400): if notification has no recipients
+        """
         if len(user_ids) == 0:
             raise HTTPException(status_code=400, detail="Notification must have at least one recipient")
         self.id = self._get_next_id()
         self.message = message
         self.user_ids = user_ids
         self.is_read = False
-        self.time = datetime.now().strftime('%Y/%m/%d %H:%M') # YYYY/MM/DD HH:MM
+        self.time = datetime.now().strftime('%Y/%m/%d %H:%M')
     
-    # get next notif id.
     def _get_next_id(self) -> int:
+        """
+        Computes the next available identifier for a new notification object.
+
+        Parameters: None
+
+        Returns:
+            int: the next available id
+        """
         notifs = load_notifications()
         if len(notifs) == 0:
             return 1
         return max(notif["id"] for notif in notifs) + 1
 
-    # convert to the respective fastapi schema
     def to_model(self) -> Notification_Response:
+        """
+        Converts the current Notification object to a Notification_Response schema for communication with frontend.
+
+        Parameters: None
+
+        Returns:
+            Notification_Response: the current notification in the correct form according to the schema
+        """
         return Notification_Response(
             id=self.id,
             message=self.message,
@@ -41,14 +76,29 @@ class Notification():
             time=self.time
         )
 
-    # save the new notification
     def save(self) -> None:
+        """
+        Saves the current notification to the notification database.
+
+        Parameters: None
+
+        Returns: None
+        """
         notifs = load_notifications()
         notifs.append(self.to_model().model_dump())
         save_notifications(notifs)
     
-    # mark notification as read
     def read_notification(self) -> None:
+        """
+        Marks notification as read.
+
+        Parameters: None
+
+        Returns: None
+
+        Raises:
+            HTTPException (status_code = 404): if this notifications id not found in notifications.json
+        """
         notifs = load_notifications()
         for notif in notifs:
             if notif["id"] == self.id:
@@ -57,8 +107,20 @@ class Notification():
                 return None
         raise HTTPException(status_code=404, detail=f"Notification '{self.id}' not found")
     
-    # send the notification to the list of users. this causes the notification to be saved.
     async def send_to_users(self) -> None:
+        """
+        Sends the current notification to the specified recipients in user_ids.
+        The notification is saved to the database in the process with a timestamp
+        so users can see it later if they are not logged in when it is sent.
+
+        Parameters: None
+
+        Returns: None
+
+        Raises:
+            HTTPException(status_code=400): if notification does not have any recipients
+        """
+        self.time = datetime.now().strftime('%Y/%m/%d %H:%M')
         self.save()
         for user_id in self.user_ids:
             await connection_manager.send_message(user_id, self.to_model())

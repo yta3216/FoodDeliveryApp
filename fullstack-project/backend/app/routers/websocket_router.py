@@ -12,6 +12,21 @@ connection_manager = ConnectionManager()
 
 @router.websocket("/{user_id}")
 async def websocket_endpoint(user_id: str, websocket: WebSocket, current_user = Depends(get_current_user_with_ws)):
+    """
+    **Adds the logged in user to the list of currently connected users and allows them to receive real-time notifications.**
+
+    Parameters:
+    *   **user_id** (str): the identifier of the user attempting to connect. must match the logged-in user's identifier.
+    *   **websocket** (Websocket): the WebSocket connection for the user
+    *   **current_user** (User): the authenticated user. automatically passed as argument.
+    
+    Returns: None
+
+    Raises:
+    *   **WebSocketException** (code = WS_1008_POLICY_VIOLATION): if the Authorization header is missing from the WebSocket request
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if current user's id does not match user id in url
+    """
     if current_user.id != user_id:
         raise HTTPException(status_code=403, detail="You are not authorized to connect this user")
     await connection_manager.connect(user_id, websocket)
