@@ -162,8 +162,15 @@ async def update_order_status(order_id:int, new_status:str, manager_id:int) -> O
 
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
-# send order status update notification
 async def send_status_notification(order: dict) -> None:
+    """
+    Sends a notification to the customer and restaurant managers when their associated order status changes.
+
+    Parameters:
+        order (dict): the associated order that requires a notification to be sent
+    
+    Returns: None
+    """
     customer_id = order["customer_id"]
     restaurant_id = order["restaurant_id"]
     manager_ids = get_managers(restaurant_id)
