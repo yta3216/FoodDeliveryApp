@@ -35,9 +35,16 @@ def update_cart_restaurant_route(restaurant_id: int, customer: Customer = Depend
 
     Parameters:
     *   **restaurant_id** (int): the new restaurant id for customer's cart
+    *   **customer** (Customer): the authenticated user with role *customer*. automatically passed as argument.
     
     Returns:
     *   **Cart**: the updated cart
+
+    Raises:
+    *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *customer*
+    *   **HTTPException** (status_code = 404): current_user's user_id not found in users.json
     """
     return update_cart_restaurant(restaurant_id, customer)
 
@@ -46,10 +53,16 @@ def get_cart_route(customer: Customer = Depends(get_customer)):
     """
     **Retrieves a logged-in customers cart.**
     
-    Parameters: None
+    Parameters:
+    *   **customer** (Customer): the authenticated user with role *customer*. automatically passed as argument.
 
     Returns:
     *   **Cart**: the customer's cart
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *customer*
+    *   **HTTPException** (status_code = 404): current_user's user_id not found in users.json
     """
     return get_cart(customer)
 
@@ -58,9 +71,15 @@ def empty_cart_route(customer: Customer = Depends(get_customer)):
     """
     **Empties the contents of a logged-in customer's cart.**
     
-    Parameters: None
+    Parameters:
+    *   **customer** (Customer): the authenticated user with role *customer*. automatically passed as argument.
     
     Returns: None
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *customer*
+    *   **HTTPException** (status_code = 404): current_user's user_id not found in users.json
     """
     return empty_cart(customer)
 
@@ -71,9 +90,19 @@ def create_cart_item_route(payload: CartItem_Create, customer: Customer = Depend
     
     Parameters:
     *   **payload** (CartItem_Create): details of the new cart item
+    *   **customer** (Customer): the authenticated user with role *customer*. automatically passed as argument.
 
     Returns:
     *   **CartItem**: the new cart item
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *customer*
+    *   **HTTPException** (status_code = 400): if user's cart has no associated restaurant
+    *   **HTTPException** (status_code = 404):
+        *   current user's cart's restaurant_id not found in restaurants.json
+        *   current user's id not found in users.json
+        *   new cart item's id not found in restaurant's menu
     """
     return create_cart_item(payload, customer)
 
@@ -84,9 +113,15 @@ def get_cart_item_route(item_id: int, customer: Customer = Depends(get_customer)
     
     Parameters:
     *   **item_id** (int): the identifier of the item to be retrieved
+    *   **customer** (Customer): the authenticated user with role *customer*. automatically passed as argument.
 
     Returns:
     *   **CartItem**: the requested cart item
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *customer*
+    *   **HTTPException** (status_code = 404): current user's id not found in users.json or cart item id not found in user's cart
     """
     return get_cart_item(item_id, customer)
 
@@ -98,9 +133,15 @@ def update_cart_item_route(item_id: int, payload: CartItem_Update, customer: Cus
     Parameters:
     *   **item_id** (int): the identifier of the item to be updated
     *   **payload** (CartItem_Update): the details of the item update
+    *   **customer** (Customer): the authenticated user with role *customer*. automatically passed as argument.
 
     Returns:
     *   **CartItem**: the updated cart item
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *customer*
+    *   **HTTPException** (status_code = 404): current user's id not found in users.json or cart item id not found in user's cart
     """
     return update_cart_item(item_id, payload, customer)
 
@@ -111,8 +152,14 @@ def delete_cart_item(item_id: int, customer = Depends(get_customer)):
     
     Parameters:
     *   **item_id** (int): the identifier of the item to be retrieved
+    *   **customer** (Customer): the authenticated user with role *customer*. automatically passed as argument.
 
     Returns:
     *   **CartItem**: the deleted cart item
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *customer*
+    *   **HTTPException** (status_code = 404): current user's id not found in users.json or cart item id not found in user's cart
     """
     return delete_cart_item(item_id, customer)

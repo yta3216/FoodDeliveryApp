@@ -21,6 +21,9 @@ def calculate_cart_total(cart: Cart) -> float:
 
     Returns:
         float: the total price of the cart
+
+    Raises:
+        HTTPException (status_code = 404): cart's restaurant_id not found in restaurants.json
     """
     restaurant = get_restaurant_by_id(cart.restaurant_id)
     menu_items = {item["id"]: item for item in restaurant["menu"]["items"]}
@@ -42,6 +45,9 @@ def update_cart_restaurant(restaurant_id: int, current_user: Customer) -> Cart:
 
     Returns:
         Cart: the cart with updated restaurant ID.
+
+    Raises:
+        HTTPException (status_code = 404): current_user's user_id not found in users.json
     """
     users = load_users()
     for user in users:
@@ -55,13 +61,16 @@ def update_cart_restaurant(restaurant_id: int, current_user: Customer) -> Cart:
 
 def get_cart(current_user: Customer) -> Cart:
     """
-    Retrieves the proviided customer's cart.
+    Retrieves the provided customer's cart.
 
     Parameters:
         current_user (Customer): the current logged-in user. must have role "customer"
 
     Returns:
         Cart: the customer's cart
+
+    Raises:
+        HTTPException (status_code = 404): current_user's user_id not found in users.json
     """
     users = load_users()
     for user in users:
@@ -77,6 +86,9 @@ def empty_cart(current_user: Customer) -> None:
         current_user (Customer): the current logged-in user. must have role "customer"
 
     Returns: None
+
+    Raises:
+        HTTPException (status_code = 404): current_user's user_id not found in users.json
     """
     users = load_users()
     for user in users:
@@ -97,12 +109,18 @@ def create_cart_item(payload: CartItem_Create, current_user: Customer) -> CartIt
 
     Returns:
         CartItem: the item added to cart
+
+    Raises:
+        HTTPException (status_code = 400): if user's cart has no associated restaurant
+        HTTPException (status_code = 404): current user's cart's restaurant_id not found in restaurants.json,
+                                           or current user's id not found in users.json,
+                                           or new cart item's id not found in restaurant's menu
     """
     users = load_users()
     restaurant_id = current_user.cart.restaurant_id
 
     if restaurant_id == 0:
-        raise HTTPException(204, detail=f"User '{current_user.id}' cart has no associated restaurant")
+        raise HTTPException(400, detail=f"User '{current_user.id}' cart has no associated restaurant")
 
     restaurant = get_restaurant_by_id(restaurant_id)
     if any(menu_item["id"] == payload.menu_item_id for menu_item in restaurant["menu"]["items"]):
@@ -125,6 +143,9 @@ def get_cart_item(item_id: int, current_user: Customer) -> CartItem:
 
     Returns:
         CartItem: the item from the customer's cart with matching item_id
+
+    Raises:
+        HTTPException (status_code = 404): current user's id not found in users.json or cart item id not found in user's cart
     """
     users = load_users()
     for user in users:
@@ -146,6 +167,9 @@ def update_cart_item(item_id: int, payload: CartItem_Update, current_user: Custo
     
     Returns:
         CartItem: the updated item from the customer's cart
+
+    Raises:
+        HTTPException (status_code = 404): current user's id not found in users.json or cart item id not found in user's cart
     """
     users = load_users()
     for user in users:
@@ -168,6 +192,9 @@ def delete_cart_item(item_id: int, current_user: Customer) -> CartItem:
 
     Returns:
         CartItem: the item removed from customer's cart
+
+    Raises:
+        HTTPException (status_code = 404): current user's id not found in users.json or cart item id not found in user's cart
     """
     users = load_users()
     for user in users:

@@ -33,6 +33,9 @@ def create_user(payload: User_Create) -> User:
     
     Returns:
         User: the newly created user
+
+    Raises:
+        HTTPException (status_code = 409): if generated ID matches an existing ID. extremely unlikely.
     """
     users = load_users()
     new_id = str(uuid.uuid4())
@@ -65,6 +68,9 @@ def get_user_by_id(user_id: str) -> User:
     
     Returns:
         User: the details of the user with matching id
+
+    Raises:
+        HTTPException (status_code = 404): user_id not found in users.json
     """
     users = load_users()
     for user in users:
@@ -84,6 +90,9 @@ def login_user(email: str, password: str) -> LoginResponse:
     
     Returns:
         LoginReponse: the user's details post-login
+
+    Raises:
+        HTTPException (status_code = 401): if email/password pair is not found in users.json
     """
     users = load_users()
     email = email.strip()
@@ -145,6 +154,9 @@ def reset_password(new_password: str, reset_token: str) -> None:
         reset_token (str): the reset token obtained from the password reset request
 
     Returns: None
+
+    Raises:
+        HTTPException (status_code = 400): if user's reset token is invalid or expired
     """
     users = load_users()
     for user in users:
@@ -169,6 +181,10 @@ def update_password_when_logged_in(user_id: str, old_password: str, new_password
         new_password (str): the user's requested new password
 
     Returns: None
+
+    Raises:
+        HTTPException (status_code = 400): if password is incorrect
+        HTTPException (status_code = 404): if user_id is not found in users.json
     """
     users = load_users()
     for user in users:
@@ -191,6 +207,9 @@ def update_user(user_id: str, payload: User_Update) -> UserPublic:
 
     Returns:
         UserPublic: the user's updated details with password hidden for security
+
+    Raises:
+        HTTPException (status_code = 404): if user_id is not found in users.json
     """
     users = load_users()
     for idx, user in enumerate(users):
@@ -239,5 +258,9 @@ def get_customer(customer: Customer = Depends(require_role(UserRole.CUSTOMER))) 
 
     Returns:   
         Customer: the logged-in customer's data
+
+    Raises:
+        HTTPException (status_code = 401): if user's token is invalid or expired
+        HTTPException (status_code = 403): if user's role does not match the requested role
     """
     return customer

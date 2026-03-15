@@ -19,6 +19,10 @@ def create_order_from_cart(current_user: Customer) -> Order:
 
     Returns:
         Order: the newly created Order, which contains all details of the customer's order
+
+    Raises:
+        HTTPException (status_code = 400): if cart is empty
+        HTTPException (status_code = 409): if generated id is the same as an existing id.
     """
     cart = get_cart(current_user)
     if cart.restaurant_id == 0:
@@ -75,6 +79,10 @@ def get_orders_for_restaurant(restaurant_id: int, manager_id: int) -> list[Order
 
     Returns:
         list[Order]: a list of all orders associated with this restaurant
+
+    Raises:
+        HTTPException (status_code = 403): if provided manager_id is not in list of managers for this restaurant
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json
     """
     restaurant = get_restaurant_by_id(restaurant_id)
     if manager_id not in restaurant.get("manager_ids", []):
@@ -94,6 +102,11 @@ def cancel_order(order_id: int, current_user: Customer) -> Order:
 
     Returns:
         Order: the cancelled order
+    
+    Raises:
+        HTTPException (status_code = 409): if current user's id does not match the order's customer id
+        HTTPEXception (status_code = 400): if order has a status other than "pending"
+        HTTPEXception (status_code = 404): if order is not found in orders.json
     """
     orders = load_orders()
 
@@ -120,6 +133,11 @@ def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
     
     Returns:
         Order: the updated order with the status change
+
+    Raises:
+        HTTPException (status_code = 403): if provided manager_id is not in list of managers for this restaurant
+        HTTPEXception (status_code = 400): if order has a status other than "pending"
+        HTTPEXception (status_code = 404): if order is not found in orders.json, or order's restaurant id not found in restaurants.json
     """
     orders = load_orders()
 

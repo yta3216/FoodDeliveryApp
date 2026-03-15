@@ -151,6 +151,9 @@ def update_restaurant_details(payload: Restaurant_Details_Update) -> Restaurant:
 
     Returns:
         Restaurant: the restaurant with updated details
+
+    Raises:
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json
     """
     restaurants = load_restaurants()
     for restaurant in restaurants:
@@ -172,6 +175,9 @@ def update_restaurant_managers(payload: Restaurant_Managers_Update) -> Restauran
     
     Returns:
         Restaurant: the restaurant with an updated list of managers
+    
+    Raises:
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json
     """
     restaurants = load_restaurants()
     for restaurant in restaurants:
@@ -181,7 +187,6 @@ def update_restaurant_managers(payload: Restaurant_Managers_Update) -> Restauran
             return Restaurant(**restaurant)
     raise HTTPException(status_code=404, detail=f"Restaurant '{payload.id}' not found")
 
-# Create a new menu item and add it to the restaurant's menu.
 def create_menu_item(restaurant_id: int, payload: MenuItem_Create) -> MenuItem:
     """
     Creates a new menu item and adds it to the provided restaurant's menu.
@@ -192,7 +197,11 @@ def create_menu_item(restaurant_id: int, payload: MenuItem_Create) -> MenuItem:
 
     Returns:
         MenuItem: the newly created menu item
+    
+    Raises:
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json
     """
+
     restaurants = load_restaurants()
     for restaurant in restaurants:
         if restaurant.get("id") == restaurant_id:
@@ -218,6 +227,9 @@ def update_menu_item(restaurant_id: int, payload: MenuItem_Update) -> MenuItem:
 
     Returns:
         MenuItem: the newly updated menu item
+
+    Raises:
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json or menu item not found in restaurant
     """
     restaurants = load_restaurants()
     for restaurant in restaurants:
@@ -242,6 +254,9 @@ def bulk_menu_item_create(restaurant_id: int, payload: MenuItem_Bulk_Create) -> 
 
     Returns:
         list[MenuItem]: the newly created menu items
+
+    Raises:
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json
     """
     restaurants = load_restaurants()
     for restaurant in restaurants:
@@ -271,6 +286,9 @@ def bulk_menu_item_update(restaurant_id: int, payload: MenuItem_Bulk_Update) -> 
 
     Returns:
         list[MenuItem]: the newly updated menu items
+
+    Raises:
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json or menu item not found in restaurant
     """
     restaurants = load_restaurants()
     for restaurant in restaurants:
@@ -298,7 +316,10 @@ def get_restaurant_by_id(restaurant_id: int) -> Restaurant:
         restaurant_id (int): the identifier of the restaurant to be retrieved
     
     Returns:
-        Restaurant: the restaurant from restaurants.json whose id matches the provided id 
+        Restaurant: the restaurant from restaurants.json whose id matches the provided id
+
+    Raises:
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json
     """
     restaurants = load_restaurants()
     for restaurant in restaurants:
@@ -316,6 +337,11 @@ def check_manager(restaurant_id: int, current_user: User = Depends(require_role(
     
     Returns:
         User: the details of the manager being verified
+
+    Raises:
+        HTTPException (status_code = 401): if user's token is invalid or expired
+        HTTPException (status_code = 403): if user's role is not "manager" or user is not a manager of the provided restaurant
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json
     """
     restaurants = load_restaurants()
     for restaurant in restaurants:

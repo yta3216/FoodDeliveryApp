@@ -91,6 +91,9 @@ class Notification():
         Parameters: None
 
         Returns: None
+
+        Raises:
+            HTTPException (status_code = 404): if this notifications id not found in notifications.json
         """
         notifs = load_notifications()
         for notif in notifs:
@@ -100,18 +103,20 @@ class Notification():
                 return None
         raise HTTPException(status_code=404, detail=f"Notification '{self.id}' not found")
     
-    # send the notification to the list of users. this causes the notification to be saved.
     async def send_to_users(self) -> None:
         """
         Sends the current notification to the specified recipients in user_ids.
-        The notification is saved to the database in the process so users can 
-        see it later if they are not logged in when it is sent.
+        The notification is saved to the database in the process with a timestamp
+        so users can see it later if they are not logged in when it is sent.
 
         Parameters: None
 
         Returns: None
+
+        Raises:
+            HTTPException(status_code=400): if notification does not have any recipients
         """
-        self.time = datetime.now().strftime('%Y/%m/%d %H:%M') # YYYY/MM/DD HH:MM
+        self.time = datetime.now().strftime('%Y/%m/%d %H:%M')
         self.save()
         if len(self.user_ids) == 0:
             raise HTTPException(status_code=400, detail="Notification must have at least one recipient")

@@ -58,7 +58,7 @@ def test_manager_can_reject_pending_order(customer_order_with_manager_token):
     assert response.status_code == 200
     assert response.json()["status"] == "rejected"
 
-
+# manager cannot accept an order which has already been accepted
 def test_cannot_accept_already_accepted_order(customer_order_with_manager_token):
     order_id = customer_order_with_manager_token["order"]["id"]
     manager_token = customer_order_with_manager_token["manager_token"]

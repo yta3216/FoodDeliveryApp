@@ -46,9 +46,14 @@ def create_restaurant_route(payload: Restaurant_Create, current_user: User = Dep
     
     Parameters:
     *   **payload** (Restaurant_Create): the details of the restaurant to be created
+    *   **current_user** (User): the authenticated user with role *manager*. automatically passed as argument.
 
     Returns:
     *   **Restaurant**: the newly created restaurant
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role does not match the requested role
     """
     return create_restaurant(payload, current_user.id)
 
@@ -78,6 +83,9 @@ def search_restaurants_route(
 
     Returns:
     *   **PaginatedRestaurantResults**: a paginated response of restaurants satisfying this criteria
+
+    Raises:
+    *   **HTTPException** (status_code = 422): arguments do not match Restaurant_Search schema
     """
     try:
         payload = Restaurant_Search(
@@ -106,6 +114,12 @@ def update_restaurant_details_route(restaurant_id: int, payload: Restaurant_Deta
 
     Returns:
     *   **Restaurant**: the modified restaurant
+
+    Raises:
+    *   **HTTPException** (status_code = 400): restaurant_id in payload and URL do not match
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not "manager" or user is not a manager of the provided restaurant
+    *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
     """
     if restaurant_id != payload.id:
         raise HTTPException(status_code=400, detail="Restaurant ID in path and body must match")
@@ -122,6 +136,12 @@ def update_restaurant_managers_route(restaurant_id: int, payload: Restaurant_Man
 
     Returns:
     *   **Restaurant**: the modified restaurant
+
+    Raises:
+    *   **HTTPException** (status_code = 400): restaurant_id in payload and URL do not match
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not "manager" or user is not a manager of the provided restaurant
+    *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
     """
     if restaurant_id != payload.id:
         raise HTTPException(status_code=400, detail="Restaurant ID in path and body must match")
@@ -138,6 +158,11 @@ def bulk_create_menu_items_route(restaurant_id: int, payload: MenuItem_Bulk_Crea
 
     Returns:
     *   **list[MenuItem]**: a list of the newly created menu items
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not "manager" or user is not a manager of the provided restaurant
+    *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
     """
     return bulk_menu_item_create(restaurant_id, payload)
 
@@ -152,6 +177,11 @@ def bulk_update_menu_items_route(restaurant_id: int, payload: MenuItem_Bulk_Upda
 
     Returns:
     *   **list[MenuItem]**: a list of the newly updated menu items
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not "manager" or user is not a manager of the provided restaurant
+    *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
     """
     return bulk_menu_item_update(restaurant_id, payload)
 
@@ -166,6 +196,11 @@ def create_menu_item_route(restaurant_id: int, payload: MenuItem_Create):
 
     Returns:
     *   **MenuItem**: the newly created menu item
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not "manager" or user is not a manager of the provided restaurant
+    *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
     """
     return create_menu_item(restaurant_id, payload)
 
@@ -176,9 +211,15 @@ def restaurant_orders_route(restaurant_id: int, current_user: User = Depends(che
 
     Parameters:
     *   **restaurant_id** (int): the identifier of the restaurant to be updated
-
+    *   **current_user** (User): the authenticated user with role *manager*. automatically passed as argument.
+    
     Returns:
     *   **list[Order]**: all orders for the given restaurant
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not "manager" or user is not a manager of the provided restaurant
+    *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
     """
     return get_orders_for_restaurant(restaurant_id=restaurant_id, manager_id=current_user.id)
 
@@ -194,6 +235,12 @@ def update_menu_item_route(restaurant_id: int, menu_item_id: int, payload: MenuI
 
     Returns:
     *   **MenuItem**: the updated menu item
+
+    Raises:
+    *   **HTTPException** (status_code = 400): restaurant_id in payload and URL do not match
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not "manager" or user is not a manager of the provided restaurant
+    *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
     """
     if menu_item_id != payload.id:
         raise HTTPException(status_code=400, detail="Menu item ID in path and body must match")
