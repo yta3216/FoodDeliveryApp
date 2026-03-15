@@ -22,7 +22,6 @@ class Notification():
         is_read (bool): true if notification has been read, false otherwise
         time (str): time (YYYY/MM/DD HH:MM) that notification was sent, or time created if not yet sent
     """
-    # create notification. save method must be used as well for it to be saved.
     def __init__(self, message: str, user_ids: list[str]):
         """
         Creates a new notification object. It is not saved to the database until it is sent.
@@ -34,6 +33,9 @@ class Notification():
         
         Returns:
             Notification: the newly created notification object
+
+        Raises:
+            HTTPException (status_code = 400): if notification has no recipients
         """
         if len(user_ids) == 0:
             raise HTTPException(status_code=400, detail="Notification must have at least one recipient")

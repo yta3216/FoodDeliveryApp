@@ -108,7 +108,7 @@ class User_Create(BaseModel):
     *   **password** (str): user's password, must be at least 8 characters long
     *   **name** (str): user's name
     *   **age** (int): user's age (0-100)
-    *   **gener** (str): users's gender. male, female, other, or prefer not to say
+    *   **gender** (str): users's gender. male, female, other, or prefer not to say
     *   **role** (UserRole): the user's account type, must be one of UserRole enumeration options
     """
     email: EmailStr

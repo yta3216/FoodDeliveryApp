@@ -27,7 +27,7 @@ def load_orders() -> list[dict[str, Any]]:
 
 def save_orders(items: list[dict[str, Any]]) -> None:
     """
-    **Overwrites current saved list of order with the passed list of orders.
+    **Overwrites current saved list of order with the passed list of orders.**
 
     Parameters:
         items (list[dict[str, Any]]): orders to save

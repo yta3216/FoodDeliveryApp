@@ -229,7 +229,7 @@ def update_menu_item_route(restaurant_id: int, menu_item_id: int, payload: MenuI
     **Updates a menu item in the restaurant's menu. Must be one of the restaurant managers to use.**
 
     Parameters:
-    *   **restaurant_id
+    *   **restaurant_id** (int): the identifier of the restaurant to receive the updates
     *   **menu_item_id** (int): the identifier of the menu item to be updated
     *   **payload** (MenuItem_Update): the updated menu item details
 

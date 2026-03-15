@@ -16,7 +16,7 @@ async def websocket_endpoint(user_id: str, websocket: WebSocket, current_user = 
     **Adds the logged in user to the list of currently connected users and allows them to receive real-time notifications.**
 
     Parameters:
-    *   **user_id** (str): the identifier forof the user attempting to connect. must match the logged-in user's identifier.
+    *   **user_id** (str): the identifier of the user attempting to connect. must match the logged-in user's identifier.
     *   **websocket** (Websocket): the WebSocket connection for the user
     *   **current_user** (User): the authenticated user. automatically passed as argument.
     

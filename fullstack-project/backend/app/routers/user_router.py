@@ -120,17 +120,16 @@ def password_reset_request(payload: Password_Reset_Request):
 @router.post("/reset-password")
 def perform_reset_password(payload: Password_Reset):
     """
-    **Resets the password of a user who has recently requested a password reset.**
+    **Resets the password of a user with a valid password reset token.**
 
     Parameters:
     *   **payload** (Password_Reset): the password reset token and desired new password
 
     Returns:
-    *   **dict[str, str]: a message stating that password reset was successful
+    *   **dict[str, str]**: a message stating that password reset was successful
 
     Raises:
     *   **HTTPException** (status_code = 400): if user's reset token is invalid or expired
-
     """
     reset_password(payload.new_password, payload.reset_token)
     return {"detail": "Password reset successful."}
@@ -146,10 +145,10 @@ def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged
     *   **current_user** (User): the authenticated user. automatically passed as argument.
 
     Returns:
-    *   **dict[str, str]: a message stating that the user's password was updated
+    *   **dict[str, str]**: a message stating that the user's password was updated
 
     Raises:
-    *   **HTTPException (status_code = 403): if current user's id does not match user_id in URL
+    *   **HTTPException** (status_code = 403): if current user's id does not match user_id in URL
     *   **HTTPException** (status_code = 400): if password is incorrect
     *   **HTTPException** (status_code = 404): if user_id is not found in users.json
     """
@@ -171,7 +170,7 @@ def get_notifications_route(user_id: str, current_user: User = Depends(get_curre
     *   **list[Notification_Response]**: a list of the notifications associated with the logged-in user
 
     Raises:
-    *   **HTTPException (status_code = 403): if current user's id does not match user_id in URL
+    *   **HTTPException** (status_code = 403): if current user's id does not match user_id in URL
     """
     if current_user.id != user_id:
         raise HTTPException(status_code=403, detail="You are not authorized to view this user's notifications")
