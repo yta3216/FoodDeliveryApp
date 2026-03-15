@@ -45,7 +45,6 @@ def get_user_from_token(token: str) -> User:
     raise HTTPException(status_code=401, detail="Invalid or expired session token")
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(http_bearer)) -> User:
-    # returns matching user, or 401 if token is invalid
     """
     Authenticates and retrieves the user currently using the system.
 
