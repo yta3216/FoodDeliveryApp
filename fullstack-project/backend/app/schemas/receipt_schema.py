@@ -43,7 +43,6 @@ class Receipt(BaseModel):
     *   **tax** (float): tax applied to the order
     *   **delivery_fee** (float): fee for delivering the order
     *   **total** (float): subtotal + tax + delivery_fee
-    *   **date_created** (str): the date and time the receipt was created
     """
     id: int
     customer_id: str
@@ -53,4 +52,3 @@ class Receipt(BaseModel):
     tax: float = 0.0
     delivery_fee: float = 0.0
     total: float = 0.0
-    date_created: str = None
