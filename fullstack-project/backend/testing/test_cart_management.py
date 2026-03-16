@@ -327,7 +327,6 @@ def test_add_item_to_cart(customer_with_token, setup_restaurant_menu):
     assert len(customer["cart"]["cart_items"]) == item2_id
 
 # test adding items but item id doesn't exist in menu
-# test adding new item to cart successfully
 def test_add_nonexistent_item(customer_with_token, setup_restaurant_menu):
     customer = customer_with_token["customer"]
     token = customer_with_token["token"]

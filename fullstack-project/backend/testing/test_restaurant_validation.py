@@ -500,7 +500,7 @@ def test_update_restaurant_invalid_postal_code(setup_restaurant):
     )
     assert response.status_code == 422
 
-# distance radius test #
+# ------- MAX DELIVERY RADIUS VALIDATION TESTS ------- #
 
 # test that a restaurant is created with the default delivery radius if none is provided
 def test_create_restaurant_default_delivery_radius(manager_token):
@@ -558,6 +558,8 @@ def test_update_restaurant_delivery_radius(setup_restaurant):
     )
     assert response.status_code == 200
     assert response.json()["max_delivery_radius_km"] == 50.0
+
+# ------- DELIVERY FEE VALIDATION TESTS ------- #
 
 # test that a restaurant is given the default delivery fee if none is provided
 def test_create_restaurant_default_delivery_fee(manager_token):
