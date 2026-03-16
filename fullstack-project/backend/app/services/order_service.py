@@ -11,6 +11,12 @@ from app.services.cart_service import empty_cart
 from app.services.notification_service import Notification
 from app.schemas.order_schema import Order
 from app.schemas.receipt_schema import Receipt
+from app.services.receipt_service import get_receipt
+
+VALID_TRANSITIONS = {
+    "pending": {"accepted", "rejected"},
+    "accepted": {"preparing"},
+}
 
 async def create_order_from_receipt(current_user: Customer, receipt: Receipt) -> Order:
     """
@@ -27,7 +33,7 @@ async def create_order_from_receipt(current_user: Customer, receipt: Receipt) ->
     Raises:
         HTTPException (status_code = 400): if cart is empty
         HTTPException (status_code = 409): if generated id is the same as an existing id.
-    """    
+    """
     orders = load_orders()
     new_id = max((order.get("id", 0) for order in orders), default=0) + 1
     if any(order.get("id") == new_id for order in orders):
@@ -66,7 +72,7 @@ def get_orders_for_customer(current_customer: Customer) -> list[Order]:
 
 def get_orders_for_restaurant(restaurant_id: int, manager_id: int) -> list[Order]:
     """
-    Retrieves all orders in history that were/will be prepared by this restaurant.
+    Retrieves all orders in history that were/will be prepared by this restaurant in queue sorted by order creation time.
     May only be accessed by a valid manager of the restaurant.
 
     Parameters:
@@ -85,11 +91,13 @@ def get_orders_for_restaurant(restaurant_id: int, manager_id: int) -> list[Order
         raise HTTPException(status_code=403, detail="Unauthorized to view orders for this restaurant.")
     
     orders = load_orders()
-    return [order for order in orders if order.get("restaurant_id") == restaurant_id]
+    restaurant_orders = [order for order in orders if order.get("restaurant_id") == restaurant_id]
+    restaurant_orders.sort(key=lambda o: o.get("date_created", ""))
+    return restaurant_orders
 
 async def cancel_order(order_id: int, current_user: Customer) -> Order:
     """
-    Cancels a pending order. Can only be cancelled by the customer that placed the order.
+    Cancels a pending order. Can only be cancelled by the customer that placed the order. Refund is sent to customer when cancelled.
 
     Parameters:
         order_id (int): the identifier of the order to cancel
@@ -113,6 +121,12 @@ async def cancel_order(order_id: int, current_user: Customer) -> Order:
                 raise HTTPException(status_code=400, detail= f"Order cannot be cancelled, order is already '{order.get('status')}'.")
             order["status"] = "cancelled"
             save_orders(orders)
+            receipt = get_receipt(order["receipt_id"])
+            refund_notification = Notification(
+                message=f"Your order #{order_id} has been cancelled. A refund of ${receipt.total:.2f} has been issued.",
+                user_ids=[current_user.id]
+            )
+            await refund_notification.send_to_users()
             await send_status_notification(order)
             return Order(**order)
         
@@ -120,9 +134,14 @@ async def cancel_order(order_id: int, current_user: Customer) -> Order:
 
 async def update_order_status(order_id:int, new_status:str, manager_id:int) -> Order:
     """
-    Accepts or declines a pending order for a restaurant which the provided manager manages.
+    Updates order status. Only accessible by manager. Refund notification is sent to customer if the order is rejected.
+    
+    Valid transitions:
+        pending  → accepted  (manager accepts the order)
+        pending  → rejected  (manager rejects the order — refund issued)
+        accepted → preparing (manager starts preparing the order)
 
-    Parameters: 
+    Parameters:
         order_id (int): the identifier of the order receiving the status change
         new_status (str): the new status of the order (accepted or rejected)
         manager_id (str): the identifier of the manager who is performing the status change. Must be a manager of this order's restaurant.
@@ -144,11 +163,24 @@ async def update_order_status(order_id:int, new_status:str, manager_id:int) -> O
                 raise HTTPException(status_code=403, detail = "You are not authorized to manage orders for this resturant")
             
             current_status = order.get("status")
-            if current_status != "pending":
-                raise HTTPException(status_code=400, detail=f"Order cannot be updated - current status is '{current_status}'.")
+            allowed = VALID_TRANSITIONS.get(current_status, set())
+            if new_status not in allowed:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Cannot transition order from '{current_status}' to '{new_status}'."
+                )
             
             order["status"] = new_status
             save_orders(orders)
+
+            if new_status == "rejected":
+                receipt = get_receipt(order["receipt_id"])
+                refund_notification = Notification(
+                    message=f"Your order #{order_id} has been rejected by the restaurant. A refund of ${receipt.total:.2f} has been issued.",
+                    user_ids=[order["customer_id"]]
+                )
+                await refund_notification.send_to_users()
+  
             await send_status_notification(order)
             return Order(**order)
 
@@ -166,7 +198,6 @@ async def send_status_notification(order: dict) -> None:
     customer_id = order["customer_id"]
     restaurant_id = order["restaurant_id"]
     manager_ids = get_managers(restaurant_id)
-    # TODO: add delivery driver id to notified users.
     notified_users = [customer_id] + manager_ids
     restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
     notification = Notification(f"Order {order['id']} from {restaurant_name} set to status: {order['status']}", notified_users)

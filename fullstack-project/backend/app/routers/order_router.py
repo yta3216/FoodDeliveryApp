@@ -42,14 +42,14 @@ def get_orders_for_customer_route(current_user: Customer = Depends(get_customer)
 @router.get("/restaurant/{restaurant_id}", response_model=list[Order], status_code=200, dependencies=[Depends(check_manager)])
 def get_orders_for_restaurant_route(restaurant_id: int, current_user: User = Depends(check_manager)):
     """
-    **Retrieves all orders associated with a given restaurant, which must be called by one of the restaurant's managers.**
+       **Retrieves all order of the restaurant**
     
     Parameters:
     *   **restaurant_id** (int): the identifier of the restaurant whose orders have been requested
     *   **current_user** (User): the authenticated user with role *manager*. automatically passed as argument.
 
     Returns:
-    *   **list[Order]**: all orders associated with this restaurant
+    *   **list[Order]**: all orders associated with this restaurant sorted by date_created
 
     Raises:
     *   **HTTPException** (status_code = 401): if user's token is invalid or expired
