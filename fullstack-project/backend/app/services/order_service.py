@@ -39,10 +39,6 @@ async def create_order_from_receipt(current_user: Customer, receipt: Receipt) ->
         "restaurant_id": receipt.restaurant_id,
         "delivery_id": 0,
         "receipt_id": receipt.id,
-        "items": [{
-            "menu_item_id": item.menu_item_id,
-            "qty": item.qty
-        } for item in receipt.items],
         "status": "pending",
         "date_created": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }
