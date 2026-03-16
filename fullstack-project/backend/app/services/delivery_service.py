@@ -1,9 +1,8 @@
 """
-this module handles business logic for delivery assignment and tracking.
-bike for <=5km (20km/h), car for >5km (50km/h).
-eta is calculated when the driver marks the order as delivering.
-drivers are assigned based on who has been available the longest.
-if no drivers are available, order stays in waiting_for_driver status.
+This module implements business logic for delivery assignment and tracking.
+Bikes are used for orders within 5km (20km/h), cars for longer distances (50km/h).
+ETA is calculated when the driver marks the order as delivering.
+Any updates to delivery logic should follow this module.
 """
 
 import time
@@ -18,20 +17,46 @@ CAR_SPEED_KMH = 50.0
 BIKE_MAX_DISTANCE_KM = 5.0
 
 
-# figure out which vehicle is needed based on distance
 def get_required_vehicle(distance_km: float) -> str:
+    """
+    Determines which vehicle type is required based on delivery distance.
+    Orders within 5km use a bike, longer distances require a car.
+
+    Parameters:
+        distance_km (float): the delivery distance in kilometres
+
+    Returns:
+        str: "bike" or "car"
+    """
     return "bike" if distance_km <= BIKE_MAX_DISTANCE_KM else "car"
 
 
-# calculate eta in minutes based on distance and vehicle
 def calculate_eta(distance_km: float, vehicle: str) -> float:
+    """
+    Calculates the estimated delivery time in minutes based on distance and vehicle type.
+
+    Parameters:
+        distance_km (float): the delivery distance in kilometres
+        vehicle (str): the vehicle type, either "bike" or "car"
+
+    Returns:
+        float: estimated delivery time in minutes, rounded to 2 decimal places
+    """
     speed = BIKE_SPEED_KMH if vehicle == "bike" else CAR_SPEED_KMH
     return round((distance_km / speed) * 60, 2)
 
 
-# find the best available driver for this order based on vehicle and availability
-# returns the driver dict or None if no driver is available
 def find_available_driver(required_vehicle: str) -> dict | None:
+    """
+    Finds the best available driver for an order based on vehicle type.
+    Picks the first available driver with the matching vehicle type as a tiebreaker.
+
+    Parameters:
+        required_vehicle (str): the vehicle type required for this order, either "bike" or "car"
+
+    Returns:
+        dict | None: the driver user dict if one is available, otherwise None
+    """
     users = load_users()
     candidates = [
         u for u in users
@@ -41,13 +66,19 @@ def find_available_driver(required_vehicle: str) -> dict | None:
     ]
     if not candidates:
         return None
-    # pick the one who has been available the longest: we use id as tiebreaker
-    # in a real system we'd track available_since timestamp but for now lowest id = longest tenured
     return candidates[0]
 
 
-# set driver status to delivering when they are assigned an order
 def set_driver_status_to_delivering(driver_id: str) -> None:
+    """
+    Updates a driver's status to "delivering" when they are assigned an order.
+
+    Parameters:
+        driver_id (str): the identifier of the driver to update
+
+    Returns:
+        None
+    """
     users = load_users()
     for user in users:
         if user.get("id") == driver_id:
@@ -56,8 +87,19 @@ def set_driver_status_to_delivering(driver_id: str) -> None:
     save_users(users)
 
 
-# create a delivery record when a driver is assigned
 def create_delivery(order_id: int, driver_id: str, distance_km: float) -> Delivery:
+    """
+    Creates a new delivery record when a driver is assigned to an order.
+    ETA and timing fields are set to 0 until the driver marks the delivery as started.
+
+    Parameters:
+        order_id (int): the identifier of the order being delivered
+        driver_id (str): the identifier of the assigned driver
+        distance_km (float): the delivery distance in kilometres
+
+    Returns:
+        Delivery: the newly created delivery record
+    """
     vehicle = get_required_vehicle(distance_km)
     deliveries = load_deliveries()
     new_id = max((d.get("id", 0) for d in deliveries), default=0) + 1
@@ -68,8 +110,8 @@ def create_delivery(order_id: int, driver_id: str, distance_km: float) -> Delive
         "driver_id": driver_id,
         "method": vehicle,
         "distance_km": distance_km,
-        "eta_minutes": 0.0,     # calculated when driver marks delivering
-        "started_at": 0.0,      # set when driver marks delivering
+        "eta_minutes": 0.0,
+        "started_at": 0.0,
         "delivered_at": 0.0,
         "actual_minutes": 0.0,
         "delay_minutes": 0.0,
@@ -80,8 +122,23 @@ def create_delivery(order_id: int, driver_id: str, distance_km: float) -> Delive
     return Delivery(**new_delivery)
 
 
-# called when driver marks order as delivering: starts the timer and calculates eta
 def start_delivery(order_id: int, driver_id: str) -> Delivery:
+    """
+    Marks a delivery as started, records the start timestamp, and calculates the ETA.
+    Also updates the associated order status from "preparing" to "delivering".
+
+    Parameters:
+        order_id (int): the identifier of the order being delivered
+        driver_id (str): the identifier of the driver starting the delivery
+
+    Returns:
+        Delivery: the updated delivery record with eta_minutes and started_at populated
+
+    Raises:
+        HTTPException (status_code = 403): if the driver is not assigned to this delivery
+        HTTPException (status_code = 400): if the delivery has already been started
+        HTTPException (status_code = 404): if no delivery record is found for this order
+    """
     from app.repositories.order_repo import load_orders, save_orders
     deliveries = load_deliveries()
     for delivery in deliveries:
@@ -98,7 +155,6 @@ def start_delivery(order_id: int, driver_id: str) -> Delivery:
             delivery["eta_minutes"] = calculate_eta(distance_km, vehicle)
             save_deliveries(deliveries)
 
-            # flip order status from preparing to delivering
             orders = load_orders()
             for order in orders:
                 if order.get("id") == order_id:
@@ -111,8 +167,25 @@ def start_delivery(order_id: int, driver_id: str) -> Delivery:
     raise HTTPException(status_code=404, detail=f"Delivery for order '{order_id}' not found.")
 
 
-# called when driver marks order as delivered: stops the timer and records actual time
 def complete_delivery(order_id: int, driver_id: str) -> Delivery:
+    """
+    Marks a delivery as completed, records the delivered timestamp and actual delivery time.
+    Calculates delay_minutes as the difference between actual and estimated time.
+    Also sets the driver's status back to "available".
+
+    Parameters:
+        order_id (int): the identifier of the order being completed
+        driver_id (str): the identifier of the driver completing the delivery
+
+    Returns:
+        Delivery: the completed delivery record with all timing fields populated
+
+    Raises:
+        HTTPException (status_code = 403): if the driver is not assigned to this delivery
+        HTTPException (status_code = 400): if the delivery has not been started yet
+        HTTPException (status_code = 400): if the delivery has already been completed
+        HTTPException (status_code = 404): if no delivery record is found for this order
+    """
     deliveries = load_deliveries()
     for delivery in deliveries:
         if delivery.get("order_id") == order_id:
@@ -127,11 +200,9 @@ def complete_delivery(order_id: int, driver_id: str) -> Delivery:
             actual_minutes = round((now - delivery["started_at"]) / 60, 2)
             delivery["delivered_at"] = now
             delivery["actual_minutes"] = actual_minutes
-            # positive = late, negative = early
             delivery["delay_minutes"] = round(actual_minutes - delivery.get("eta_minutes", 0.0), 2)
             save_deliveries(deliveries)
 
-            # set driver status back to available
             users = load_users()
             for user in users:
                 if user.get("id") == driver_id:
@@ -144,8 +215,19 @@ def complete_delivery(order_id: int, driver_id: str) -> Delivery:
     raise HTTPException(status_code=404, detail=f"Delivery for order '{order_id}' not found.")
 
 
-# get delivery info for a specific order — for customer to view
 def get_delivery_by_order(order_id: int) -> Delivery:
+    """
+    Retrieves the delivery record associated with a given order.
+
+    Parameters:
+        order_id (int): the identifier of the order
+
+    Returns:
+        Delivery: the delivery record for this order
+
+    Raises:
+        HTTPException (status_code = 404): if no delivery record is found for this order
+    """
     deliveries = load_deliveries()
     for delivery in deliveries:
         if delivery.get("order_id") == order_id:
@@ -153,14 +235,22 @@ def get_delivery_by_order(order_id: int) -> Delivery:
     raise HTTPException(status_code=404, detail=f"Delivery for order '{order_id}' not found.")
 
 
-# called when a driver sets their status to available —
-# checks if any orders are waiting for a driver and assigns the oldest one
 def check_waiting_orders(driver: dict) -> None:
+    """
+    Called when a driver sets their status to available.
+    Checks if any orders are waiting for a driver with the matching vehicle type,
+    and assigns the oldest waiting order to this driver.
+
+    Parameters:
+        driver (dict): the driver user dict, must include "vehicle" and "id" fields
+
+    Returns:
+        None
+    """
     from app.repositories.order_repo import load_orders, save_orders
     orders = load_orders()
     required_vehicle = driver.get("vehicle")
 
-    # find orders waiting for a driver that match this vehicle type
     waiting = [
         o for o in orders
         if o.get("status") == "waiting_for_driver"
@@ -170,11 +260,9 @@ def check_waiting_orders(driver: dict) -> None:
     if not waiting:
         return
 
-    # assign the oldest waiting order (lowest id = placed first)
     waiting.sort(key=lambda o: o["id"])
     order = waiting[0]
 
-    # create delivery and update order — status goes to preparing, driver hits start to begin delivering
     delivery = create_delivery(order["id"], driver["id"], order.get("distance_km", 0.0))
     set_driver_status_to_delivering(driver["id"])
 
