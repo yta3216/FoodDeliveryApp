@@ -74,8 +74,8 @@ async def cancel_order_route(order_id:int, current_user: Customer = Depends(get_
     *   **HTTPException** (status_code = 401): if current user's token is invalid or expired
     *   **HTTPException** (status_code = 403): if current user's role is not *customer*
     *   **HTTPException** (status_code = 409): if current user's id does not match the order's customer id
-    *   **HTTPEXception** (status_code = 400): if order has a status other than "pending"
-    *   **HTTPEXception** (status_code = 404): if order is not found in orders.json
+    *   **HTTPException** (status_code = 400): if order has a status other than "pending"
+    *   **HTTPException** (status_code = 404): if order is not found in orders.json
     """
     return await cancel_order(order_id=order_id, current_user=current_user)
 
@@ -95,8 +95,8 @@ async def update_order_status_route(order_id:int, body: OrderStatusUpdate, curre
     Raises:
     *   **HTTPException** (status_code = 401): if user's token is invalid or expired
     *   **HTTPException** (status_code = 403): if user's role is not *manager*, or if provided user_id is not in restaurant's list of managers
-    *   **HTTPEXception** (status_code = 400): if order has a status other than "pending"
-    *   **HTTPEXception** (status_code = 404): if order is not found in orders.json, or order's restaurant id not found in restaurants.json
+    *   **HTTPException** (status_code = 400): if order has a status other than "pending"
+    *   **HTTPException** (status_code = 404): if order is not found in orders.json, or order's restaurant id not found in restaurants.json
     """
     return await update_order_status(order_id=order_id, new_status=body.status, manager_id=current_user.id)
 
