@@ -23,14 +23,14 @@ def create_receipt(current_user: Customer) -> Receipt:
     The cart is not modified. A new receipt is created each time this is called.**
 
     Parameters:
-    *   **current_user** (Customer): the authenticated user with role *customer*
+        **current_user** (Customer): the authenticated user with role *customer*
 
     Returns:
-    *   **Receipt**: the saved receipt with full cost breakdown
+        **Receipt**: the saved receipt with full cost breakdown
 
     Raises:
-    *   **HTTPException** (status_code = 400): if the cart is empty
-    *   **HTTPException** (status_code = 404): if the cart's restaurant is not found
+        **HTTPException** (status_code = 400): if the cart is empty
+        **HTTPException** (status_code = 404): if the cart's restaurant is not found
     """
     cart = get_cart(current_user)
     if cart.restaurant_id == 0:
@@ -87,16 +87,43 @@ def get_receipt(receipt_id: int) -> Receipt:
     **Retrieves a saved receipt by its identifier.**
 
     Parameters:
-    *   **receipt_id** (int): the identifier of the receipt to retrieve
+        **receipt_id** (int): the identifier of the receipt to retrieve
 
     Returns:
-    *   **Receipt**: the matching receipt
+        **Receipt**: the matching receipt
 
     Raises:
-    *   **HTTPException** (status_code = 404): if receipt is not found
+        **HTTPException** (status_code = 404): if receipt is not found
     """
     receipts = load_receipts()
     for receipt in receipts:
         if receipt.get("id") == receipt_id:
             return Receipt(**receipt)
     raise HTTPException(status_code=404, detail=f"Receipt '{receipt_id}' not found.")
+
+def refresh_receipt(receipt_id: int, current_user: Customer) -> Receipt:
+    """
+    **Refreshes a receipt by generating a new snapshot of the customer's current cart.
+    This is used when the underlying cart or restaurant pricing has changed since the original receipt was generated.**
+
+    Parameters:
+        **receipt_id** (int): the identifier of the receipt to refresh. used for authorization.
+        **current_user** (Customer): the authenticated user who owns the receipt.
+
+    Returns:
+        **Receipt**: a newly created receipt based on the current cart state.
+
+    Raises:
+        **HTTPException** (status_code = 403): if the receipt belongs to a different user.
+        **HTTPException** (status_code = 409): if the cart has changed restaurants since the receipt was created.
+    """
+
+    current_receipt = get_receipt(receipt_id)
+    if current_receipt.customer_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot refresh a receipt that belongs to another user.")
+
+    cart = get_cart(current_user)
+    if cart.restaurant_id != current_receipt.restaurant_id:
+        raise HTTPException(status_code=409, detail="Cart restaurant has changed since receipt creation. Please generate a new receipt.")
+
+    return create_receipt(current_user)

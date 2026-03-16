@@ -12,6 +12,7 @@ from app.schemas.payment_schema import PaymentRequest, PaymentResponse
 from app.services.order_service import create_order_from_receipt
 from app.services.notification_service import Notification
 from app.services.receipt_service import get_receipt
+from app.services.restaurant_service import get_restaurant_by_id
 
 
 def _validate_payment(payment: PaymentRequest) -> tuple[bool, str]:
@@ -59,9 +60,13 @@ async def process_payment(payment: PaymentRequest, current_user: Customer) -> Pa
 
     Raises:
         HTTPException (status_code = 400): if payment validation fails. cart is left untouched and no order is created
+        HTTPException (status_code = 409): if the restaurant's delivery fee has changed since the receipt was created.
     """
     
     receipt = get_receipt(payment.receipt_id)
+
+    if (get_restaurant_by_id(receipt["restaurant_id"])["delivery_fee"] != receipt["delivery_fee"]):
+        raise HTTPException(status_code=409, detail="The restaurant's delivery fee has changed. Please try again.")
 
     is_valid, error_message = _validate_payment(payment)
  
