@@ -53,13 +53,4 @@ class OrderAcceptReject(BaseModel):
         *   *preparing*: manager marks an accepted order as being prepared
     """
     status: Literal["accepted", "rejected", "preparing"]
-
-
-# schema for customer to update items on a pending order
-class OrderItemsUpdate(BaseModel):
-    items: list[OrderItem] = Field(default_factory=list)
-
-
-# schema for customer to create an order, includes distance from restaurant
-class OrderCreate(BaseModel):
-    distance_km: float = 0.0
+    

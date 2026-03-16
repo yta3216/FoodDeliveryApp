@@ -4,8 +4,7 @@ This module defines the API routes for order management.
 from fastapi import APIRouter, Depends
 from app.schemas.order_schema import (
     Order,
-    OrderAcceptReject,
-    OrderItemsUpdate,
+    OrderAcceptReject
 )
 from app.schemas.user_schema import Customer, User
 from app.services.user_service import get_customer
@@ -13,8 +12,7 @@ from app.services.order_service import (
     get_orders_for_customer,
     get_orders_for_restaurant,
     cancel_order,
-    accept_reject_order,
-    update_order_items,
+    accept_reject_order
 )
 from app.services.restaurant_service import check_manager
 from app.auth import require_role
@@ -99,8 +97,3 @@ async def accept_reject_order_route(order_id: int, body: OrderAcceptReject, curr
     *   **HTTPException** (status_code = 404): if order is not found in orders.json, or order's restaurant id not found in restaurants.json
     """
     return await accept_reject_order(order_id=order_id, new_status=body.status, manager_id=current_user.id)
-
-# update items on a pending order: blocked once the order is confirmed
-@router.patch("/{order_id}/items", response_model=Order, status_code=200)
-def update_order_items_route(order_id: int, body: OrderItemsUpdate, current_user: Customer = Depends(get_customer)):
-    return update_order_items(order_id=order_id, payload=body, current_user=current_user)

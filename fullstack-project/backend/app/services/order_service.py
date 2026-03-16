@@ -9,7 +9,7 @@ from app.services.restaurant_service import get_restaurant_by_id, get_managers
 from app.schemas.user_schema import Customer
 from app.services.cart_service import empty_cart
 from app.services.notification_service import Notification
-from app.schemas.order_schema import Order, OrderItemsUpdate
+from app.schemas.order_schema import Order
 from app.schemas.receipt_schema import Receipt
 from app.services.receipt_service import get_receipt
 
@@ -224,29 +224,6 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -
             return Order(**order)
 
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
-
-
-# update items on a pending order: blocked if the order is already confirmed
-def update_order_items(order_id: int, payload: OrderItemsUpdate, current_user: Customer) -> Order:
-    orders = load_orders()
-
-    for order in orders:
-        if order.get("id") == order_id:
-            # make sure this order belongs to the customer making the request
-            if order.get("customer_id") != current_user.id:
-                raise HTTPException(status_code=403, detail="You are not authorized to edit this order.")
-
-            # block edits once the order is no longer pending
-            if order.get("status") != "pending":
-                raise HTTPException(status_code=400, detail=f"Order is locked and cannot be edited — current status is '{order.get('status')}'.")
-
-            # replace the items list with what the customer sent
-            order["items"] = [{"menu_item_id": item.menu_item_id, "qty": item.qty} for item in payload.items]
-            save_orders(orders)
-            return Order(**order)
-
-    raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
-
 
 async def send_status_notification(order: dict) -> None:
     """
