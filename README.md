@@ -7,12 +7,23 @@ Team Members:
 - Sultan Aldeiro (35187749)
 
 ## How to Run
-1. Make sure your terminal is in the backend directory 
+### Option 1: From Virtual Environment
+1. Make sure your terminal is in the *backend* directory 
 2. Create your virtual environment (name it whatever you want) IN THE BACKEND DIRECTORY
+    * example terminal prompt (last argument is venv name): *python -m venv venv*
 3. Activate the virtual environment
-4. From the backend repository
-4. pip install "pip install -r requirements.txt"
-5. To run: fastapi dev app/main.py
+    * for the previous example (venv=venv name): *venv/scripts/activate*
+4. From the backend directory, run the following commands:
+    * *pip install -r requirements.txt*
+    * *fastapi dev app/main.py*
+5. To close the program, press *ctrl + c* from the terminal
+
+## Option 2: Using Docker (from terminal)
+1. Open the Docker Desktop app
+2. Make sure your terminal is in the root directory *FoodDeliveryApp/*
+3. Run the following command:
+    * *docker compose up --build*
+4. To close the program, press *ctrl + c* from the terminal
 
 ## For Developers
 ### Run Tests & Generate Coverage Reports
