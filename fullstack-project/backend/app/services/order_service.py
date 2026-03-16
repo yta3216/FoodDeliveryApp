@@ -130,7 +130,7 @@ async def cancel_order(order_id: int, current_user: Customer) -> Order:
 
 # manager accepts or declines pending order
 # if accepted, tries to assign a driver: if none available, order goes to waiting_for_driver
-async def update_order_status(order_id: int, new_status: str, manager_id: int) -> Order:
+async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -> Order:
     """
     Accepts or declines a pending order for a restaurant which the provided manager manages.
 

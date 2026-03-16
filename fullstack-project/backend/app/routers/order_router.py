@@ -4,7 +4,7 @@ This module defines the API routes for order management.
 from fastapi import APIRouter, Depends
 from app.schemas.order_schema import (
     Order,
-    OrderStatusUpdate,
+    OrderAcceptReject,
     OrderItemsUpdate,
 )
 from app.schemas.user_schema import Customer, User
@@ -13,7 +13,7 @@ from app.services.order_service import (
     get_orders_for_customer,
     get_orders_for_restaurant,
     cancel_order,
-    update_order_status,
+    accept_reject_order,
     update_order_items,
 )
 from app.services.restaurant_service import check_manager
@@ -80,13 +80,13 @@ async def cancel_order_route(order_id: int, current_user: Customer = Depends(get
     return await cancel_order(order_id=order_id, current_user=current_user)
 
 @router.patch("/{order_id}/status", response_model=Order, status_code=200)
-async def update_order_status_route(order_id: int, body: OrderStatusUpdate, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))):
+async def accept_reject_order_route(order_id: int, body: OrderAcceptReject, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))):
     """
     **This method is used by restaurant managers to accept or reject pending orders for their restaurant.**
 
     Parameters:
     *   **order_id** (int): the identifier of the order with the requested status change
-    *   **body** (OrderStatusUpdate): the new order status
+    *   **body** (OrderAcceptReject): the new order status
     *   **current_user** (User): the authenticated user with role *manager*. automatically passed as argument.
 
     Returns:
@@ -98,7 +98,7 @@ async def update_order_status_route(order_id: int, body: OrderStatusUpdate, curr
     *   **HTTPException** (status_code = 400): if order has a status other than "pending"
     *   **HTTPException** (status_code = 404): if order is not found in orders.json, or order's restaurant id not found in restaurants.json
     """
-    return await update_order_status(order_id=order_id, new_status=body.status, manager_id=current_user.id)
+    return await accept_reject_order(order_id=order_id, new_status=body.status, manager_id=current_user.id)
 
 # update items on a pending order: blocked once the order is confirmed
 @router.patch("/{order_id}/items", response_model=Order, status_code=200)

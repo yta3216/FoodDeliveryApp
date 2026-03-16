@@ -43,7 +43,7 @@ class Order(BaseModel):
     date_created: str = None
 
 
-class OrderStatusUpdate(BaseModel):
+class OrderAcceptReject(BaseModel):
     """
     **Defines the attributes of an update to the order status.**
     Attributes:
