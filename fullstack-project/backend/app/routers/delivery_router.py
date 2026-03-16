@@ -1,7 +1,13 @@
-from fastapi import APIRouter, Depends
+"""
+this module defines the api routes for delivery management.
+drivers can update their status, mark orders as delivering/delivered.
+customers can view delivery info for their orders.
+"""
+
+from fastapi import APIRouter, Depends, HTTPException
 from app.schemas.delivery_schema import Delivery
 from app.schemas.user_schema import User, UserRole
-from app.auth import require_role
+from app.auth import require_role, get_current_user
 from app.services.delivery_service import (
     start_delivery,
     complete_delivery,
@@ -9,7 +15,6 @@ from app.services.delivery_service import (
     check_waiting_orders,
 )
 from app.repositories.user_repo import load_users, save_users
-from app.auth import get_current_user
 
 router = APIRouter(prefix="/delivery", tags=["delivery"])
 
@@ -22,19 +27,19 @@ def update_driver_status_route(
     current_user: User = Depends(require_role(UserRole.DELIVERY_DRIVER))
 ):
     if status not in ("available", "unavailable"):
-        from fastapi import HTTPException
-        raise HTTPException(status_code=400, detail="status must be available or unavailable")
+        raise HTTPException(status_code=400, detail="status can only be manually updated to one of available or unavailable")
 
     users = load_users()
+    updated_user = None
     for user in users:
         if user.get("id") == current_user.id:
             user["driver_status"] = status
+            updated_user = user
             break
     save_users(users)
 
     # if driver just became available, check for any waiting orders
-    if status == "available":
-        updated_user = next(u for u in users if u.get("id") == current_user.id)
+    if status == "available" and updated_user:
         check_waiting_orders(updated_user)
 
     return {"message": f"status updated to {status}"}

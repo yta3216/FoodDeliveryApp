@@ -9,16 +9,35 @@ from testing.test_restaurant_crud import setup_restaurant
 
 client = TestClient(app)
 
+# Helper: generate receipt->complete checkout->return created order
+def place_order(token: str) -> dict:
+    receipt_response = client.get("/receipt", headers={"Authorization": f"Bearer {token}"})
+    assert receipt_response.status_code == 200
+    receipt_id = receipt_response.json()["id"]
+ 
+    checkout_response = client.post(
+        "/payment/checkout",
+        json={
+            "receipt_id": receipt_id,
+            "card_number": "1234567890123456",
+            "expiry_month": 12,
+            "expiry_year": 2099,
+            "cvv": "123",
+            "cardholder_name": "Test Customer"
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert checkout_response.status_code == 201
+    return checkout_response.json()["order"]
+
 # places an order
 @pytest.fixture
 def placed_order(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
-
-    response = client.post("/order", headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 201
+    order = place_order(token)
 
     return {
-        "order": response.json(),
+        "order": order,
         "token": token,
         "customer_id": customer_with_cart_and_token["customer_id"]
     }

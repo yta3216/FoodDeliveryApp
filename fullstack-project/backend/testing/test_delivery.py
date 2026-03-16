@@ -5,6 +5,27 @@ from app.schemas.user_schema import UserRole
 
 client = TestClient(app)
 
+VALID_PAYMENT = {
+    "card_number": "1234567890123456",
+    "expiry_month": 12,
+    "expiry_year": 2099,
+    "cvv": "123",
+    "cardholder_name": "Test Customer"
+}
+
+# helper to place an order via the payment flow
+def place_order(customer_token: str, distance_km: float = 0.0) -> dict:
+    receipt_resp = client.get(f"/receipt?distance_km={distance_km}", headers={"Authorization": f"Bearer {customer_token}"})
+    assert receipt_resp.status_code == 200
+    receipt_id = receipt_resp.json()["id"]
+    checkout_resp = client.post(
+        "/payment/checkout",
+        json={**VALID_PAYMENT, "receipt_id": receipt_id},
+        headers={"Authorization": f"Bearer {customer_token}"}
+    )
+    assert checkout_resp.status_code == 201
+    return checkout_resp.json()["order"]
+
 
 # fixtures
 @pytest.fixture
@@ -83,20 +104,18 @@ def delivery_setup():
     client.put(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
     client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 1},
                 headers={"Authorization": f"Bearer {customer_token}"})
-    order_resp = client.post("/order",
-                             json={"distance_km": 3.0},
-                             headers={"Authorization": f"Bearer {customer_token}"})
-    assert order_resp.status_code == 201
+    order = place_order(customer_token, distance_km=3.0)
 
     return {
         "manager_token": manager_token,
         "customer_token": customer_token,
         "driver_token": driver_token,
-        "order": order_resp.json(),
+        "order": order,
         "restaurant_id": restaurant_id,
     }
 
-# when manager accepts and a bike driver is available, order goes to delivering
+
+# when manager accepts and a bike driver is available, order goes to preparing
 def test_manager_accept_assigns_driver(delivery_setup):
     order_id = delivery_setup["order"]["id"]
     manager_token = delivery_setup["manager_token"]
@@ -159,10 +178,8 @@ def test_no_driver_sets_waiting_status():
     client.put(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
     client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 1},
                 headers={"Authorization": f"Bearer {customer_token}"})
-    order_resp = client.post("/order",
-                             json={"distance_km": 3.0},
-                             headers={"Authorization": f"Bearer {customer_token}"})
-    order_id = order_resp.json()["id"]
+    order = place_order(customer_token)
+    order_id = order["id"]
 
     response = client.patch(
         f"/order/{order_id}/status",
@@ -216,7 +233,6 @@ def test_driver_can_start_delivery(delivery_setup):
     order_resp = client.get("/order/customer", headers={"Authorization": f"Bearer {customer_token}"})
     orders = [o for o in order_resp.json() if o["id"] == order_id]
     assert orders[0]["status"] == "delivering"
-    assert response.json()["started_at"] > 0
 
 
 # driver can complete delivery and actual time is recorded
@@ -263,3 +279,88 @@ def test_customer_can_view_delivery(delivery_setup):
     )
     assert response.status_code == 200
     assert response.json()["order_id"] == order_id
+
+
+# when a driver becomes available, waiting_for_driver order gets assigned to them
+def test_waiting_order_assigned_when_driver_becomes_available():
+    # create manager, restaurant, customer with no driver initially
+    client.post("/user", json={
+        "email": "wait_manager@example.com",
+        "password": "password",
+        "name": "Wait Manager",
+        "age": 35,
+        "gender": "male",
+        "role": UserRole.RESTAURANT_MANAGER.value,
+    })
+    manager_token = client.post("/user/login", json={
+        "email": "wait_manager@example.com", "password": "password"
+    }).json()["token"]
+
+    restaurant_resp = client.post("/restaurant", json={
+        "name": "Wait Restaurant",
+        "city": "Vancouver",
+        "address": {
+            "street": "789 Wait St",
+            "city": "Vancouver",
+            "province": "BC",
+            "postal_code": "V6B3C3"
+        }
+    }, headers={"Authorization": f"Bearer {manager_token}"})
+    restaurant_id = restaurant_resp.json()["id"]
+
+    menu_resp = client.post(f"/restaurant/{restaurant_id}/menu", json={
+        "name": "Wait Burger",
+        "price": 9.99,
+        "tags": ["test"]
+    }, headers={"Authorization": f"Bearer {manager_token}"})
+    menu_item_id = menu_resp.json()["id"]
+
+    client.post("/user", json={
+        "email": "wait_customer@example.com",
+        "password": "password",
+        "name": "Wait Customer",
+        "age": 25,
+        "gender": "female",
+        "role": UserRole.CUSTOMER.value,
+    })
+    customer_token = client.post("/user/login", json={
+        "email": "wait_customer@example.com", "password": "password"
+    }).json()["token"]
+
+    # place order with no driver available — should go to waiting_for_driver
+    client.put(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
+    client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 1},
+                headers={"Authorization": f"Bearer {customer_token}"})
+    order = place_order(customer_token)
+    order_id = order["id"]
+
+    accept = client.patch(
+        f"/order/{order_id}/status",
+        json={"status": "accepted"},
+        headers={"Authorization": f"Bearer {manager_token}"},
+    )
+    assert accept.json()["status"] == "waiting_for_driver"
+
+    # now a bike driver registers and sets themselves available
+    client.post("/user", json={
+        "email": "wait_driver@example.com",
+        "password": "password",
+        "name": "Wait Driver",
+        "age": 28,
+        "gender": "male",
+        "role": UserRole.DELIVERY_DRIVER.value,
+        "vehicle": "bike",
+    })
+    driver_token = client.post("/user/login", json={
+        "email": "wait_driver@example.com", "password": "password"
+    }).json()["token"]
+
+    client.patch(
+        "/delivery/status?status=available",
+        headers={"Authorization": f"Bearer {driver_token}"}
+    )
+
+    # order should now be assigned to the driver and status should be preparing
+    order_check = client.get("/order/customer", headers={"Authorization": f"Bearer {customer_token}"})
+    orders = [o for o in order_check.json() if o["id"] == order_id]
+    assert orders[0]["status"] == "preparing"

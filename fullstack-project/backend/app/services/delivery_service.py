@@ -1,3 +1,11 @@
+"""
+this module handles business logic for delivery assignment and tracking.
+bike for <=5km (20km/h), car for >5km (50km/h).
+eta is calculated when the driver marks the order as delivering.
+drivers are assigned based on who has been available the longest.
+if no drivers are available, order stays in waiting_for_driver status.
+"""
+
 import time
 from fastapi import HTTPException
 from app.repositories.delivery_repo import load_deliveries, save_deliveries
@@ -38,8 +46,8 @@ def find_available_driver(required_vehicle: str) -> dict | None:
     return candidates[0]
 
 
-# assign a driver to an order, update driver status to delivering
-def assign_driver_to_order(driver_id: str) -> None:
+# set driver status to delivering when they are assigned an order
+def set_driver_status_to_delivering(driver_id: str) -> None:
     users = load_users()
     for user in users:
         if user.get("id") == driver_id:
@@ -64,6 +72,7 @@ def create_delivery(order_id: int, driver_id: str, distance_km: float) -> Delive
         "started_at": 0.0,      # set when driver marks delivering
         "delivered_at": 0.0,
         "actual_minutes": 0.0,
+        "delay_minutes": 0.0,
     }
 
     deliveries.append(new_delivery)
@@ -101,6 +110,7 @@ def start_delivery(order_id: int, driver_id: str) -> Delivery:
 
     raise HTTPException(status_code=404, detail=f"Delivery for order '{order_id}' not found.")
 
+
 # called when driver marks order as delivered: stops the timer and records actual time
 def complete_delivery(order_id: int, driver_id: str) -> Delivery:
     deliveries = load_deliveries()
@@ -133,6 +143,7 @@ def complete_delivery(order_id: int, driver_id: str) -> Delivery:
 
     raise HTTPException(status_code=404, detail=f"Delivery for order '{order_id}' not found.")
 
+
 # get delivery info for a specific order — for customer to view
 def get_delivery_by_order(order_id: int) -> Delivery:
     deliveries = load_deliveries()
@@ -163,13 +174,13 @@ def check_waiting_orders(driver: dict) -> None:
     waiting.sort(key=lambda o: o["id"])
     order = waiting[0]
 
-    # create delivery and update order
+    # create delivery and update order — status goes to preparing, driver hits start to begin delivering
     delivery = create_delivery(order["id"], driver["id"], order.get("distance_km", 0.0))
-    assign_driver_to_order(driver["id"])
+    set_driver_status_to_delivering(driver["id"])
 
     for o in orders:
         if o["id"] == order["id"]:
-            o["status"] = "delivering"
+            o["status"] = "preparing"
             o["delivery_id"] = delivery.id
             break
     save_orders(orders)

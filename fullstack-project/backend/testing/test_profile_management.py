@@ -18,7 +18,7 @@ def register_and_login(email, password="Password123", role="customer"):
     return data.get("token"), data.get("user_id")
 
 
-# viewing profile
+# ------------ viewing profile ----------------- #
 
 def test_user_can_view_own_profile():
     token, user_id = register_and_login("viewprofile@example.com")
@@ -38,7 +38,7 @@ def test_password_not_returned_in_profile():
     assert "password" not in response.json()
 
 
-# updating profile
+# -------------- updating profile -------------- #
 
 def test_user_can_update_own_details():
     token, user_id = register_and_login("updateme@example.com")
