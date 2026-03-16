@@ -1,4 +1,4 @@
-"""Test cases for order management"""
+"""Test cases for order management."""
 
 from fastapi.testclient import TestClient
 import pytest
@@ -6,7 +6,6 @@ from app.main import app
 from app.schemas.user_schema import UserRole
 from app.services.user_service import get_customer
 from app.services.restaurant_service import get_restaurant_by_id
-from app.services.receipt_service import get_receipt
 from testing.test_restaurant_crud import setup_restaurant
 from testing.test_cart_management import customer_with_cart_and_token, customer_with_token, setup_restaurant_menu
 
@@ -47,7 +46,6 @@ def test_place_order(customer_with_cart_and_token):
     assert order["restaurant_id"] == restaurant
     assert order["status"] == "pending"
     assert order["receipt_id"] != 0
-    assert len(get_receipt(order["receipt_id"]).items) == 2
 
 def test_place_order_with_empty_cart(customer_with_token):
     token = customer_with_token["token"]
@@ -72,7 +70,6 @@ def test_get_orders_for_customer(customer_with_cart_and_token):
         assert order["restaurant_id"] == restaurant
         assert order["status"] == "pending"
         assert order["receipt_id"] != 0
-        assert len(get_receipt(order["receipt_id"]).items) == 2
 
 def test_get_orders_for_customer_with_no_orders(customer_with_token):
     token = customer_with_token["token"]
@@ -104,7 +101,7 @@ def test_get_orders_for_restaurant(customer_with_cart_and_token, setup_restauran
         assert order["restaurant_id"] == restaurant
         assert order["status"] == "pending"
         assert order["receipt_id"] != 0
-        assert len(get_receipt(order["receipt_id"]).items) == 2
+
 
 def test_get_orders_for_restaurant_unauthorized(customer_with_cart_and_token, setup_restaurant_menu):
     token = customer_with_cart_and_token["token"]

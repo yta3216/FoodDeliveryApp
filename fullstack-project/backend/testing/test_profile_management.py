@@ -1,3 +1,5 @@
+"""Test cases for user profile management, viewing, and updating profile details."""
+
 from fastapi.testclient import TestClient
 from app.main import app
 
@@ -17,7 +19,6 @@ def register_and_login(email, password="Password123", role="customer"):
     data = response.json()
     return data.get("token"), data.get("user_id")
 
-
 # ------------ viewing profile ----------------- #
 
 def test_user_can_view_own_profile():
@@ -36,7 +37,6 @@ def test_password_not_returned_in_profile():
     assert response.status_code == 200
     # password should never be returned
     assert "password" not in response.json()
-
 
 # -------------- updating profile -------------- #
 
