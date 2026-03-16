@@ -146,7 +146,7 @@ def update_cart_item_route(item_id: int, payload: CartItem_Update, customer: Cus
     return update_cart_item(item_id, payload, customer)
 
 @router.delete("/item/{item_id}", response_model=CartItem, status_code=200)
-def delete_cart_item(item_id: int, customer = Depends(get_customer)):
+def delete_cart_item_route(item_id: int, customer = Depends(get_customer)):
     """
     **Removes an item from a logged-in customer's cart and returns it.**
     
