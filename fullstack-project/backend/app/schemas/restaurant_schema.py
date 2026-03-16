@@ -247,7 +247,8 @@ class Restaurant(BaseModel):
     *   **city** (str): the city the restaurant is located in
     *   **address** (Address): the full address of the restaurant
     *   **mnager_ids** (list[str]): list of user IDs who are managers of the restaurant
-    *   **max_delivery_radius_km** (float): the maximum radius that a restaurant will deliver to. default=10
+    *   **max_delivery_radius_km** (float): the maximum radius that a restaurant will deliver to. *(optional; default = 10)*
+    *   **delivery_fee** (float): the fee charged for delivery by this restaurant. *(optional; default = 0)*
     *   **menu** (Menu): the restaurant's menu
     """
     id: int
@@ -256,6 +257,7 @@ class Restaurant(BaseModel):
     address: Address
     manager_ids: list[str]
     max_delivery_radius_km: float = 10.0
+    delivery_fee: float = 0.0
     menu: Menu = Menu()
 
 class Restaurant_Create(BaseModel):
@@ -267,12 +269,14 @@ class Restaurant_Create(BaseModel):
     *   **city** (str): the city the restaurant is located in
     *   **address** (Address): the full address of the restaurant
     *   **max_delivery_radius_km** (float): the maximum radius that a restaurant will deliver to. *(optional; default = 10)*
+    *   **delivery_fee** (float): the fee charged for delivery by this restaurant. *(optional; default = 0)*
     *   **menu** (Menu): the restaurant's menu, empty if not provided *(optional; default = empty menu)*
     """
     name: str
     city: str
     address: Address
     max_delivery_radius_km: float = 10.0
+    delivery_fee: float = 0.0
     menu: Menu_Create = Menu_Create()
 
     @field_validator("name")
@@ -298,6 +302,11 @@ class Restaurant_Create(BaseModel):
         if not _NAME_RE.match(v):
             raise ValueError("Restaurant city contains invalid characters")
         return v
+    
+    @field_validator("delivery_fee")
+    @classmethod
+    def round_delivery_fee(cls, v:float) -> float:
+        return round(v, 2)
 
 class Restaurant_Search(BaseModel):
     """
@@ -366,18 +375,20 @@ class Restaurant_Details_Update(BaseModel):
     """
     **Defines the attributes required to update restaurant details.**
 
-    Atributes:
+    Attributes:
     *   **id** (int): identifier of restaurant to be updated
     *   **name** (str): updated restaurant name
     *   **city** (str): updated restaurant city
     *   **address** (Address): updated restaurant address
-    *   **max_delivery_radius_km** (float): maximum distance that the restaurant will accept orders from.
+    *   **max_delivery_radius_km** (float): maximum distance that the restaurant will accept orders from. *(optional; default = 10)*
+    *   **delivery_fee** (float): the fee charged for delivery by this restaurant. *(optional; default = 0)*
     """
     id: int
     name: str
     city: str
     address: Address
     max_delivery_radius_km: float = 10.0
+    delivery_fee: float = 0.0
 
     @field_validator("name")
     @classmethod
@@ -402,6 +413,11 @@ class Restaurant_Details_Update(BaseModel):
         if not _NAME_RE.match(v):
             raise ValueError("Restaurant city contains invalid characters")
         return v
+    
+    @field_validator("delivery_fee")
+    @classmethod
+    def round_delivery_fee(cls, v:float) -> float:
+        return round(v, 2)
     
 class Restaurant_Managers_Update(BaseModel):
     """
