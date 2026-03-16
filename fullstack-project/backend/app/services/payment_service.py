@@ -9,8 +9,9 @@ from fastapi import HTTPException
 
 from app.schemas.user_schema import Customer
 from app.schemas.payment_schema import PaymentRequest, PaymentResponse
-from app.services.order_service import create_order_from_cart
+from app.services.order_service import create_order_from_receipt
 from app.services.notification_service import Notification
+from app.services.receipt_service import get_receipt
 
 
 def _validate_payment(payment: PaymentRequest) -> tuple[bool, str]:
@@ -59,7 +60,9 @@ async def process_payment(payment: PaymentRequest, current_user: Customer) -> Pa
     Raises:
         HTTPException (status_code = 400): if payment validation fails. cart is left untouched and no order is created
     """
-        
+    
+    receipt = get_receipt(payment.receipt_id)
+
     is_valid, error_message = _validate_payment(payment)
  
     if not is_valid:
@@ -70,7 +73,7 @@ async def process_payment(payment: PaymentRequest, current_user: Customer) -> Pa
         await notification.send_to_users()
         raise HTTPException(status_code=400, detail=error_message)
  
-    order = await create_order_from_cart(current_user)
+    order = await create_order_from_receipt(current_user, receipt)
  
     return PaymentResponse(
         payment_status="success",
