@@ -6,8 +6,6 @@ Cost calculations are handled here.
 Any updates to receipt logic should follow this module.
 """
 
-import datetime
-
 from fastapi import HTTPException
 
 from app.schemas.user_schema import Customer
@@ -73,7 +71,6 @@ def create_receipt(current_user: Customer) -> Receipt:
         tax=tax,
         delivery_fee=delivery_fee,
         total=total,
-        date_created=datetime.datetime.now(datetime.timezone.utc).isoformat()
     )
 
     receipts.append(new_receipt.model_dump())
