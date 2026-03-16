@@ -13,8 +13,6 @@ from app.schemas.order_schema import Order
 from app.schemas.receipt_schema import Receipt
 from app.services.receipt_service import get_receipt
 
-ACTIVE_STATUSES = {"pending", "accepted", "preparing"}
-
 VALID_TRANSITIONS = {
     "pending": {"accepted", "rejected"},
     "accepted": {"preparing"},
@@ -74,7 +72,7 @@ def get_orders_for_customer(current_customer: Customer) -> list[Order]:
 
 def get_orders_for_restaurant(restaurant_id: int, manager_id: int) -> list[Order]:
     """
-    Retrieves all orders in history that were/will be prepared by this restaurant.
+    Retrieves all orders in history that were/will be prepared by this restaurant in queue sorted by order creation time.
     May only be accessed by a valid manager of the restaurant.
 
     Parameters:
@@ -93,7 +91,9 @@ def get_orders_for_restaurant(restaurant_id: int, manager_id: int) -> list[Order
         raise HTTPException(status_code=403, detail="Unauthorized to view orders for this restaurant.")
     
     orders = load_orders()
-    return [order for order in orders if order.get("restaurant_id") == restaurant_id]
+    restaurant_orders = [order for order in orders if order.get("restaurant_id") == restaurant_id]
+    restaurant_orders.sort(key=lambda o: o.get("date_created", ""))
+    return restaurant_orders
 
 async def cancel_order(order_id: int, current_user: Customer) -> Order:
     """
@@ -198,7 +198,6 @@ async def send_status_notification(order: dict) -> None:
     customer_id = order["customer_id"]
     restaurant_id = order["restaurant_id"]
     manager_ids = get_managers(restaurant_id)
-    # TODO: add delivery driver id to notified users.
     notified_users = [customer_id] + manager_ids
     restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
     notification = Notification(f"Order {order['id']} from {restaurant_name} set to status: {order['status']}", notified_users)
