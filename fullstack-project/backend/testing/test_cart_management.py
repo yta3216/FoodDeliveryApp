@@ -212,19 +212,21 @@ def test_get_cart_item_wrong_id(customer_with_cart_and_token):
     assert get_response.status_code == 404
 
 # test updating cart restaurant id successfully
-def test_update_cart_restaurant(customer_with_token, setup_restaurant_menu):
-    customer = customer_with_token["customer"]
-    token = customer_with_token["token"]
+def test_update_cart_restaurant(customer_with_cart_and_token, setup_restaurant_menu):
+    customer = customer_with_cart_and_token["customer"]
+    token = customer_with_cart_and_token["token"]
     restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
     # send update request
     update_response = client.put(
         f"/cart/{restaurant_id}",
         headers={"Authorization": f"Bearer {token}"}
-        )
-    # check result
+    )
     assert update_response.status_code == 200
-    assert update_response.json()["restaurant_id"] == restaurant_id
+    new_data = update_response.json()
+    # check result
+    assert new_data["restaurant_id"] == restaurant_id
+    assert customer["cart"] == new_data
 
 # test changing restaurant id but user isn't Customer
 def test_update_cart_restaurant_wrong_role(manager_with_token, setup_restaurant_menu):
@@ -253,7 +255,6 @@ def test_update_cart_wrong_restaurant(customer_with_token):
         )
     # check result
     assert update_response.status_code == 404
-
 
 # test emptying cart with an item in it
 def test_emptying_cart(customer_with_cart_and_token):
@@ -386,30 +387,16 @@ def test_qty_change_wrong_item(customer_with_cart_and_token):
     assert update_response.status_code == 404
 
 # test successful item deletion from cart
-def def_cart_item_removal(customer_with_cart_and_token):
+def test_cart_item_removal(customer_with_cart_and_token):
     customer = customer_with_cart_and_token["customer"]
     token = customer_with_cart_and_token["token"]
 
-    # get item id to remove
     item_id = customer["cart"]["cart_items"][0]["menu_item_id"]
 
-    # remove it
-    update_response = client.delete("cart/item/{item_id}", headers={"Authorization": f"Bearer {token}"})
-    assert update_response.status_code == 404
-    
-# test item deletion attempt but item id not found
-    customer = customer_with_cart_and_token["customer"]
-    token = customer_with_cart_and_token["token"]
+    response = client.delete(f"/cart/item/{item_id}", headers={"Authorization": f"Bearer {token}"})
 
-    wrong_item_id = get_fake_cart_item_id(customer)
-
-    update_response = client.put(
-        f"/cart/item/{wrong_item_id}",
-        json={
-            "new_qty": 7
-        },
-        headers={"Authorization": f"Bearer {token}"}
-    )
-
-    assert update_response.status_code == 404
-    
+    assert response.status_code == 200
+    data = response.json()
+    assert data["menu_item_id"] == item_id
+    updated_customer = get_customer(customer["id"])
+    assert updated_customer["cart"]["cart_items"][0]["menu_item_id"] != item_id

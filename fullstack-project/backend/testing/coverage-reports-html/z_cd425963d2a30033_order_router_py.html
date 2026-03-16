@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_cd425963d2a30033_payment_router_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.4">coverage.py v7.13.4</a>,
-            created at 2026-03-16 02:21 -0700
+            created at 2026-03-16 10:17 -0700
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -124,14 +124,14 @@
     <p class="run"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">"/restaurant/{restaurant_id}"</span><span class="op">,</span> <span class="nam">response_model</span><span class="op">=</span><span class="nam">list</span><span class="op">[</span><span class="nam">Order</span><span class="op">]</span><span class="op">,</span> <span class="nam">status_code</span><span class="op">=</span><span class="num">200</span><span class="op">,</span> <span class="nam">dependencies</span><span class="op">=</span><span class="op">[</span><span class="nam">Depends</span><span class="op">(</span><span class="nam">check_manager</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t"><span class="key">def</span> <span class="nam">get_orders_for_restaurant_route</span><span class="op">(</span><span class="nam">restaurant_id</span><span class="op">:</span> <span class="nam">int</span><span class="op">,</span> <span class="nam">current_user</span><span class="op">:</span> <span class="nam">User</span> <span class="op">=</span> <span class="nam">Depends</span><span class="op">(</span><span class="nam">check_manager</span><span class="op">)</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t"><span class="str">    **Retrieves all orders associated with a given restaurant, which must be called by one of the restaurant's managers.**</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t"><span class="str">       **Retrieves all order of the restaurant**</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t"><span class="str">    </span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t"><span class="str">    Parameters:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t48" href="#t48">48</a></span><span class="t"><span class="str">    *   **restaurant_id** (int): the identifier of the restaurant whose orders have been requested</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t"><span class="str">    *   **current_user** (User): the authenticated user with role *manager*. automatically passed as argument.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t"><span class="str">    Returns:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t"><span class="str">    *   **list[Order]**: all orders associated with this restaurant</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t"><span class="str">    *   **list[Order]**: all orders associated with this restaurant sorted by date_created</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t"><span class="str">    Raises:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t"><span class="str">    *   **HTTPException** (status_code = 401): if user's token is invalid or expired</span>&nbsp;</span><span class="r"></span></p>
@@ -191,7 +191,7 @@
             <a class="nav" href="z_cd425963d2a30033_payment_router_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.4">coverage.py v7.13.4</a>,
-            created at 2026-03-16 02:21 -0700
+            created at 2026-03-16 10:17 -0700
         </p>
     </div>
 </footer>
