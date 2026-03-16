@@ -168,8 +168,16 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -
                 await send_status_notification(order)
                 return Order(**order)
 
-            # manager accepted: try to assign a driver
+            # auto-decline if order is outside the restaurant's delivery radius
             distance_km = order.get("distance_km", 0.0)
+            delivery_radius = restaurant.get("max_delivery_radius_km", 0.0)
+            if delivery_radius > 0 and distance_km > delivery_radius:
+                order["status"] = "rejected"
+                save_orders(orders)
+                await send_status_notification(order)
+                return Order(**order)
+
+            # manager accepted: try to assign a driver
             required_vehicle = get_required_vehicle(distance_km)
             driver = find_available_driver(required_vehicle)
 

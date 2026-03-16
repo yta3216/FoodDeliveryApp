@@ -364,3 +364,65 @@ def test_waiting_order_assigned_when_driver_becomes_available():
     order_check = client.get("/order/customer", headers={"Authorization": f"Bearer {customer_token}"})
     orders = [o for o in order_check.json() if o["id"] == order_id]
     assert orders[0]["status"] == "preparing"
+
+# order outside restaurant's delivery radius gets auto-declined when manager accepts
+def test_order_outside_delivery_radius_auto_declined():
+    client.post("/user", json={
+        "email": "radius_manager@example.com",
+        "password": "password",
+        "name": "Radius Manager",
+        "age": 35,
+        "gender": "male",
+        "role": UserRole.RESTAURANT_MANAGER.value,
+    })
+    manager_token = client.post("/user/login", json={
+        "email": "radius_manager@example.com", "password": "password"
+    }).json()["token"]
+
+    # create restaurant with 5km delivery radius
+    restaurant_resp = client.post("/restaurant", json={
+        "name": "Radius Restaurant",
+        "city": "Vancouver",
+        "address": {
+            "street": "101 Radius St",
+            "city": "Vancouver",
+            "province": "BC",
+            "postal_code": "V6B4D4"
+        },
+        "max_delivery_radius_km": 5.0
+    }, headers={"Authorization": f"Bearer {manager_token}"})
+    restaurant_id = restaurant_resp.json()["id"]
+
+    menu_resp = client.post(f"/restaurant/{restaurant_id}/menu", json={
+        "name": "Radius Burger",
+        "price": 9.99,
+        "tags": ["test"]
+    }, headers={"Authorization": f"Bearer {manager_token}"})
+    menu_item_id = menu_resp.json()["id"]
+
+    client.post("/user", json={
+        "email": "radius_customer@example.com",
+        "password": "password",
+        "name": "Radius Customer",
+        "age": 25,
+        "gender": "female",
+        "role": UserRole.CUSTOMER.value,
+    })
+    customer_token = client.post("/user/login", json={
+        "email": "radius_customer@example.com", "password": "password"
+    }).json()["token"]
+
+    # place order with 10km distance — outside the 5km radius
+    client.put(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
+    client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 1},
+                headers={"Authorization": f"Bearer {customer_token}"})
+    order = place_order(customer_token, distance_km=10.0)
+    order_id = order["id"]
+
+    response = client.patch(
+        f"/order/{order_id}/status",
+        json={"status": "accepted"},
+        headers={"Authorization": f"Bearer {manager_token}"},
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "rejected"
