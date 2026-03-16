@@ -16,8 +16,8 @@ Team Members:
 
 ## For Developers
 ### Run Tests & Generate Coverage Reports
-Run the following prompt in your terminal (from the FoodDeliveryApp directory):
+Run the following prompt in your terminal (from the backend directory):
 
-pytest fullstack-project/backend/testing --cov --cov-report=term --cov-report=html:fullstack-project/backend/testing/coverage-reports-html
+pytest testing --cov --cov-report=term --cov-report=html:testing/coverage-reports-html
 
 *Note: if you would like to commit these reports to GitHub, you will need to delete the .gitignore file in the coverage report folder.*
