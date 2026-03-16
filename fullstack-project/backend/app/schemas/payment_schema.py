@@ -12,12 +12,14 @@ class PaymentRequest(BaseModel):
     """
     **Defines the attributes required to submit a payment.**
     Attributes:
+    *   **receipt_id** (int): the identifier of the receipt generated from GET /receipt. must exist in storage
     *   **card_number** (str): the card number. must be exactly 16 digits
     *   **expiry_month** (int): the card's expiry month. must be between 1 and 12
     *   **expiry_year** (int): the card's expiry year
     *   **cvv** (str): the card's CVV. must be 3 or 4 digits
     *   **cardholder_name** (str): the name of the cardholder. must not be empty
     """
+    receipt_id: int
     card_number: str
     expiry_month: int
     expiry_year: int

@@ -10,6 +10,7 @@ from .routers.cart_router import router as cart_router
 from .routers.websocket_router import router as websocket_router
 from .routers.order_router import router as order_router
 from .routers.payment_router import router as payment_router
+from .routers.receipt_router import router as receipt_router
 
 description = """
 *Why bother cooking your own meals...*
@@ -50,6 +51,7 @@ app.include_router(cart_router)
 app.include_router(websocket_router)
 app.include_router(order_router)
 app.include_router(payment_router)
+app.include_router(receipt_router)
 
 @app.get("/", tags=["root"])
 async def read_root():

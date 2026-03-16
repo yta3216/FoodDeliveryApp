@@ -49,22 +49,18 @@ class Order(BaseModel):
     *   **customer_id** (str): the identifier of the customer who placed the order
     *   **restaurant_id** (int): the identifier of the restaurant who will fulfill this order
     *   **delivery_id** (int): the identifier of the delivery driver who will deliver the order
+    *   **receipt_id** (int): the identifier of the receipt this order was created from
     *   **items** (list[OrderItem]): a list of the items included in the order
     *   **status** (str): the order's status (pending, preparing, delivered, etc.)
-    *   **delivery_fee** (float): the fee associated with delivering the order
-    *   **tax** (float): taxes for the order
-    *   **subtotal** (str): price of items in order without considering additional fees such as tax and delivery fee
     *   **date_created** (str): the date the order was created
     """
     id: int
     customer_id: str
     restaurant_id: int = 0
     delivery_id: int = 0
+    receipt_id: int = 0;
     items: list[OrderItem] = Field(default_factory=list)
     status: str = "pending"
-    delivery_fee: float = 0.0
-    tax: float = 0.0
-    subtotal: float = 0.0
     date_created: str = None
 
 class OrderStatusUpdate(BaseModel):
