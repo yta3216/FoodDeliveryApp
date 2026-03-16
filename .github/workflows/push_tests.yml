@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - '**'
+    paths-ignore:
+      - "fullstack-project/backend/testing/coverage-reports-html/**"
 
 permissions:
   contents: write
@@ -46,6 +48,8 @@ jobs:
           --cov-report=html:fullstack-project/backend/testing/coverage-reports-html/app
     - name: commit coverage reports to repo
       run: |
+        git config --global user.email "push.tests@example.com"
+        git config --global user.name "Push Tests"
         git add fullstack-project/backend/testing/coverage-reports-html
         git commit -m "Update coverage reports"
         git push
