@@ -11,7 +11,6 @@ from app.services.user_service import (
     get_customer
 )
 from app.services.order_service import (
-    create_order_from_cart,
     get_orders_for_customer,
     get_orders_for_restaurant,
     cancel_order,
@@ -22,25 +21,6 @@ from app.auth import require_role
 from app.schemas.user_schema import UserRole
 
 router = APIRouter(prefix="/order", tags=["order"])
-
-@router.post("", response_model=Order, status_code=201, dependencies=[Depends(get_customer)])
-async def create_order_from_cart_route(current_user: Customer = Depends(get_customer)):
-    """
-    **Converts a logged-in customer's cart to an order, meaning they have paid for the items.**
-
-    Parameters:
-    *   **current_user** (Customer): the authenticated user with role *customer*. automatically passed as argument.
-
-    Returns:
-    *   **Order**: the newly created order
-
-    Raises:
-    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
-    *   **HTTPException** (status_code = 403): if user's role is not *customer*
-    *   **HTTPException** (status_code = 400): if cart is empty
-    *   **HTTPException** (status_code = 409): if generated id is the same as an existing id.
-    """
-    return await create_order_from_cart(current_user)
 
 @router.get("/customer", response_model=list[Order], status_code=200, dependencies=[Depends(get_customer)])
 def get_orders_for_customer_route(current_user: Customer = Depends(get_customer)):
