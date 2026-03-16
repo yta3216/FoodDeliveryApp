@@ -18,6 +18,27 @@ from testing.test_authorization import register_and_login
 
 client = TestClient(app)
 
+# Helper
+def place_order(token: str) -> dict:
+
+    receipt_response = client.get("/receipt", headers={"Authorization": f"Bearer {token}"})
+    assert receipt_response.status_code == 200
+    receipt_id = receipt_response.json()["id"]
+ 
+    checkout_response = client.post(
+        "/payment/checkout",
+        json={
+            "receipt_id": receipt_id,
+            "card_number": "1234567890123456",
+            "expiry_month": 12,
+            "expiry_year": 2099,
+            "cvv": "123",
+            "cardholder_name": "Test Customer"
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert checkout_response.status_code == 201
+    return checkout_response.json()["order"]
 
 @pytest.fixture
 # customer creates pending order
@@ -26,11 +47,10 @@ def customer_order_with_manager_token(customer_with_cart_and_token, setup_restau
     manager_token = setup_restaurant_menu["token"]
     restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
-    response = client.post("/order", headers={"Authorization": f"Bearer {customer_token}"})
-    assert response.status_code == 201
-
+    order = place_order(customer_token)
+ 
     return {
-        "order": response.json(),
+        "order": order,
         "customer_token": customer_token,
         "manager_token": manager_token,
         "restaurant_id": restaurant_id,

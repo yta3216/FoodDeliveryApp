@@ -141,14 +141,20 @@ def get_orders_for_customer(customer_id: str):
     orders = load_orders()
     return [o for o in orders if o.get("customer_id") == customer_id]
 
+def get_receipt_id(token: str) -> int:
+    receipt_response = client.get("/receipt", headers={"Authorization": f"Bearer {token}"})
+    assert receipt_response.status_code == 200
+    return receipt_response.json()["id"]
+
 # test successful checkout: valid payment with an item in cart
 def test_successful_checkout(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     response = client.post(
         "/payment/checkout",
-        json=VALID_PAYMENT,
+        json={**VALID_PAYMENT, "receipt_id": receipt_id},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -163,12 +169,13 @@ def test_successful_checkout(customer_with_cart_and_token):
 def test_successful_checkout_creates_order(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     orders_before = get_orders_for_customer(customer_id)
 
     client.post(
         "/payment/checkout",
-        json=VALID_PAYMENT,
+        json={**VALID_PAYMENT, "receipt_id": receipt_id},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -179,10 +186,11 @@ def test_successful_checkout_creates_order(customer_with_cart_and_token):
 def test_successful_checkout_empties_cart(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     client.post(
         "/payment/checkout",
-        json=VALID_PAYMENT,
+        json={**VALID_PAYMENT, "receipt_id": receipt_id},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -198,37 +206,37 @@ def test_successful_checkout_correct_subtotal(customer_with_cart_and_token, setu
     item2_price = restaurant["menu"]["items"][1]["price"]
     expected_subtotal = round((item1_price * 2) + (item2_price * 1), 2)
 
+    receipt_response = client.get("/receipt", headers={"Authorization": f"Bearer {token}"})
+    assert receipt_response.status_code == 200
+    receipt = receipt_response.json()
+    assert round(receipt["subtotal"], 2) == expected_subtotal
+
     response = client.post(
         "/payment/checkout",
-        json=VALID_PAYMENT,
+        json={**VALID_PAYMENT, "receipt_id": receipt["id"]},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 201
-    assert round(response.json()["order"]["subtotal"], 2) == expected_subtotal
 
 # test that checkout fails when cart is empty
 def test_checkout_with_empty_cart(customer_with_token):
     token = customer_with_token["token"]
     customer_id = customer_with_token["customer"]["id"]
 
-    response = client.post(
-        "/payment/checkout",
-        json=VALID_PAYMENT,
-        headers={"Authorization": f"Bearer {token}"}
-    )
-
-    assert response.status_code == 400
-    # no order should have been created
+    receipt_response = client.get("/receipt", headers={"Authorization": f"Bearer {token}"})
+    assert receipt_response.status_code == 400
     assert len(get_orders_for_customer(customer_id)) == 0
+
 # test payment fails with card number shorter than 16 digits
 def test_checkout_short_card_number(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     response = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "card_number": "12345"},
+        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "12345"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -239,10 +247,11 @@ def test_checkout_short_card_number(customer_with_cart_and_token):
 def test_checkout_long_card_number(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     response = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "card_number": "12345678901234567"},
+        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "12345678901234567"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -253,10 +262,11 @@ def test_checkout_long_card_number(customer_with_cart_and_token):
 def test_checkout_non_digit_card_number(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     response = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "card_number": "1234abcd56789012"},
+        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "1234abcd56789012"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -267,10 +277,11 @@ def test_checkout_non_digit_card_number(customer_with_cart_and_token):
 def test_checkout_declined_card(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     response = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "card_number": "0000000000000000"},
+        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "0000000000000000"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -281,10 +292,11 @@ def test_checkout_declined_card(customer_with_cart_and_token):
 def test_checkout_expired_card(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     response = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "expiry_month": 1, "expiry_year": 2020},
+        json={**VALID_PAYMENT, "receipt_id": receipt_id, "expiry_month": 1, "expiry_year": 2020},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -295,10 +307,11 @@ def test_checkout_expired_card(customer_with_cart_and_token):
 def test_checkout_invalid_expiry_month(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     response = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "expiry_month": 13},
+        json={**VALID_PAYMENT, "receipt_id": receipt_id, "expiry_month": 13},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -309,10 +322,11 @@ def test_checkout_invalid_expiry_month(customer_with_cart_and_token):
 def test_checkout_invalid_cvv(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     response = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "cvv": "12"},
+        json={**VALID_PAYMENT, "receipt_id": receipt_id, "cvv": "12"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -323,10 +337,11 @@ def test_checkout_invalid_cvv(customer_with_cart_and_token):
 def test_checkout_empty_cardholder_name(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     response = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "cardholder_name": "   "},
+        json={**VALID_PAYMENT, "receipt_id": receipt_id, "cardholder_name": "   "},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -337,12 +352,13 @@ def test_checkout_empty_cardholder_name(customer_with_cart_and_token):
 def test_failed_payment_cart_preserved(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
 
     cart_before = get_customer_from_db(customer_id)["cart"]
 
     client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "card_number": "0000000000000000"},
+        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "0000000000000000"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
