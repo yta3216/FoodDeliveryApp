@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "customer_id": "9ce21471-e9da-4649-960c-1e8f3f070aa4",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "California roll",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      },
+      {
+        "menu_item_id": 2,
+        "name": "Salmon roll",
+        "unit_price": 10.99,
+        "qty": 1,
+        "line_total": 10.99
+      }
+    ],
+    "subtotal": 30.97,
+    "tax": 0.0,
+    "delivery_fee": 0.0,
+    "total": 30.97,
+    "date_created": "2026-03-16T03:21:32.175366+00:00"
+  }
+]
