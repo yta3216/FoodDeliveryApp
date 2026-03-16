@@ -28,29 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r fullstack-project/backend/requirements.txt
         pip install pylint
-    - name: Analysing the code with pylint
+    - name: run pytest tests with coverage report in terminal
       run: |
-        git ls-files '*.py' | xargs -n 10 pylint || true
-    - name: run pytest tests, save coverage reports 
-      run: |
-        pytest fullstack-project/backend/testing
-        pytest --cov=fullstack-project/backend/realtime \
-          --cov-report=html:fullstack-project/backend/testing/coverage-reports-html/realtime
-        pytest --cov=fullstack-project/backend/repositories \
-          --cov-report=html:fullstack-project/backend/testing/coverage-reports-html/repositories
-        pytest --cov=fullstack-project/backend/routers \
-          --cov-report=html:fullstack-project/backend/testing/coverage-reports-html/routers
-        pytest --cov=fullstack-project/backend/schemas \
-          --cov-report=html:fullstack-project/backend/testing/coverage-reports-html/schemas
-        pytest --cov=fullstack-project/backend/services \
-          --cov-report=html:fullstack-project/backend/testing/coverage-reports-html/services
-        pytest --cov=fullstack-project/backend/app \
-          --cov-report=html:fullstack-project/backend/testing/coverage-reports-html/app
-    - name: commit coverage reports to repo
-      run: |
-        git config --global user.email "push.tests@example.com"
-        git config --global user.name "Push Tests"
-        git add fullstack-project/backend/testing/coverage-reports-html
-        git commit -m "Update coverage reports"
-        git push
+        pytest fullstack-project/backend/testing --cov
         
