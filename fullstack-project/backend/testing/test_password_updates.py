@@ -1,4 +1,4 @@
-"""testing password updates workflows"""
+"""Test cases for password reset and update flows."""
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient

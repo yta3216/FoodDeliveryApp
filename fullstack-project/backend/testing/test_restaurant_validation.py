@@ -500,7 +500,7 @@ def test_update_restaurant_invalid_postal_code(setup_restaurant):
     )
     assert response.status_code == 422
 
-# distance radius test #
+# ------- MAX DELIVERY RADIUS VALIDATION TESTS ------- #
 
 # test that a restaurant is created with the default delivery radius if none is provided
 def test_create_restaurant_default_delivery_radius(manager_token):
@@ -558,3 +558,100 @@ def test_update_restaurant_delivery_radius(setup_restaurant):
     )
     assert response.status_code == 200
     assert response.json()["max_delivery_radius_km"] == 50.0
+
+# ------- DELIVERY FEE VALIDATION TESTS ------- #
+
+# test that a restaurant is given the default delivery fee if none is provided
+def test_create_restaurant_default_delivery_fee(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Radius Test Place",
+            "city": "Kelowna",
+            "address": {
+                "street": "123 Main St",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "V1Y 1A1"
+            }
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 201
+    assert response.json()["delivery_fee"] == 0.0
+
+# test that a restaurant is created with a custom delivery fee
+def test_create_restaurant_custom_delivery_fee(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Custom Radius Place",
+            "city": "Kelowna",
+            "address": {
+                "street": "123 Main St",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "V1Y 1A1"
+            },
+            "delivery_fee": 4.99
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 201
+    assert response.json()["delivery_fee"] == 4.99
+
+# test that a restaurant's custom delivery fee is rounded
+def test_create_restaurant_custom_delivery_fee_rounded(manager_token):
+    response = client.post(
+        "/restaurant",
+        json={
+            "name": "Custom Radius Place",
+            "city": "Kelowna",
+            "address": {
+                "street": "123 Main St",
+                "city": "Kelowna",
+                "province": "BC",
+                "postal_code": "V1Y 1A1"
+            },
+            "delivery_fee": 6.759
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert response.status_code == 201
+    assert response.json()["delivery_fee"] == 6.76
+
+# test that delivery fee is updated when restaurant details are updated
+def test_update_restaurant_delivery_fee(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+    response = client.put(
+        f"/restaurant/{restaurant['id']}",
+        json={
+            "id": restaurant["id"],
+            "name": restaurant["name"],
+            "city": restaurant["city"],
+            "address": restaurant["address"],
+            "delivery_fee": 6.76
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json()["delivery_fee"] == 6.76
+
+# test that the updated delivery fee is rounded
+def test_update_restaurant_delivery_fee_rounded(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+    response = client.put(
+        f"/restaurant/{restaurant['id']}",
+        json={
+            "id": restaurant["id"],
+            "name": restaurant["name"],
+            "city": restaurant["city"],
+            "address": restaurant["address"],
+            "delivery_fee": 6.7559
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json()["delivery_fee"] == 6.76

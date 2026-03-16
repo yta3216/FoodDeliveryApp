@@ -12,28 +12,6 @@ from app.schemas.cart_schema import (
     Cart
 )
 
-def calculate_cart_total(cart: Cart) -> float:
-    """
-    Calculates the total price of a cart. This does not include taxes or other fees.
-
-    Parameters:
-        cart (Cart): the logged-in user's cart
-
-    Returns:
-        float: the total price of the cart
-
-    Raises:
-        HTTPException (status_code = 404): cart's restaurant_id not found in restaurants.json
-    """
-    restaurant = get_restaurant_by_id(cart.restaurant_id)
-    menu_items = {item["id"]: item for item in restaurant["menu"]["items"]}
-    total = 0.0
-    for cart_item in cart.cart_items:
-        menu_item = menu_items.get(cart_item.menu_item_id)
-        if menu_item:
-            total += menu_item.get("price", 0.0) * cart_item.qty
-    return total
-
 def update_cart_restaurant(restaurant_id: int, current_user: Customer) -> Cart:
     """
     Updates the restaurant associated with a user's cart, used when they want to change the restaurant they're ordering from.
@@ -199,10 +177,10 @@ def delete_cart_item(item_id: int, current_user: Customer) -> CartItem:
     users = load_users()
     for user in users:
         if user.get("id") == current_user.id:
-            for item in current_user["cart"]["cart_items"]:
+            for item in user["cart"]["cart_items"]:
                 if item.get("menu_item_id") == item_id:
-                    current_user["cart"]["cart_items"].remove(item)
+                    user["cart"]["cart_items"].remove(item)
                     save_users(users)
-                    return CartItem(item.model_dump())
+                    return CartItem(**item)
             raise HTTPException(404, detail=f"Item '{item_id}' not found in user '{current_user.id}' cart")
     raise HTTPException(404, detail=f"User '{current_user.id}' not found")

@@ -25,11 +25,11 @@ def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
     *   **distance_km** (float): the distance in kilometers for delivery fee calculation
 
     Returns:
-    *   **Receipt**: the saved receipt with full cost breakdown
+        **Receipt**: the saved receipt with full cost breakdown
 
     Raises:
-    *   **HTTPException** (status_code = 400): if the cart is empty
-    *   **HTTPException** (status_code = 404): if the cart's restaurant is not found
+        **HTTPException** (status_code = 400): if the cart is empty
+        **HTTPException** (status_code = 404): if the cart's restaurant is not found
     """
     cart = get_cart(current_user)
     if cart.restaurant_id == 0:
@@ -57,7 +57,7 @@ def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
 
     subtotal = round(subtotal, 2)
     tax = 0.0
-    delivery_fee = 0.0
+    delivery_fee = restaurant.get("delivery_fee", 0.0)
     total = round(subtotal + tax + delivery_fee, 2)
 
     receipts = load_receipts()
@@ -86,16 +86,37 @@ def get_receipt(receipt_id: int) -> Receipt:
     **Retrieves a saved receipt by its identifier.**
 
     Parameters:
-    *   **receipt_id** (int): the identifier of the receipt to retrieve
+        **receipt_id** (int): the identifier of the receipt to retrieve
 
     Returns:
-    *   **Receipt**: the matching receipt
+        **Receipt**: the matching receipt
 
     Raises:
-    *   **HTTPException** (status_code = 404): if receipt is not found
+        **HTTPException** (status_code = 404): if receipt is not found
     """
     receipts = load_receipts()
     for receipt in receipts:
         if receipt.get("id") == receipt_id:
             return Receipt(**receipt)
     raise HTTPException(status_code=404, detail=f"Receipt '{receipt_id}' not found.")
+
+def refresh_receipt(receipt_id: int, current_user: Customer) -> Receipt:
+    """
+    **Refreshes a receipt for when the restaurant pricing has changed since the original receipt was generated.**
+
+    Parameters:
+        **receipt_id** (int): the identifier of the receipt to refresh. used for authorization.
+        **current_user** (Customer): the authenticated user who owns the receipt.
+
+    Returns:
+        **Receipt**: a newly created receipt based on the current cart state.
+
+    Raises:
+        **HTTPException** (status_code = 403): if the receipt belongs to a different user.
+    """
+
+    current_receipt = get_receipt(receipt_id)
+    if current_receipt.customer_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot refresh a receipt that belongs to another user.")
+
+    return create_receipt(current_user)

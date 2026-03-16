@@ -49,7 +49,7 @@ def get_orders_for_restaurant_route(restaurant_id: int, current_user: User = Dep
     *   **current_user** (User): the authenticated user with role *manager*. automatically passed as argument.
 
     Returns:
-    *   **list[Order]**: all orders associated with this restaurant
+    *   **list[Order]**: all orders associated with this restaurant sorted by date_created
 
     Raises:
     *   **HTTPException** (status_code = 401): if user's token is invalid or expired

@@ -21,15 +21,15 @@ def get_receipt_route(distance_km: float = 0.0, current_user: Customer = Depends
     The returned receipt_id must be passed to POST /payment/checkout.**
 
     Parameters:
-    *   **current_user** (Customer): the authenticated user with role *customer*. automatically passed as argument.
+        **current_user** (Customer): the authenticated user with role *customer*. automatically passed as argument.
 
     Returns:
-    *   **Receipt**: the saved receipt with full cost breakdown and a receipt_id
+        **Receipt**: the saved receipt with full cost breakdown and a receipt_id
 
     Raises:
-    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
-    *   **HTTPException** (status_code = 403): if user's role is not *customer*
-    *   **HTTPException** (status_code = 400): if the cart is empty
-    *   **HTTPException** (status_code = 404): if the cart's restaurant is not found
+        **HTTPException** (status_code = 401): if user's token is invalid or expired
+        **HTTPException** (status_code = 403): if user's role is not *customer*
+        **HTTPException** (status_code = 400): if the cart is empty
+        **HTTPException** (status_code = 404): if the cart's restaurant is not found
     """
         return create_receipt(current_user, distance_km)
