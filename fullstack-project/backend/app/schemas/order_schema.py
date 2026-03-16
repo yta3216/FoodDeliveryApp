@@ -37,4 +37,4 @@ class OrderStatusUpdate(BaseModel):
     Attributes:
     *   **status** (str): the updated status. must be either "accepted" or rejected"
     """
-    status: Literal["accepted","rejected"]
+    status: Literal["accepted","rejected","preparing"]
