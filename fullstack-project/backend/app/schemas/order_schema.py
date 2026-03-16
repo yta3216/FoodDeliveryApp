@@ -35,6 +35,9 @@ class OrderStatusUpdate(BaseModel):
     **Defines the attributes of an update to the order status.**
 
     Attributes:
-    *   **status** (str): the updated status. must be either "accepted" or rejected"
+        *   **status** (str): the updated status. must be one of:
+        *   *accepted*: manager accepts a pending order
+        *   *rejected*: manager rejects a pending order
+        *   *preparing*: manager marks an accepted order as being prepared
     """
     status: Literal["accepted","rejected","preparing"]
