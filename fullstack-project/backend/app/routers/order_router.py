@@ -42,7 +42,7 @@ def get_orders_for_customer_route(current_user: Customer = Depends(get_customer)
 @router.get("/restaurant/{restaurant_id}", response_model=list[Order], status_code=200, dependencies=[Depends(check_manager)])
 def get_orders_for_restaurant_route(restaurant_id: int, current_user: User = Depends(check_manager)):
     """
-       **Retrieves the active order queue for a restaurant, sorted oldest first.Only orders with status pending, accepted, or preparing are returned.**
+       **Retrieves all order of the restaurant**
     
     Parameters:
     *   **restaurant_id** (int): the identifier of the restaurant whose orders have been requested
