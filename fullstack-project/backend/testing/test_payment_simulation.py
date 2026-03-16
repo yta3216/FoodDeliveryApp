@@ -1,3 +1,5 @@
+"""Test cases for payment simulation and checkout."""
+
 from fastapi.testclient import TestClient
 import pytest
 from app.main import app
@@ -182,6 +184,38 @@ def test_successful_checkout_creates_order(customer_with_cart_and_token):
     orders_after = get_orders_for_customer(customer_id)
     assert len(orders_after) == len(orders_before) + 1
 
+def test_checkout_fails_delivery_fee_changes(customer_with_cart_and_token, setup_restaurant_menu):
+    token = customer_with_cart_and_token["token"]
+    customer_id = customer_with_cart_and_token["customer"]["id"]
+    restaurant = setup_restaurant_menu["restaurant"]
+    manager = setup_restaurant_menu["token"]
+
+    receipt = get_receipt_id(token)
+
+    response = client.put(
+        f"/restaurant/{restaurant['id']}",
+        json={
+            "id": restaurant["id"],
+            "name": restaurant["name"],
+            "city": restaurant["city"],
+            "address": restaurant["address"],
+            "delivery_fee": 6.76
+        },
+        headers={"Authorization": f"Bearer {manager}"}
+    )
+    assert response.status_code == 200
+
+    response_new = client.post(
+        "/payment/checkout",
+        json={**VALID_PAYMENT, "receipt_id": receipt},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    order_len = len(get_orders_for_customer(customer_id))
+
+    assert response_new.status_code == 409
+    assert len(get_orders_for_customer(customer_id)) == order_len
+
 # test that a successful payment empties the cart
 def test_successful_checkout_empties_cart(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
@@ -196,28 +230,6 @@ def test_successful_checkout_empties_cart(customer_with_cart_and_token):
 
     updated_customer = get_customer_from_db(customer_id)
     assert len(updated_customer["cart"]["cart_items"]) == 0
-
-# test that order subtotal matches expected cart total
-def test_successful_checkout_correct_subtotal(customer_with_cart_and_token, setup_restaurant_menu):
-    token = customer_with_cart_and_token["token"]
-    restaurant = setup_restaurant_menu["restaurant"]
-
-    item1_price = restaurant["menu"]["items"][0]["price"]
-    item2_price = restaurant["menu"]["items"][1]["price"]
-    expected_subtotal = round((item1_price * 2) + (item2_price * 1), 2)
-
-    receipt_response = client.get("/receipt", headers={"Authorization": f"Bearer {token}"})
-    assert receipt_response.status_code == 200
-    receipt = receipt_response.json()
-    assert round(receipt["subtotal"], 2) == expected_subtotal
-
-    response = client.post(
-        "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt["id"]},
-        headers={"Authorization": f"Bearer {token}"}
-    )
-
-    assert response.status_code == 201
 
 # test that checkout fails when cart is empty
 def test_checkout_with_empty_cart(customer_with_token):

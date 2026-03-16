@@ -11,7 +11,7 @@ from app.schemas.user_schema import Customer
 from app.schemas.payment_schema import PaymentRequest, PaymentResponse
 from app.services.order_service import create_order_from_receipt
 from app.services.notification_service import Notification
-from app.services.receipt_service import get_receipt
+from app.services.receipt_service import get_receipt, refresh_receipt
 from app.services.restaurant_service import get_restaurant_by_id
 
 
@@ -65,7 +65,8 @@ async def process_payment(payment: PaymentRequest, current_user: Customer) -> Pa
     
     receipt = get_receipt(payment.receipt_id)
 
-    if (get_restaurant_by_id(receipt["restaurant_id"])["delivery_fee"] != receipt["delivery_fee"]):
+    if (get_restaurant_by_id(receipt.restaurant_id)["delivery_fee"] != receipt.delivery_fee):
+        refresh_receipt(receipt.id, current_user)
         raise HTTPException(status_code=409, detail="The restaurant's delivery fee has changed. Please try again.")
 
     is_valid, error_message = _validate_payment(payment)

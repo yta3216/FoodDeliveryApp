@@ -58,7 +58,7 @@ def create_receipt(current_user: Customer) -> Receipt:
 
     subtotal = round(subtotal, 2)
     tax = 0.0
-    delivery_fee = 0.0
+    delivery_fee = restaurant.get("delivery_fee", 0.0)
     total = round(subtotal + tax + delivery_fee, 2)
 
     receipts = load_receipts()
@@ -103,8 +103,7 @@ def get_receipt(receipt_id: int) -> Receipt:
 
 def refresh_receipt(receipt_id: int, current_user: Customer) -> Receipt:
     """
-    **Refreshes a receipt by generating a new snapshot of the customer's current cart.
-    This is used when the underlying cart or restaurant pricing has changed since the original receipt was generated.**
+    **Refreshes a receipt for when the restaurant pricing has changed since the original receipt was generated.**
 
     Parameters:
         **receipt_id** (int): the identifier of the receipt to refresh. used for authorization.
@@ -115,15 +114,10 @@ def refresh_receipt(receipt_id: int, current_user: Customer) -> Receipt:
 
     Raises:
         **HTTPException** (status_code = 403): if the receipt belongs to a different user.
-        **HTTPException** (status_code = 409): if the cart has changed restaurants since the receipt was created.
     """
 
     current_receipt = get_receipt(receipt_id)
     if current_receipt.customer_id != current_user.id:
         raise HTTPException(status_code=403, detail="Cannot refresh a receipt that belongs to another user.")
-
-    cart = get_cart(current_user)
-    if cart.restaurant_id != current_receipt.restaurant_id:
-        raise HTTPException(status_code=409, detail="Cart restaurant has changed since receipt creation. Please generate a new receipt.")
 
     return create_receipt(current_user)
