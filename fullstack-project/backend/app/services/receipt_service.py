@@ -15,13 +15,14 @@ from app.services.cart_service import get_cart
 from app.services.restaurant_service import get_restaurant_by_id
 
 
-def create_receipt(current_user: Customer) -> Receipt:
+def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
     """
     **Calculates the cost of the customer's current cart and saves a receipt to storage.
     The cart is not modified. A new receipt is created each time this is called.**
 
     Parameters:
-        **current_user** (Customer): the authenticated user with role *customer*
+    *   **current_user** (Customer): the authenticated user with role *customer*
+    *   **distance_km** (float): the distance in kilometers for delivery fee calculation
 
     Returns:
         **Receipt**: the saved receipt with full cost breakdown
@@ -70,6 +71,7 @@ def create_receipt(current_user: Customer) -> Receipt:
         subtotal=subtotal,
         tax=tax,
         delivery_fee=delivery_fee,
+        distance_km=distance_km,
         total=total,
     )
 

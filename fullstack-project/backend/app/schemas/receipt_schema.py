@@ -51,4 +51,6 @@ class Receipt(BaseModel):
     subtotal: float = 0.0
     tax: float = 0.0
     delivery_fee: float = 0.0
+    distance_km: float = 0.0
     total: float = 0.0
+    date_created: str | None = None

@@ -14,8 +14,8 @@ router = APIRouter(prefix="/receipt", tags=["receipt"])
 
 
 @router.get("", response_model=Receipt, status_code=200)
-def get_receipt_route(current_user: Customer = Depends(get_customer)):
-    """
+def get_receipt_route(distance_km: float = 0.0, current_user: Customer = Depends(get_customer)):
+        """
     **Generates and saves a priced receipt from the customer's current cart.
     The cart is not modified and no order is created.
     The returned receipt_id must be passed to POST /payment/checkout.**
@@ -32,4 +32,4 @@ def get_receipt_route(current_user: Customer = Depends(get_customer)):
         **HTTPException** (status_code = 400): if the cart is empty
         **HTTPException** (status_code = 404): if the cart's restaurant is not found
     """
-    return create_receipt(current_user)
+        return create_receipt(current_user, distance_km)
