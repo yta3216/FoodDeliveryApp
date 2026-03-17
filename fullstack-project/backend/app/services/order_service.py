@@ -14,6 +14,7 @@ from app.services.cart_service import empty_cart
 from app.services.notification_service import Notification
 from app.schemas.order_schema import Order
 from app.schemas.receipt_schema import Receipt
+from app.services.receipt_service import get_receipt
 
 
 async def create_order_from_receipt(current_user: Customer, receipt: Receipt) -> Order:
@@ -98,6 +99,7 @@ def get_orders_for_restaurant(restaurant_id: int, manager_id: int) -> list[Order
 async def cancel_order(order_id: int, current_user: Customer) -> Order:
     """
     Cancels a pending order. Only the customer who placed the order may cancel it.
+    Sends a refund notification to the customer after cancellation.
 
     Parameters:
         order_id (int): the identifier of the order to cancel
@@ -122,6 +124,12 @@ async def cancel_order(order_id: int, current_user: Customer) -> Order:
             order["status"] = "cancelled"
             save_orders(orders)
             await send_status_notification(order)
+            receipt = get_receipt(order["receipt_id"])
+            refund_notification = Notification(
+                f"Refund of ${receipt.total} for order {order['id']} from {get_restaurant_by_id(order['restaurant_id'])['name']} is being processed.",
+                [current_user.id]
+            )
+            await refund_notification.send_to_users()
             return Order(**order)
 
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
@@ -133,6 +141,7 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -
     If accepted and the order is within the delivery radius, a driver is assigned if available.
     If no driver is available, the order goes to waiting_for_driver status.
     If the order is outside the restaurant's delivery radius, it is automatically rejected.
+    Sends a refund notification to the customer when an order is rejected.
 
     Parameters:
         order_id (int): the identifier of the order receiving the status change
@@ -166,6 +175,12 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -
                 order["status"] = "rejected"
                 save_orders(orders)
                 await send_status_notification(order)
+                receipt = get_receipt(order["receipt_id"])
+                refund_notification = Notification(
+                    f"Refund of ${receipt.total} for order {order['id']} from {restaurant['name']} is being processed.",
+                    [order["customer_id"]]
+                )
+                await refund_notification.send_to_users()
                 return Order(**order)
 
             distance_km = order.get("distance_km", 0.0)
@@ -174,6 +189,12 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -
                 order["status"] = "rejected"
                 save_orders(orders)
                 await send_status_notification(order)
+                receipt = get_receipt(order["receipt_id"])
+                refund_notification = Notification(
+                    f"Refund of ${receipt.total} for order {order['id']} from {restaurant['name']} is being processed.",
+                    [order["customer_id"]]
+                )
+                await refund_notification.send_to_users()
                 return Order(**order)
 
             required_vehicle = get_required_vehicle(distance_km)

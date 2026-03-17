@@ -46,8 +46,8 @@ class User(BaseModel):
     age: int
     gender: str
     role: UserRole
-    reset_token: str | None = None  # Optional field for password reset token
-    reset_token_expiry: int | None = None  # Optional field for token expiry timestamp
+    reset_token: str | None = None  
+    reset_token_expiry: int | None = None  
 
 class Customer(User):
     """
@@ -90,10 +90,10 @@ class DeliveryDriver(User):
     *   **role** (UserRole): always set to UserRole.DELIVERY_DRIVER
     """
     role: UserRole = UserRole.DELIVERY_DRIVER
-    vehicle: str = "bike"           # bike or car
-    driver_status: str = "available" # available, delivering, unavailable
+    vehicle: str = "bike"           
+    driver_status: str = "available" 
 
-# Map user roles to appropriate classes for creation
+
 ROLE_TO_CLASS = {
     UserRole.CUSTOMER: Customer,
     UserRole.RESTAURANT_MANAGER: RestaurantManager,
@@ -258,7 +258,6 @@ class Password_Update_When_Logged_In(BaseModel):
     old_password: str
     new_password: str
 
-# public-facing user model - excludes password for security
 class UserPublic(BaseModel):
     """
     **Defines the attributes returned when user data is requested but password should be hidden for security purposes.**

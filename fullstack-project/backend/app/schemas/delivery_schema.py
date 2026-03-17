@@ -1,14 +1,33 @@
+"""
+This module defines the schema for delivery records.
+A delivery record is created when a driver is assigned to an order.
+"""
 from pydantic import BaseModel
 
-# the delivery record, linked to an order and a driver
+
 class Delivery(BaseModel):
+    """
+    **Defines the attributes of a delivery record.**
+
+    Attributes:
+    *   **id** (int): the identifier of the delivery record
+    *   **order_id** (int): the identifier of the order being delivered
+    *   **driver_id** (str): the identifier of the delivery driver assigned to this order
+    *   **method** (str): the delivery vehicle type, either *bike* or *car*
+    *   **distance_km** (float): the delivery distance in kilometres
+    *   **eta_minutes** (float): estimated delivery time in minutes, calculated when the driver starts the delivery
+    *   **started_at** (float): unix timestamp of when the driver marked the delivery as started
+    *   **delivered_at** (float): unix timestamp of when the driver marked the delivery as completed
+    *   **actual_minutes** (float): actual time taken to deliver in minutes
+    *   **delay_minutes** (float): difference between actual and estimated time. negative means early, positive means late
+    """
     id: int
     order_id: int
-    driver_id: str          # matches the user id of the delivery driver
-    method: str             # bike or car
+    driver_id: str
+    method: str
     distance_km: float
-    eta_minutes: float = 0.0        # calculated when status hits delivering
-    started_at: float = 0.0         # unix timestamp when driver marks delivering
-    delivered_at: float = 0.0       # unix timestamp when driver marks delivered
-    actual_minutes: float = 0.0     # calculated when delivered
-    delay_minutes: float = 0.0      # actual_minutes - eta_minutes, negative = early, positive = late
+    eta_minutes: float = 0.0
+    started_at: float = 0.0
+    delivered_at: float = 0.0
+    actual_minutes: float = 0.0
+    delay_minutes: float = 0.0
