@@ -124,8 +124,7 @@ async def cancel_order(order_id: int, current_user: Customer) -> Order:
             order["status"] = "cancelled"
             save_orders(orders)
             await send_status_notification(order)
-            receipt = get_receipt(order["receipt_id"])
-            send_refund_notification(order, "Order cancelled by customer")
+            await send_refund_notification(order, "Order cancelled by customer")
             return Order(**order)
 
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
@@ -171,8 +170,7 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -
                 order["status"] = "rejected"
                 save_orders(orders)
                 await send_status_notification(order)
-                receipt = get_receipt(order["receipt_id"])
-                send_refund_notification(order, f"Rejected by restaurant")
+                await send_refund_notification(order, f"Rejected by restaurant")
                 return Order(**order)
 
             distance_km = order.get("distance_km", 0.0)
@@ -181,12 +179,7 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -
                 order["status"] = "rejected"
                 save_orders(orders)
                 await send_status_notification(order)
-                receipt = get_receipt(order["receipt_id"])
-                refund_notification = Notification(
-                    f"Refund of ${receipt.total} for order {order['id']} from {restaurant['name']} is being processed.",
-                    [order["customer_id"]]
-                )
-                await refund_notification.send_to_users()
+                await send_refund_notification(order, "Restaurant max delivery distance exceeded")
                 return Order(**order)
 
             required_vehicle = get_required_vehicle(distance_km)
