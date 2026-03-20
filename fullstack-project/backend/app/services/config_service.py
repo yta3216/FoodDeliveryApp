@@ -1,0 +1,37 @@
+""" This module implements business logic for config management. """
+
+from fastapi import HTTPException
+from app.repositories.config_repo import load_config, save_config
+
+def get_tax_rate() -> float:
+    """
+    **Retrieves the current tax rate from storage.**
+
+    Parameters: None
+
+    Returns:
+        **float**: the current tax rate, default: 0.12
+    """
+    return load_config().get("tax_rate", 0.12)
+
+def set_tax_rate(new_tax_rate: float) -> float:
+    """
+    Sets the tax rate for the app.
+
+    Parameters:
+        new_tax_rate (float): the new tax rate, must be between 0 and 1
+
+    Returns:
+        float: the new tax rate
+
+    Raises:
+        HTTPException (status_code = 400): if the new tax rate is not between 0 and 1
+    """
+    if not (0 <= new_tax_rate <= 1):
+        raise HTTPException(status_code=400, detail="Tax rate must be between 0 and 1")
+    
+    config = load_config()
+    config["tax_rate"] = new_tax_rate
+    save_config(config)
+    
+    return new_tax_rate

@@ -2,7 +2,6 @@
 
 import secrets
 import time
-from typing import Any
 import uuid
 from fastapi import HTTPException, Depends
 from app.auth import require_role

@@ -12,6 +12,7 @@ from .routers.order_router import router as order_router
 from .routers.delivery_router import router as delivery_router
 from .routers.payment_router import router as payment_router
 from .routers.receipt_router import router as receipt_router
+from .routers.config_router import router as config_router
 
 description = """
 *Why bother cooking your own meals...*
@@ -48,6 +49,7 @@ app.include_router(order_router)
 app.include_router(delivery_router)
 app.include_router(payment_router)
 app.include_router(receipt_router)
+app.include_router(config_router)
 
 @app.get("/", tags=["root"])
 async def read_root():
