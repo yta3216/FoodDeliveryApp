@@ -70,7 +70,7 @@ async def process_payment(payment: PaymentRequest, current_user: Customer) -> Pa
         refresh_receipt(receipt.id, current_user)
         raise HTTPException(status_code=409, detail="The restaurant's delivery fee has changed. Please try again.")
     
-    if (get_tax_rate() * receipt.subtotal != receipt.tax):
+    if round(get_tax_rate() * receipt.subtotal, 2) != receipt.tax:
         refresh_receipt(receipt.id, current_user)
         raise HTTPException(status_code=409, detail="The tax rate has changed. Please try again.")
 
