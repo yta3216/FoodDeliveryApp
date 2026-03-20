@@ -13,6 +13,7 @@ from app.services.order_service import create_order_from_receipt
 from app.services.notification_service import Notification
 from app.services.receipt_service import get_receipt, refresh_receipt
 from app.services.restaurant_service import get_restaurant_by_id
+from app.services.config_service import get_tax_rate
 
 
 def _validate_payment(payment: PaymentRequest) -> tuple[bool, str]:
@@ -60,7 +61,7 @@ async def process_payment(payment: PaymentRequest, current_user: Customer) -> Pa
 
     Raises:
         HTTPException (status_code = 400): if payment validation fails. cart is left untouched and no order is created
-        HTTPException (status_code = 409): if the restaurant's delivery fee has changed since the receipt was created.
+        HTTPException (status_code = 409): if either the delivery fee or tax rate has changed since the receipt was created. Will auto-refresh the receipt.
     """
     
     receipt = get_receipt(payment.receipt_id)
@@ -68,6 +69,10 @@ async def process_payment(payment: PaymentRequest, current_user: Customer) -> Pa
     if (get_restaurant_by_id(receipt.restaurant_id)["delivery_fee"] != receipt.delivery_fee):
         refresh_receipt(receipt.id, current_user)
         raise HTTPException(status_code=409, detail="The restaurant's delivery fee has changed. Please try again.")
+    
+    if (get_tax_rate() * receipt.subtotal != receipt.tax):
+        refresh_receipt(receipt.id, current_user)
+        raise HTTPException(status_code=409, detail="The tax rate has changed. Please try again.")
 
     is_valid, error_message = _validate_payment(payment)
  
