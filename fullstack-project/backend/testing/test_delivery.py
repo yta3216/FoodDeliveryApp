@@ -211,18 +211,19 @@ def test_bike_assigned_for_short_distance(delivery_setup):
 
 
 # driver can start delivery and eta is calculated
-def test_driver_can_start_delivery(delivery_setup):
+@pytest.mark.anyio
+async def test_driver_can_start_delivery(delivery_setup):
     order_id = delivery_setup["order"]["id"]
     manager_token = delivery_setup["manager_token"]
     driver_token = delivery_setup["driver_token"]
 
-    client.patch(
+    await client.patch(
         f"/order/{order_id}/status",
         json={"status": "accepted"},
         headers={"Authorization": f"Bearer {manager_token}"},
     )
 
-    response = client.patch(
+    response = await client.patch(
         f"/delivery/{order_id}/start",
         headers={"Authorization": f"Bearer {driver_token}"},
     )
@@ -236,7 +237,8 @@ def test_driver_can_start_delivery(delivery_setup):
 
 
 # driver can complete delivery and actual time is recorded
-def test_driver_can_complete_delivery(delivery_setup):
+@pytest.mark.anyio
+async def test_driver_can_complete_delivery(delivery_setup):
     order_id = delivery_setup["order"]["id"]
     manager_token = delivery_setup["manager_token"]
     driver_token = delivery_setup["driver_token"]
@@ -246,7 +248,7 @@ def test_driver_can_complete_delivery(delivery_setup):
         json={"status": "accepted"},
         headers={"Authorization": f"Bearer {manager_token}"},
     )
-    client.patch(
+    await client.patch(
         f"/delivery/{order_id}/start",
         headers={"Authorization": f"Bearer {driver_token}"},
     )

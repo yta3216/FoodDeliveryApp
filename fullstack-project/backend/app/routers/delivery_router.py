@@ -57,7 +57,7 @@ def update_driver_status_route(
 
 
 @router.patch("/{order_id}/start", response_model=Delivery, status_code=200)
-def start_delivery_route(
+async def start_delivery_route(
     order_id: int,
     current_user: User = Depends(require_role(UserRole.DELIVERY_DRIVER))
 ):
@@ -78,7 +78,7 @@ def start_delivery_route(
     *   **HTTPException** (status_code = 403): if user is not the assigned driver for this delivery
     *   **HTTPException** (status_code = 404): if no delivery record is found for this order
     """
-    return start_delivery(order_id=order_id, driver_id=current_user.id)
+    return await start_delivery(order_id=order_id, driver_id=current_user.id)
 
 
 @router.patch("/{order_id}/complete", response_model=Delivery, status_code=200)
