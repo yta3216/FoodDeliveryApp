@@ -106,7 +106,7 @@ async def complete_delivery_route(
     from app.repositories.order_repo import load_orders, save_orders
     from app.services.order_service import send_status_notification
 
-    delivery = complete_delivery(order_id=order_id, driver_id=current_user.id)
+    delivery = await complete_delivery(order_id=order_id, driver_id=current_user.id)
 
     orders = load_orders()
     for order in orders:

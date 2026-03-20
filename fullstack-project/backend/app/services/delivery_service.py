@@ -163,7 +163,7 @@ async def start_delivery(order_id: int, driver_id: str) -> Delivery:
             for order in orders:
                 if order.get("id") == order_id:
                     order["status"] = "delivering"
-                    await send_new_delivery_notification(delivery)
+                    await send_new_delivery_notification(delivery, eta)
                     break
             save_orders(orders)
 
