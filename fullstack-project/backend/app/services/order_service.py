@@ -207,8 +207,11 @@ async def send_status_notification(order: dict) -> None:
     Parameters:
         order (dict): the order that triggered the notification
 
-    Returns:
-        None
+    Returns: None
+
+    Raises:
+        HTTPException(status_code=400): if notification does not have any recipients
+
     """
     customer_id = order["customer_id"]
     restaurant_id = order["restaurant_id"]

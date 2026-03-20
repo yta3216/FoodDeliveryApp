@@ -9,6 +9,10 @@ import time
 from fastapi import HTTPException
 from app.repositories.delivery_repo import load_deliveries, save_deliveries
 from app.repositories.user_repo import load_users, save_users
+from app.services.order_service import send_status_notification
+from app.services.restaurant_service import get_restaurant_by_id
+from app.repositories.order_repo import load_orders, save_orders
+from app.services.notification_service import Notification
 from app.schemas.delivery_schema import Delivery
 
 
@@ -122,7 +126,7 @@ def create_delivery(order_id: int, driver_id: str, distance_km: float) -> Delive
     return Delivery(**new_delivery)
 
 
-def start_delivery(order_id: int, driver_id: str) -> Delivery:
+async def start_delivery(order_id: int, driver_id: str) -> Delivery:
     """
     Marks a delivery as started, records the start timestamp, and calculates the ETA.
     Also updates the associated order status from "preparing" to "delivering".
@@ -139,7 +143,6 @@ def start_delivery(order_id: int, driver_id: str) -> Delivery:
         HTTPException (status_code = 400): if the delivery has already been started
         HTTPException (status_code = 404): if no delivery record is found for this order
     """
-    from app.repositories.order_repo import load_orders, save_orders
     deliveries = load_deliveries()
     for delivery in deliveries:
         if delivery.get("order_id") == order_id:
@@ -152,13 +155,15 @@ def start_delivery(order_id: int, driver_id: str) -> Delivery:
             vehicle = delivery.get("method")
             distance_km = delivery.get("distance_km")
             delivery["started_at"] = now
-            delivery["eta_minutes"] = calculate_eta(distance_km, vehicle)
+            eta = calculate_eta(distance_km, vehicle)
+            delivery["eta_minutes"] = eta
             save_deliveries(deliveries)
 
             orders = load_orders()
             for order in orders:
                 if order.get("id") == order_id:
                     order["status"] = "delivering"
+                    await send_new_delivery_notification(delivery, eta)
                     break
             save_orders(orders)
 
@@ -167,7 +172,7 @@ def start_delivery(order_id: int, driver_id: str) -> Delivery:
     raise HTTPException(status_code=404, detail=f"Delivery for order '{order_id}' not found.")
 
 
-def complete_delivery(order_id: int, driver_id: str) -> Delivery:
+async def complete_delivery(order_id: int, driver_id: str) -> Delivery:
     """
     Marks a delivery as completed, records the delivered timestamp and actual delivery time.
     Calculates delay_minutes as the difference between actual and estimated time.
@@ -202,6 +207,8 @@ def complete_delivery(order_id: int, driver_id: str) -> Delivery:
             delivery["actual_minutes"] = actual_minutes
             delivery["delay_minutes"] = round(actual_minutes - delivery.get("eta_minutes", 0.0), 2)
             save_deliveries(deliveries)
+
+            await send_complete_delivery_notification(delivery)
 
             users = load_users()
             for user in users:
@@ -247,7 +254,6 @@ def check_waiting_orders(driver: dict) -> None:
     Returns:
         None
     """
-    from app.repositories.order_repo import load_orders, save_orders
     orders = load_orders()
     required_vehicle = driver.get("vehicle")
 
@@ -272,3 +278,62 @@ def check_waiting_orders(driver: dict) -> None:
             o["delivery_id"] = delivery.id
             break
     save_orders(orders)
+
+async def send_new_delivery_notification(delivery: dict, eta: float):
+    """
+    Sends a notification to the customer that order has been set to delivering status,
+    and another to notify them of delivery eta and transportation method.
+
+    Parameters:
+        delivery (dict): the delivery that triggered the notification
+        eta (float): the eta for this order
+
+    Returns: None
+
+    Raises:
+        HTTPException(status_code=400): if notification does not have any recipients
+    """
+    order_id = delivery.get("order_id")
+    orders = load_orders()
+    for order in orders:
+        if order.get("id") == order_id:
+            order = order
+
+    await send_status_notification(order)
+
+    customer_id = order["customer_id"]
+    restaurant_id = order["restaurant_id"]
+    restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
+    vehicle = delivery["method"]
+    notification = Notification(
+        f"Order {order['id']} from {restaurant_name} will arrive in approximately "
+        f"{eta} minutes via {vehicle}.", [customer_id])
+    await notification.send_to_users()
+
+async def send_complete_delivery_notification(delivery: dict):
+    """
+    Sends a notification to the customer that order has been delivered.
+
+    Parameters:
+        delivery (dict): the delivery that triggered the notification
+
+    Returns: None
+
+    Raises:
+        HTTPException(status_code=400): if notification does not have any recipients
+    """
+    order_id = delivery.get("order_id")
+    orders = load_orders()
+    for order in orders:
+        if order.get("id") == order_id:
+            order = order
+
+    await send_status_notification(order)
+
+    customer_id = order["customer_id"]
+    restaurant_id = order["restaurant_id"]
+    restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
+    time = delivery["actual_minutes"]
+    notification = Notification(
+        f"Order {order['id']} from {restaurant_name} was delivered in {time} minutes", [customer_id])
+    await notification.send_to_users()

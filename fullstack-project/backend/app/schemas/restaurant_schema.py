@@ -246,7 +246,7 @@ class Restaurant(BaseModel):
     *   **name** (name): the restaurant's name
     *   **city** (str): the city the restaurant is located in
     *   **address** (Address): the full address of the restaurant
-    *   **mnager_ids** (list[str]): list of user IDs who are managers of the restaurant
+    *   **manager_ids** (list[str]): list of user IDs who are managers of the restaurant
     *   **max_delivery_radius_km** (float): the maximum radius that a restaurant will deliver to. *(optional; default = 10)*
     *   **delivery_fee** (float): the fee charged for delivery by this restaurant. *(optional; default = 0)*
     *   **menu** (Menu): the restaurant's menu
