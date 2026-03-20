@@ -172,7 +172,7 @@ async def start_delivery(order_id: int, driver_id: str) -> Delivery:
     raise HTTPException(status_code=404, detail=f"Delivery for order '{order_id}' not found.")
 
 
-def complete_delivery(order_id: int, driver_id: str) -> Delivery:
+async def complete_delivery(order_id: int, driver_id: str) -> Delivery:
     """
     Marks a delivery as completed, records the delivered timestamp and actual delivery time.
     Calculates delay_minutes as the difference between actual and estimated time.
@@ -207,6 +207,8 @@ def complete_delivery(order_id: int, driver_id: str) -> Delivery:
             delivery["actual_minutes"] = actual_minutes
             delivery["delay_minutes"] = round(actual_minutes - delivery.get("eta_minutes", 0.0), 2)
             save_deliveries(deliveries)
+
+            await send_complete_delivery_notification(delivery)
 
             users = load_users()
             for user in users:
@@ -306,4 +308,32 @@ async def send_new_delivery_notification(delivery: dict, eta: float):
     notification = Notification(
         f"Order {order['id']} from {restaurant_name} will arrive in approximately "
         f"{eta} minutes via {vehicle}.", [customer_id])
+    await notification.send_to_users()
+
+async def send_complete_delivery_notification(delivery: dict):
+    """
+    Sends a notification to the customer that order has been delivered.
+
+    Parameters:
+        delivery (dict): the delivery that triggered the notification
+
+    Returns: None
+
+    Raises:
+        HTTPException(status_code=400): if notification does not have any recipients
+    """
+    order_id = delivery.get("order_id")
+    orders = load_orders()
+    for order in orders:
+        if order.get("id") == order_id:
+            order = order
+
+    await send_status_notification(order)
+
+    customer_id = order["customer_id"]
+    restaurant_id = order["restaurant_id"]
+    restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
+    time = delivery["actual_minutes"]
+    notification = Notification(
+        f"Order {order['id']} from {restaurant_name} was delivered in {time} minutes", [customer_id])
     await notification.send_to_users()
