@@ -186,7 +186,7 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -
             driver = find_available_driver(required_vehicle)
 
             if driver:
-                delivery = create_delivery(order_id, driver["id"], distance_km)
+                delivery = await create_delivery(order_id, driver["id"], distance_km)
                 set_driver_status_to_delivering(driver["id"])
                 order["status"] = "preparing"
                 order["delivery_id"] = delivery.id
