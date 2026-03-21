@@ -305,8 +305,8 @@ async def send_delivery_created_notification(delivery: dict):
     restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
     notified_users = [customer_id] + manager_ids
     notification = Notification(
-        f"Order {order['id']} from {restaurant_name} has been assigned "
-        f"to driver {driver_id}.", notified_users)
+        f"Order {order['id']} from {restaurant_name} has been assigned to driver {driver_id}"
+        f" for delivery. Order will be delivered when food is ready.", notified_users)
     await notification.send_to_users()
 
 
