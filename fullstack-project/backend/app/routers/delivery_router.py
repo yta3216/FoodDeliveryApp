@@ -18,7 +18,7 @@ router = APIRouter(prefix="/delivery", tags=["delivery"])
 
 
 @router.patch("/status", status_code=200)
-def update_driver_status_route(
+async def update_driver_status_route(
     status: str,
     current_user: User = Depends(require_role(UserRole.DELIVERY_DRIVER))
 ):
@@ -51,7 +51,7 @@ def update_driver_status_route(
     save_users(users)
 
     if status == "available" and updated_user:
-        check_waiting_orders(updated_user)
+        await check_waiting_orders(updated_user)
 
     return {"message": f"status updated to {status}"}
 
