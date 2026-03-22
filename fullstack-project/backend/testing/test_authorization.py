@@ -61,7 +61,7 @@ def test_customer_cannot_edit_other_user():
     token1, _ = register_and_login("editcustomer1@example.com")
     _, user_id2 = register_and_login("editcustomer2@example.com")
 
-    response = client.put(f"/user/{user_id2}", 
+    response = client.patch(f"/user/{user_id2}", 
         headers={"Authorization": f"Bearer {token1}"},
         json={
             "email": "hacked@example.com",
@@ -78,7 +78,7 @@ def test_manager_cannot_edit_other_user():
     token_manager, _ = register_and_login("editmanager@example.com", role="manager")
     _, customer_id = register_and_login("editmanagertarget@example.com")
 
-    response = client.put(f"/user/{customer_id}",
+    response = client.patch(f"/user/{customer_id}",
         headers={"Authorization": f"Bearer {token_manager}"},
         json={
             "email": "hacked@example.com",

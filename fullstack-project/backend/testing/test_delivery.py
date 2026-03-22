@@ -101,7 +101,7 @@ def delivery_setup():
     )
 
     # add item to cart and place order with 3km distance (bike range)
-    client.put(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
+    client.patch(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
     client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 1},
                 headers={"Authorization": f"Bearer {customer_token}"})
     order = place_order(customer_token, distance_km=3.0)
@@ -175,7 +175,7 @@ def test_no_driver_sets_waiting_status():
         "email": "nodriver_customer@example.com", "password": "password"
     }).json()["token"]
 
-    client.put(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
+    client.patch(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
     client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 1},
                 headers={"Authorization": f"Bearer {customer_token}"})
     order = place_order(customer_token)
@@ -330,7 +330,7 @@ def test_waiting_order_assigned_when_driver_becomes_available():
     }).json()["token"]
 
     # place order with no driver available — should go to waiting_for_driver
-    client.put(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
+    client.patch(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
     client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 1},
                 headers={"Authorization": f"Bearer {customer_token}"})
     order = place_order(customer_token)
@@ -415,7 +415,7 @@ def test_order_outside_delivery_radius_auto_declined():
     }).json()["token"]
 
     # place order with 10km distance — outside the 5km radius
-    client.put(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
+    client.patch(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
     client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 1},
                 headers={"Authorization": f"Bearer {customer_token}"})
     order = place_order(customer_token, distance_km=10.0)

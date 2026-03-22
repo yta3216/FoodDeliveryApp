@@ -125,7 +125,7 @@ def update_restaurant_details_route(restaurant_id: int, payload: Restaurant_Deta
         raise HTTPException(status_code=400, detail="Restaurant ID in path and body must match")
     return update_restaurant_details(payload)
 
-@router.put("/{restaurant_id}/managers", response_model=Restaurant, dependencies=[Depends(check_manager)])
+@router.patch("/{restaurant_id}/managers", response_model=Restaurant, dependencies=[Depends(check_manager)])
 def update_restaurant_managers_route(restaurant_id: int, payload: Restaurant_Managers_Update):
     """
     **Updates a restaurant's list of managers. Must be one of the restaurant managers to use.**
