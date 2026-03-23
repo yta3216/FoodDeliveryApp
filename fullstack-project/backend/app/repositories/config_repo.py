@@ -8,7 +8,9 @@ CONFIG_DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "config.json"
 
 # TODO: update all other files that declare global variables to use config instead
 default = {
+    # defaults for receipt/payment workflow
     "tax_rate": 0.12,
+    # defaults for delivery_service
     "bike_speed_kmh": 20.0,
     "car_speed_kmh": 50.0,
     "bike_max_distance_km": 5.0,
