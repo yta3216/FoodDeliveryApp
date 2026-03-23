@@ -6,7 +6,6 @@ import os
 
 CONFIG_DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "config.json"
 
-# TODO: update all other files that declare global variables to use config instead
 default = {
     # defaults for receipt/payment workflow
     "GLOBAL_TAX_RATE": 0.12,
