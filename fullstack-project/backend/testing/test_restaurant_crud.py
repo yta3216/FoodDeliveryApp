@@ -124,7 +124,7 @@ def test_update_restaurant_managers(setup_restaurant):
     second_manager_id = second_manager.json().get("id")
 
     # Update the restaurant managers
-    update_response = client.put(
+    update_response = client.patch(
         f"/restaurant/{restaurant['id']}/managers",
         json={
             "id": restaurant["id"],

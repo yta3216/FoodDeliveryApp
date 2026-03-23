@@ -134,7 +134,7 @@ def perform_reset_password(payload: Password_Reset):
     reset_password(payload.new_password, payload.reset_token)
     return {"detail": "Password reset successful."}
 
-@router.put("/{user_id}/password")
+@router.patch("/{user_id}/password")
 def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged_In, current_user: User = Depends(get_current_user)):
     """
     **Resets the password of a logged-in user.**

@@ -112,7 +112,7 @@ def customer_with_cart_and_token(customer_with_token, setup_restaurant_menu):
     restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
     # add items to cart
-    set_id_response = client.put(
+    set_id_response = client.patch(
         f"/cart/{restaurant_id}",
         headers={"Authorization": f"Bearer {token}"}
         )
@@ -218,7 +218,7 @@ def test_update_cart_restaurant(customer_with_cart_and_token, setup_restaurant_m
     restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
     # send update request
-    update_response = client.put(
+    update_response = client.patch(
         f"/cart/{restaurant_id}",
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -235,7 +235,7 @@ def test_update_cart_restaurant_wrong_role(manager_with_token, setup_restaurant_
     restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
     # send update request
-    update_response = client.put(
+    update_response = client.patch(
         f"/cart/{restaurant_id}",
         headers={"Authorization": f"Bearer {token}"}
         )
@@ -249,7 +249,7 @@ def test_update_cart_wrong_restaurant(customer_with_token):
     nonexistent_id = 123456
 
     # send update request
-    update_response = client.put(
+    update_response = client.patch(
         f"/cart/{nonexistent_id}",
         headers={"Authorization": f"Bearer {token}"}
         )
@@ -295,7 +295,7 @@ def test_add_item_to_cart(customer_with_token, setup_restaurant_menu):
     restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
     # add items to cart
-    set_id_response = client.put(
+    set_id_response = client.patch(
         f"/cart/{restaurant_id}",
         headers={"Authorization": f"Bearer {token}"}
         )
@@ -335,7 +335,7 @@ def test_add_nonexistent_item(customer_with_token, setup_restaurant_menu):
     restaurant_id = setup_restaurant_menu["restaurant"]["id"]
 
     # add item to cart who is not in restaurant menu
-    set_id_response = client.put(
+    set_id_response = client.patch(
         f"/cart/{restaurant_id}",
         headers={"Authorization": f"Bearer {token}"}
         )
@@ -358,7 +358,7 @@ def test_successful_qty_change(customer_with_cart_and_token):
 
     item_id = customer["cart"]["cart_items"][0]["menu_item_id"]
 
-    update_response = client.put(
+    update_response = client.patch(
         f"/cart/item/{item_id}",
         json={
             "new_qty": 5
@@ -376,7 +376,7 @@ def test_qty_change_wrong_item(customer_with_cart_and_token):
 
     wrong_item_id = get_fake_cart_item_id(customer)
 
-    update_response = client.put(
+    update_response = client.patch(
         f"/cart/item/{wrong_item_id}",
         json={
             "new_qty": 7
