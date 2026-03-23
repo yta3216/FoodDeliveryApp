@@ -5,7 +5,7 @@ from app.repositories.config_repo import load_config, save_config
 
 def get_tax_rate() -> float:
     """
-    **Retrieves the current tax rate from storage.**
+    **Retrieves the current tax rate from the stored configs.**
 
     Parameters: None
 
@@ -16,13 +16,13 @@ def get_tax_rate() -> float:
 
 def set_tax_rate(new_tax_rate: float) -> float:
     """
-    Sets the tax rate for the app.
+    **Sets the tax rate for the app.**
 
     Parameters:
-        new_tax_rate (float): the new tax rate, must be between 0 and 1
+        **new_tax_rate** (float): the new tax rate, must be between 0 and 1
 
     Returns:
-        float: the new tax rate
+        **float**: the new tax rate
 
     Raises:
         HTTPException (status_code = 400): if the new tax rate is not between 0 and 1
@@ -35,3 +35,15 @@ def set_tax_rate(new_tax_rate: float) -> float:
     save_config(config)
     
     return new_tax_rate
+
+def get_bike_speed_default() -> float:
+    return load_config().get("bike_speed_kmh", 20.0)
+
+def get_car_speed_default() -> float:
+    return load_config().get("car_speed_kmh", 50.0)
+
+def get_bike_max_distance_default() -> float:
+    return load_config().get("bike_max_distance_km", 5.0)
+
+def get_distance_defaults() -> dict[float, float, float]:
+    return {"bike_speed_kmh": get_bike_speed_default(), "car_speed_kmh": get_car_speed_default(), "bike_max_distance_km": get_bike_max_distance_default()}
