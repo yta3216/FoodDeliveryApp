@@ -12,7 +12,7 @@ def get_tax_rate() -> float:
     Returns:
         **float**: the current tax rate, default: 0.12
     """
-    return load_config().get("tax_rate", 0.12)
+    return load_config().get("GLOBAL_TAX_RATE", 0.12)
 
 def set_tax_rate(new_tax_rate: float) -> float:
     """
@@ -31,19 +31,22 @@ def set_tax_rate(new_tax_rate: float) -> float:
         raise HTTPException(status_code=400, detail="Tax rate must be between 0 and 1")
     
     config = load_config()
-    config["tax_rate"] = new_tax_rate
+    config["GLOBAL_TAX_RATE"] = new_tax_rate
     save_config(config)
     
     return new_tax_rate
 
 def get_bike_speed_default() -> float:
-    return load_config().get("bike_speed_kmh", 20.0)
+    return load_config().get("BIKE_SPEED_KMH", 20.0)
 
 def get_car_speed_default() -> float:
-    return load_config().get("car_speed_kmh", 50.0)
+    return load_config().get("CAR_SPEED_KMH", 50.0)
 
 def get_bike_max_distance_default() -> float:
-    return load_config().get("bike_max_distance_km", 5.0)
+    return load_config().get("BIKE_MAX_DISTANCE_KMH", 5.0)
 
-def get_distance_defaults() -> dict[float, float, float]:
-    return {"bike_speed_kmh": get_bike_speed_default(), "car_speed_kmh": get_car_speed_default(), "bike_max_distance_km": get_bike_max_distance_default()}
+def get_reset_token_expiry_default() -> float:
+    return load_config().get("RESET_TOKEN_EXPIRY", 900)
+
+def get_session_token_expiry_default() -> float:
+    return load_config().get("SESSION_TOKEN_EXPIRY", 86400)
