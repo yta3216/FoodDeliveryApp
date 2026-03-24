@@ -1,1 +1,34 @@
-[]
+[
+  {
+    "id": "662a5610-b7a7-4cd2-9f87-85580b9b6ead",
+    "email": "testingtesting123@example.com",
+    "name": "Password Testing",
+    "password": "testpassword",
+    "age": 56,
+    "gender": "female",
+    "role": "customer",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "cart": {
+      "restaurant_id": 0,
+      "cart_items": []
+    },
+    "auth_token": "Z0oR9KBCHJVNiOfLiWgwpVURcPm3Z28KWpzPmcLopWU",
+    "auth_token_expiry": 1774426567.6520987
+  },
+  {
+    "id": "16e1ecc2-1d52-4e47-98be-b97a836a2c77",
+    "email": "testingtesting123@example.com",
+    "name": "Password Testing",
+    "password": "testpassword",
+    "age": 56,
+    "gender": "female",
+    "role": "customer",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "cart": {
+      "restaurant_id": 0,
+      "cart_items": []
+    }
+  }
+]
