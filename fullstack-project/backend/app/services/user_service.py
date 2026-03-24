@@ -18,10 +18,9 @@ from app.schemas.user_schema import (
     Customer,
     ROLE_TO_CLASS
 )
+from app.services.config_service import get_reset_token_expiry_default, get_session_token_expiry_default
 
-RESET_TOKEN_EXPIRY = 900  # 15 minutes before password reset token expires
-SESSION_TOKEN_EXPIRY = 86400  # 24 hours before session token expires
-
+RESET_TOKEN_EXPIRY, SESSION_TOKEN_EXPIRY = get_reset_token_expiry_default(), get_session_token_expiry_default()
 
 def create_user(payload: User_Create) -> User:
     """

@@ -6,9 +6,18 @@ import os
 
 CONFIG_DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "config.json"
 
-# TODO: update all other files that declare global variables to use config instead
 default = {
-    "tax_rate": 0.12
+    # defaults for receipt/payment workflow
+    "GLOBAL_TAX_RATE": 0.12,
+
+    # defaults for delivery_service
+    "BIKE_SPEED_KMH": 20.0,
+    "CAR_SPEED_KMH": 50.0,
+    "BIKE_MAX_DISTANCE_KMH": 5.0,
+
+    # defaults for user service
+    "RESET_TOKEN_EXPIRY": 900, # 15 minutes
+    "SESSION_TOKEN_EXPIRY": 86400 # 24 hours
 }
 
 def load_config() -> dict:

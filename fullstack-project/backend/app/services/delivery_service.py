@@ -14,12 +14,9 @@ from app.services.restaurant_service import get_managers, get_restaurant_by_id
 from app.repositories.order_repo import load_orders, save_orders
 from app.services.notification_service import Notification
 from app.schemas.delivery_schema import Delivery
+from app.services.config_service import get_bike_speed_default, get_car_speed_default, get_bike_max_distance_default
 
-
-BIKE_SPEED_KMH = 20.0
-CAR_SPEED_KMH = 50.0
-BIKE_MAX_DISTANCE_KM = 5.0
-
+BIKE_SPEED_KMH, CAR_SPEED_KMH, BIKE_MAX_DISTANCE_KM = get_bike_speed_default(), get_car_speed_default(), get_bike_max_distance_default()
 
 def get_required_vehicle(distance_km: float) -> str:
     """
