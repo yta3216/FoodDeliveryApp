@@ -42,7 +42,7 @@ def test_password_reset(register_user):
     reset_token = get_user_reset_token(user_id)
     new_password = "newpassword"
 
-    response = client.post("/user/password-reset", json={"new_password": new_password, "reset_token": reset_token})
+    response = client.patch("/user/password-reset", json={"new_password": new_password, "reset_token": reset_token})
     assert response.status_code == 200
     
     users = load_users()
@@ -67,7 +67,7 @@ def test_password_reset_expired_token(register_user):
             break
     save_users(users)
 
-    response = client.post("/user/password-reset", json={"new_password": new_password, "reset_token": reset_token})
+    response = client.patch("/user/password-reset", json={"new_password": new_password, "reset_token": reset_token})
     assert response.status_code == 400
     assert response.json().get("detail") == "Reset token has expired"
 
@@ -80,7 +80,7 @@ def get_user_reset_token(user_id):
 
 # test password reset with invalid token
 def test_password_reset_wrong_token():
-    response = client.post("/user/password-reset", json={"new_password": "newpassword", "reset_token": "invalidtoken"})
+    response = client.patch("/user/password-reset", json={"new_password": "newpassword", "reset_token": "invalidtoken"})
     assert response.status_code == 400
     assert response.json().get("detail") == "Invalid reset token"
 

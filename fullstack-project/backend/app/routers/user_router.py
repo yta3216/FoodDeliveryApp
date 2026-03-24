@@ -117,7 +117,7 @@ def password_reset_request(payload: Password_Reset_Request):
     reset_password_request(payload.email)
     return {"detail": "If the email exists, a password reset link has been sent."}
 
-@router.post("/password-reset")
+@router.patch("/password-reset")
 def perform_reset_password(payload: Password_Reset):
     """
     **Resets the password of a user with a valid password reset token.**
