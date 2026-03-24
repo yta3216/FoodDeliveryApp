@@ -24,7 +24,8 @@ from app.services.user_service import (
     reset_password,
     update_password_when_logged_in,
     update_user,
-    get_notifications
+    get_notifications,
+    read_notification
 )
 from app.auth import get_current_user
 
@@ -176,6 +177,20 @@ def get_notifications_route(user_id: str, current_user: User = Depends(get_curre
         raise HTTPException(status_code=403, detail="You are not authorized to view this user's notifications")
     return get_notifications(user_id)
 
-# TODO: get single notification
+@router.patch("/{user_id}/notifications/{notification_id}", response_model=Notification_Response)
+def read_notification_route(user_id: str, notification_id: str, current_user: User = Depends(get_current_user)):
+    """
+    **Retrieves a notification for the logged in user and marks it as read.**
 
-# TODO: mark notification as read
+    Parameters:
+    *   **user_id** (str): the identifier of the account to read a notification. must match the logged in user's id
+    *   **notification_id** (str): the identifier of the notification to read. user_id must be a recipient
+
+    Raises:
+    *   **HTTPException** (status_code = 403): if current user's id does not match user_id in URL
+    *   **HTTPException** (status_code = 404): if this notifications id not found in notifications.json
+    *   **HTTPException** (status_code = 404): if user_id is not in list of readers (which matches recipient list)
+    """
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="You are not authorized to read this user's notifications")
+    return read_notification(notification_id, user_id)

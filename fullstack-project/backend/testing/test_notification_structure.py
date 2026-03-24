@@ -65,14 +65,14 @@ def test_save(mock_load, notification):
 def test_read_notif(mock_load, notification):
     mock_load.return_value = []
     notification.save()
-    notification.read_notification()
+    notification.mark_as_read("user1")
     notifs = load_notifications()
     for notif in notifs:
         if notif["id"] == notification.id:
             loaded_notif = notif
-    assert loaded_notif["is_read"] == True
+    assert loaded_notif["is_read"].get("user1") == True
 
-# test that http 404 status is raised when notification not found
+# test that HTTP 404 status is raised when notification not found
 def test_read_missing_notif(mock_load, notification):
     mock_load.return_value = []
     with pytest.raises(HTTPException) as e:
