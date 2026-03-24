@@ -177,8 +177,8 @@ def get_notifications_route(user_id: str, current_user: User = Depends(get_curre
         raise HTTPException(status_code=403, detail="You are not authorized to view this user's notifications")
     return get_notifications(user_id)
 
-@router.patch("/{user_id}/notifications/{notification_id}", response_model=Notification_Response)
-def read_notification_route(user_id: str, notification_id: str, current_user: User = Depends(get_current_user)):
+@router.patch("/{user_id}/notifications/{notification_id}/read", response_model=Notification_Response)
+def read_notification_route(user_id: str, notification_id: int, current_user: User = Depends(get_current_user)):
     """
     **Retrieves a notification for the logged in user and marks it as read.**
 
