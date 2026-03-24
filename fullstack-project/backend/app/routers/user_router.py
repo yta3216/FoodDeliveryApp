@@ -42,7 +42,7 @@ def create_user_route(payload: User_Create):
     *   **UserPublic**: the newly created user
 
     Raises:
-    *    **HTTPException** (status_code = 409): if generated ID matches an existing ID. extremely unlikely.
+    *    **HTTPException** (status_code = 409): if generated ID matches an existing ID, or if email already exists.
     """
     return create_user(payload)
 

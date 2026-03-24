@@ -28,3 +28,31 @@ def test_create_user():
     assert response.json().get("role") == "customer"
     assert response.json().get("reset_token") is None
     assert response.json().get("reset_token_expiry") is None
+
+# test user creation but email already exists
+def test_create_duplicate_user():
+    response=client.post(
+        "/user", 
+        json={
+            "email": "test@duplicate.com", 
+            "password": "passwordpassword",
+            "name": "John Smith",
+            "age": 25,
+            "gender": "male",
+            "role": "customer"
+        }
+        )
+    assert response.status_code == 201
+
+    invalid_response=client.post(
+        "/user", 
+        json={
+            "email": "test@duplicate.com", 
+            "password": "password123",
+            "name": "Johnny Appleseed",
+            "age": 32,
+            "gender": "male",
+            "role": "manager"
+        }
+        )
+    assert invalid_response.json().get("detail") == "An account with this email already exists."

@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+import uuid
 from app.main import app
 
 client = TestClient(app)
@@ -17,7 +18,7 @@ def setup_restaurant(name = "Test Restaurant", city = "Kelowna", address = VALID
     test_manager = client.post(
         "/user",
         json={
-            "email": "search@example.com",
+            "email": f"search{str(uuid.uuid4())}@example.com",
             "password": "testpassword",
             "name": "Test Manager",
             "age": 25,
