@@ -27,7 +27,8 @@ Team Members:
 
 ## For Developers
 ### Run Tests & Generate Coverage Reports
-Run the following prompt in your terminal (from the backend directory):
+Run the following prompts in your terminal (from the backend directory):
+(remove existing coverage reports from git if needed: git rm -r testing/coverage-reports-html)
 
 pytest testing --cov --cov-report=term --cov-report=html:testing/coverage-reports-html
 
