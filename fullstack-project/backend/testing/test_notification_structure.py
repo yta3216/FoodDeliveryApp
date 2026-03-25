@@ -97,12 +97,10 @@ def read_notif_not_recipient(mock_load, notification):
 def test_read_notif_route(real_notification, register_user):
     real_notification.save()
     user_id = register_user.get("user_id")
-    print(user_id)
     auth_token = register_user.get("token")
 
     response = client.patch(f"/user/{user_id}/notifications/{real_notification.id}/read",
                             headers={"Authorization": f"Bearer {auth_token}"})
-    print(response.json().get("detail"))
     assert response.status_code == 200
     
     notifs = load_notifications()
