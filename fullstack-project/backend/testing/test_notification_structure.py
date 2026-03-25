@@ -97,7 +97,6 @@ def test_read_missing_notif(mock_load, notification):
 def test_read_notif_route(real_notification, register_user):
     real_notification.save()
     user_id = register_user.get("user_id")
-    print(user_id)
     auth_token = register_user.get("token")
 
     response = client.patch(f"/user/{user_id}/notifications/{real_notification.id}/read",
