@@ -2,13 +2,13 @@
 
 import secrets
 import time
-from typing import Any
 import uuid
 from fastapi import HTTPException, Depends
 from app.auth import require_role
 from app.repositories.user_repo import load_users, save_users
 from app.repositories.notification_repo import load_notifications
 from app.schemas.notification_schema import Notification_Response
+from app.services.notification_service import Notification
 from app.schemas.user_schema import (
     User, 
     User_Create,
@@ -19,10 +19,9 @@ from app.schemas.user_schema import (
     Customer,
     ROLE_TO_CLASS
 )
+from app.services.config_service import get_reset_token_expiry_default, get_session_token_expiry_default
 
-RESET_TOKEN_EXPIRY = 900  # 15 minutes before password reset token expires
-SESSION_TOKEN_EXPIRY = 86400  # 24 hours before session token expires
-
+RESET_TOKEN_EXPIRY, SESSION_TOKEN_EXPIRY = get_reset_token_expiry_default(), get_session_token_expiry_default()
 
 def create_user(payload: User_Create) -> User:
     """
@@ -35,18 +34,22 @@ def create_user(payload: User_Create) -> User:
         User: the newly created user
 
     Raises:
-        HTTPException (status_code = 409): if generated ID matches an existing ID. extremely unlikely.
+        HTTPException (status_code = 409): if generated ID matches an existing ID, or if email exists already.
     """
     users = load_users()
     new_id = str(uuid.uuid4())
-    if any(user.get("id") == new_id for user in users):
-        raise HTTPException(status_code=409, detail="ID collision; retry.")
+    new_email = payload.email.strip()
+    for user in users:
+        if user.get("id") == new_id:
+            raise HTTPException(status_code=409, detail="ID collision; retry.")
+        if user.get("email") == new_email:
+            raise HTTPException(status_code=409, detail="An account with this email already exists.")
     
     user_class = ROLE_TO_CLASS[payload.role]
 
     new_user = user_class(
         id = new_id,
-        email = payload.email.strip(),
+        email = new_email,
         password = payload.password.strip(),
         name = payload.name.strip(),
         age = payload.age,
@@ -248,6 +251,25 @@ def get_notifications(user_id: str) -> list[Notification_Response]:
         if user_id in notif["user_ids"]:
             user_notifs.append(notif)
     return user_notifs
+
+def read_notification(notification_id: str, user_id: str) -> Notification_Response:
+    """
+    Retrieves a notification for the logged in user and marks it as read.
+
+    Parameters:
+        user_id (str): the identifier of the account to read a notification. must match the logged in user's id
+        notification_id (str): the identifier of the notification to read. user_id must be a recipient
+
+    Raises:
+        HTTPException (status_code = 404): if this notifications id not found in notifications.json
+        HTTPException (status_code = 404): if user_id is not in list of readers (which matches recipient list)
+    """
+    notifs = load_notifications()
+    for notif in notifs:
+        if notif.get("id") == notification_id:
+            notif_object = Notification.model_to_Notification(notif)
+            return notif_object.mark_as_read(user_id)
+    raise HTTPException(status_code=404, detail=f"Notification '{notification_id}' not found")
 
 def get_customer(customer: Customer = Depends(require_role(UserRole.CUSTOMER))) -> Customer:
     """

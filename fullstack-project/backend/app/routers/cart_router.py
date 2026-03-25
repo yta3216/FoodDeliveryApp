@@ -27,7 +27,7 @@ from app.services.cart_service import (
 
 router = APIRouter(prefix="/cart", tags=["cart"])
 
-@router.put("/{restaurant_id}", response_model=Cart, dependencies=[Depends(get_restaurant_by_id)])
+@router.patch("/{restaurant_id}", response_model=Cart, dependencies=[Depends(get_restaurant_by_id)])
 def update_cart_restaurant_route(restaurant_id: int, customer: Customer = Depends(get_customer)):
     """
     **Updates the restaurant associated with a user's cart, used when they want to change the restaurant they're ordering from.  
@@ -125,7 +125,7 @@ def get_cart_item_route(item_id: int, customer: Customer = Depends(get_customer)
     """
     return get_cart_item(item_id, customer)
 
-@router.put("/item/{item_id}", response_model=CartItem)
+@router.patch("/item/{item_id}", response_model=CartItem)
 def update_cart_item_route(item_id: int, payload: CartItem_Update, customer: Customer = Depends(get_customer)):
     """
     **Updates the quantity of an item in a logged-in customer's cart.**

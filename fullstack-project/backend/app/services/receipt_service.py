@@ -13,6 +13,7 @@ from app.schemas.receipt_schema import Receipt, ReceiptItem
 from app.repositories.receipt_repo import load_receipts, save_receipts
 from app.services.cart_service import get_cart
 from app.services.restaurant_service import get_restaurant_by_id
+from app.services.config_service import get_tax_rate
 
 
 def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
@@ -56,7 +57,7 @@ def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
             ))
 
     subtotal = round(subtotal, 2)
-    tax = 0.0
+    tax = round(get_tax_rate() * subtotal, 2)
     delivery_fee = restaurant.get("delivery_fee", 0.0)
     total = round(subtotal + tax + delivery_fee, 2)
 

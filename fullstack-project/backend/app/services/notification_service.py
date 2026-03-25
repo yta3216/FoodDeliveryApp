@@ -25,7 +25,8 @@ class Notification():
     def __init__(self, message: str, user_ids: list[str]):
         """
         Creates a new notification object. It is not saved to the database until it is sent.
-        id and time are set automatically, and is_read is initially set to False. Time has format YYYY/MM/DD HH:MM.
+        id and time are set automatically, and is_read is initially set to False for all users. 
+        Time has format YYYY/MM/DD HH:MM.
 
         Parameters:
             message (str): the body text to be sent in the notification
@@ -42,9 +43,9 @@ class Notification():
         self.id = self._get_next_id()
         self.message = message
         self.user_ids = user_ids
-        self.is_read = False
+        self.is_read = {user_id: False for user_id in user_ids}
         self.time = datetime.now().strftime('%Y/%m/%d %H:%M')
-    
+
     def _get_next_id(self) -> int:
         """
         Computes the next available identifier for a new notification object.
@@ -58,6 +59,24 @@ class Notification():
         if len(notifs) == 0:
             return 1
         return max(notif["id"] for notif in notifs) + 1
+
+    @classmethod
+    def model_to_Notification(cls, notif_dict: Notification_Response):
+        """
+        Converts the current Notification_Response pydantic model to Notification class
+        so that methods can be used.
+
+        Parameters:
+            notif_dict (Notification_Response): the notification data as a pydantic model
+        
+        Returns:
+            Notification: a Notification object with the same data as the pydantic model
+        """
+        notif = cls(notif_dict.get("message"), notif_dict.get("user_ids"))
+        notif.id = notif_dict.get("id")
+        notif.is_read = notif_dict.get("is_read")
+        notif.time = notif_dict.get("time")
+        return notif
 
     def to_model(self) -> Notification_Response:
         """
@@ -88,23 +107,27 @@ class Notification():
         notifs.append(self.to_model().model_dump())
         save_notifications(notifs)
     
-    def read_notification(self) -> None:
+    def mark_as_read(self, user_id) -> Notification_Response:
         """
-        Marks notification as read.
+        Marks notification as read and saves to database.
 
         Parameters: None
 
-        Returns: None
+        Returns:
+            Notification_Response: the read notification in the correct form according to the schema
 
         Raises:
             HTTPException (status_code = 404): if this notifications id not found in notifications.json
+            HTTPException (status_code = 404): if user_id is not in list of readers (which matches recipient list)
         """
         notifs = load_notifications()
         for notif in notifs:
             if notif["id"] == self.id:
-                notif["is_read"] = True
+                if user_id not in notif["is_read"]:
+                    raise HTTPException(status_code=404, detail=f"User '{user_id}' cannot read notification '{self.id}'")
+                notif["is_read"][user_id] = True
                 save_notifications(notifs)
-                return None
+                return self.to_model()
         raise HTTPException(status_code=404, detail=f"Notification '{self.id}' not found")
     
     async def send_to_users(self) -> None:

@@ -109,7 +109,7 @@ def customer_with_cart_and_token(customer_with_token, setup_restaurant_menu):
     item2_id = restaurant["menu"]["items"][1]["id"]
 
     # set cart restaurant
-    set_restaurant_response = client.put(
+    set_restaurant_response = client.patch(
         f"/cart/{restaurant_id}",
         headers={"Authorization": f"Bearer {token}"}
     )

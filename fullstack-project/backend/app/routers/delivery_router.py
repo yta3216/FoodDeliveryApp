@@ -18,7 +18,7 @@ router = APIRouter(prefix="/delivery", tags=["delivery"])
 
 
 @router.patch("/status", status_code=200)
-def update_driver_status_route(
+async def update_driver_status_route(
     status: str,
     current_user: User = Depends(require_role(UserRole.DELIVERY_DRIVER))
 ):
@@ -51,13 +51,13 @@ def update_driver_status_route(
     save_users(users)
 
     if status == "available" and updated_user:
-        check_waiting_orders(updated_user)
+        await check_waiting_orders(updated_user)
 
     return {"message": f"status updated to {status}"}
 
 
 @router.patch("/{order_id}/start", response_model=Delivery, status_code=200)
-def start_delivery_route(
+async def start_delivery_route(
     order_id: int,
     current_user: User = Depends(require_role(UserRole.DELIVERY_DRIVER))
 ):
@@ -78,7 +78,7 @@ def start_delivery_route(
     *   **HTTPException** (status_code = 403): if user is not the assigned driver for this delivery
     *   **HTTPException** (status_code = 404): if no delivery record is found for this order
     """
-    return start_delivery(order_id=order_id, driver_id=current_user.id)
+    return await start_delivery(order_id=order_id, driver_id=current_user.id)
 
 
 @router.patch("/{order_id}/complete", response_model=Delivery, status_code=200)
@@ -106,7 +106,7 @@ async def complete_delivery_route(
     from app.repositories.order_repo import load_orders, save_orders
     from app.services.order_service import send_status_notification
 
-    delivery = complete_delivery(order_id=order_id, driver_id=current_user.id)
+    delivery = await complete_delivery(order_id=order_id, driver_id=current_user.id)
 
     orders = load_orders()
     for order in orders:

@@ -124,12 +124,7 @@ async def cancel_order(order_id: int, current_user: Customer) -> Order:
             order["status"] = "cancelled"
             save_orders(orders)
             await send_status_notification(order)
-            receipt = get_receipt(order["receipt_id"])
-            refund_notification = Notification(
-                f"Refund of ${receipt.total} for order {order['id']} from {get_restaurant_by_id(order['restaurant_id'])['name']} is being processed.",
-                [current_user.id]
-            )
-            await refund_notification.send_to_users()
+            await send_refund_notification(order, "Order cancelled by customer")
             return Order(**order)
 
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
@@ -175,12 +170,7 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -
                 order["status"] = "rejected"
                 save_orders(orders)
                 await send_status_notification(order)
-                receipt = get_receipt(order["receipt_id"])
-                refund_notification = Notification(
-                    f"Refund of ${receipt.total} for order {order['id']} from {restaurant['name']} is being processed.",
-                    [order["customer_id"]]
-                )
-                await refund_notification.send_to_users()
+                await send_refund_notification(order, f"Rejected by restaurant")
                 return Order(**order)
 
             distance_km = order.get("distance_km", 0.0)
@@ -189,19 +179,14 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -
                 order["status"] = "rejected"
                 save_orders(orders)
                 await send_status_notification(order)
-                receipt = get_receipt(order["receipt_id"])
-                refund_notification = Notification(
-                    f"Refund of ${receipt.total} for order {order['id']} from {restaurant['name']} is being processed.",
-                    [order["customer_id"]]
-                )
-                await refund_notification.send_to_users()
+                await send_refund_notification(order, "Restaurant max delivery distance exceeded")
                 return Order(**order)
 
             required_vehicle = get_required_vehicle(distance_km)
             driver = find_available_driver(required_vehicle)
 
             if driver:
-                delivery = create_delivery(order_id, driver["id"], distance_km)
+                delivery = await create_delivery(order_id, driver["id"], distance_km)
                 set_driver_status_to_delivering(driver["id"])
                 order["status"] = "preparing"
                 order["delivery_id"] = delivery.id
@@ -222,8 +207,11 @@ async def send_status_notification(order: dict) -> None:
     Parameters:
         order (dict): the order that triggered the notification
 
-    Returns:
-        None
+    Returns: None
+
+    Raises:
+        HTTPException(status_code=400): if notification does not have any recipients
+
     """
     customer_id = order["customer_id"]
     restaurant_id = order["restaurant_id"]
@@ -231,4 +219,29 @@ async def send_status_notification(order: dict) -> None:
     notified_users = [customer_id] + manager_ids
     restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
     notification = Notification(f"Order {order['id']} from {restaurant_name} set to status: {order['status']}", notified_users)
+    await notification.send_to_users()
+
+async def send_refund_notification(order: dict, reason: str = None) -> None:
+    """
+    Sends a notification to the customer regarding a refund which was issued.
+
+    Parameters:
+        order (dict): the order which was refunded
+        reason (str): the reason the order was refunded (optional)
+
+    Returns:
+        None
+    """
+    customer_id = order["customer_id"]
+    order_id = order['id']
+    restaurant_id = order["restaurant_id"]
+    receipt = get_receipt(order["receipt_id"])
+    notified_users = [customer_id]
+    restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
+
+    message = f"Refund of ${receipt.total} for order {order_id} from {restaurant_name} is being processed."
+    if reason:
+        message += f" Reason: {reason}."
+
+    notification = Notification(message, notified_users)
     await notification.send_to_users()

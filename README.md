@@ -18,7 +18,7 @@ Team Members:
     * *fastapi dev app/main.py*
 5. To close the program, press *ctrl + c* from the terminal
 
-## Option 2: Using Docker (from terminal)
+### Option 2: Using Docker (from terminal)
 1. Open the Docker Desktop app
 2. Make sure your terminal is in the root directory *FoodDeliveryApp/*
 3. Run the following command:
@@ -27,7 +27,8 @@ Team Members:
 
 ## For Developers
 ### Run Tests & Generate Coverage Reports
-Run the following prompt in your terminal (from the backend directory):
+Run the following prompts in your terminal (from the backend directory):
+*(remove existing coverage reports from git if needed: git rm -r testing/coverage-reports-html)*
 
 pytest testing --cov --cov-report=term --cov-report=html:testing/coverage-reports-html
 
