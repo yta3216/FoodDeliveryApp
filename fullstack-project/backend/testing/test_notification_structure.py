@@ -101,7 +101,6 @@ def test_read_notif_route(real_notification, register_user):
 
     response = client.patch(f"/user/{user_id}/notifications/{real_notification.id}/read",
                             headers={"Authorization": f"Bearer {auth_token}"})
-    print(response.json().get("detail"))
     assert response.status_code == 200
     
     notifs = load_notifications()
