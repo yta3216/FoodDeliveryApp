@@ -12,11 +12,11 @@ class Notification_Response(BaseModel):
     *   **id** (int): the identifier of the notification object
     *   **user_ids** (list[str]): the identifiers of the users who should receive this notification
     *   **message** (str): the message of the notification
-    *   **is_read** (bool): true if message has been read, false if not
+    *   **is_read** (dict[str, bool]): true if message has been read, false if not. one entry per user id in user_ids
     *   **time** (str): time that notification was sent, or time it was created if not sent yet (YYYY/MM/DD HH:MM)
     """
     id: int
     user_ids: list[str]
     message: str
-    is_read: bool
+    is_read: dict[str, bool]
     time: str

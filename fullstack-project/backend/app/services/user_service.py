@@ -8,6 +8,7 @@ from app.auth import require_role
 from app.repositories.user_repo import load_users, save_users
 from app.repositories.notification_repo import load_notifications
 from app.schemas.notification_schema import Notification_Response
+from app.services.notification_service import Notification
 from app.schemas.user_schema import (
     User, 
     User_Create,
@@ -250,6 +251,25 @@ def get_notifications(user_id: str) -> list[Notification_Response]:
         if user_id in notif["user_ids"]:
             user_notifs.append(notif)
     return user_notifs
+
+def read_notification(notification_id: str, user_id: str) -> Notification_Response:
+    """
+    Retrieves a notification for the logged in user and marks it as read.
+
+    Parameters:
+        user_id (str): the identifier of the account to read a notification. must match the logged in user's id
+        notification_id (str): the identifier of the notification to read. user_id must be a recipient
+
+    Raises:
+        HTTPException (status_code = 404): if this notifications id not found in notifications.json
+        HTTPException (status_code = 404): if user_id is not in list of readers (which matches recipient list)
+    """
+    notifs = load_notifications()
+    for notif in notifs:
+        if notif.get("id") == notification_id:
+            notif_object = Notification.model_to_Notification(notif)
+            return notif_object.mark_as_read(user_id)
+    raise HTTPException(status_code=404, detail=f"Notification '{notification_id}' not found")
 
 def get_customer(customer: Customer = Depends(require_role(UserRole.CUSTOMER))) -> Customer:
     """
