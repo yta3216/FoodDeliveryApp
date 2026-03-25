@@ -159,9 +159,7 @@ async def start_delivery(order_id: int, driver_id: str) -> Delivery:
             delivery["eta_minutes"] = eta
             save_deliveries(deliveries)
 
-            order = _set_order_status(order_id, "delivering")
             await send_delivery_started_notification(delivery, eta)
-            await send_status_notification(order)
 
             return Delivery(**delivery)
 
