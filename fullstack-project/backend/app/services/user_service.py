@@ -33,18 +33,22 @@ def create_user(payload: User_Create) -> User:
         User: the newly created user
 
     Raises:
-        HTTPException (status_code = 409): if generated ID matches an existing ID. extremely unlikely.
+        HTTPException (status_code = 409): if generated ID matches an existing ID, or if email exists already.
     """
     users = load_users()
     new_id = str(uuid.uuid4())
-    if any(user.get("id") == new_id for user in users):
-        raise HTTPException(status_code=409, detail="ID collision; retry.")
+    new_email = payload.email.strip()
+    for user in users:
+        if user.get("id") == new_id:
+            raise HTTPException(status_code=409, detail="ID collision; retry.")
+        if user.get("email") == new_email:
+            raise HTTPException(status_code=409, detail="An account with this email already exists.")
     
     user_class = ROLE_TO_CLASS[payload.role]
 
     new_user = user_class(
         id = new_id,
-        email = payload.email.strip(),
+        email = new_email,
         password = payload.password.strip(),
         name = payload.name.strip(),
         age = payload.age,

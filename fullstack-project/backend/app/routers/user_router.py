@@ -42,7 +42,7 @@ def create_user_route(payload: User_Create):
     *   **UserPublic**: the newly created user
 
     Raises:
-    *    **HTTPException** (status_code = 409): if generated ID matches an existing ID. extremely unlikely.
+    *    **HTTPException** (status_code = 409): if generated ID matches an existing ID, or if email already exists.
     """
     return create_user(payload)
 
@@ -117,7 +117,7 @@ def password_reset_request(payload: Password_Reset_Request):
     reset_password_request(payload.email)
     return {"detail": "If the email exists, a password reset link has been sent."}
 
-@router.post("/reset-password")
+@router.patch("/password-reset")
 def perform_reset_password(payload: Password_Reset):
     """
     **Resets the password of a user with a valid password reset token.**
@@ -141,7 +141,7 @@ def update_password_logged_in(user_id: str, payload: Password_Update_When_Logged
 
     Parameters:
     *   **user_id** (str): the identifier for the account to be updated. must match the logged in user's id
-    *   **payload** (Password_Reset): the password reset token and desired new password
+    *   **payload** (Password_Update_When_Logged_In): authenticated user's email & password, as well as desired new password 
     *   **current_user** (User): the authenticated user. automatically passed as argument.
 
     Returns:
