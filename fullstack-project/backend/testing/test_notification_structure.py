@@ -86,7 +86,7 @@ def test_read_missing_notif(mock_load, notification):
     assert e.value.status_code == 404
 
 # test that HTTP 404 status is raised when user is not a recipient
-def test_read_missing_notif(mock_load, notification):
+def read_notif_not_recipient(mock_load, notification):
     mock_load.return_value = []
     notification.save()
     with pytest.raises(HTTPException) as e:
