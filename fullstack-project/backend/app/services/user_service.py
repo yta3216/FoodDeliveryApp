@@ -246,7 +246,7 @@ def get_notifications(user_id: str) -> list[Notification_Response]:
         list[Notification_Response]: the user's notifications
     """
     notifs = load_notifications()
-    user_notifs = [Notification_Response]
+    user_notifs = []
     for notif in notifs:
         if user_id in notif["user_ids"]:
             user_notifs.append(notif)

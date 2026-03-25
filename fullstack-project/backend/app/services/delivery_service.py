@@ -9,7 +9,7 @@ import time
 from fastapi import HTTPException
 from app.repositories.delivery_repo import load_deliveries, save_deliveries
 from app.repositories.user_repo import load_users, save_users
-from app.services.order_service import send_status_notification
+from app.services.order_service import get_order_by_id, send_status_notification
 from app.services.restaurant_service import get_managers, get_restaurant_by_id
 from app.repositories.order_repo import load_orders, save_orders
 from app.services.notification_service import Notification
@@ -208,6 +208,14 @@ async def complete_delivery(order_id: int, driver_id: str) -> Delivery:
             delivery["delay_minutes"] = round(actual_minutes - delivery.get("eta_minutes", 0.0), 2)
             save_deliveries(deliveries)
 
+            orders = load_orders()
+            for order in orders:
+                if order.get("id") == order_id:
+                    order["status"] = "delivered"
+                    save_orders(orders)
+                    await send_status_notification(order)
+                    break
+
             await send_complete_delivery_notification(delivery)
 
             users = load_users()
@@ -290,11 +298,8 @@ async def send_delivery_created_notification(delivery: dict):
     Returns: None
     """
     order_id = delivery.get("order_id")
-    orders = load_orders()
-    for order in orders:
-        if order.get("id") == order_id:
-            order = order
-
+    order = get_order_by_id(order_id)
+    
     customer_id = order["customer_id"]
     driver_id = delivery["driver_id"]
     restaurant_id = order["restaurant_id"]
@@ -319,10 +324,7 @@ async def send_delivery_started_notification(delivery: dict, eta: float):
     Returns: None
     """
     order_id = delivery.get("order_id")
-    orders = load_orders()
-    for order in orders:
-        if order.get("id") == order_id:
-            order = order
+    order = get_order_by_id(order_id)
 
     await send_status_notification(order)
 
@@ -345,10 +347,7 @@ async def send_complete_delivery_notification(delivery: dict):
     Returns: None
     """
     order_id = delivery.get("order_id")
-    orders = load_orders()
-    for order in orders:
-        if order.get("id") == order_id:
-            order = order
+    order = get_order_by_id(order_id)
 
     await send_status_notification(order)
 

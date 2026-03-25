@@ -103,18 +103,7 @@ async def complete_delivery_route(
     *   **HTTPException** (status_code = 403): if user is not the assigned driver for this delivery
     *   **HTTPException** (status_code = 404): if no delivery record is found for this order
     """
-    from app.repositories.order_repo import load_orders, save_orders
-    from app.services.order_service import send_status_notification
-
     delivery = await complete_delivery(order_id=order_id, driver_id=current_user.id)
-
-    orders = load_orders()
-    for order in orders:
-        if order.get("id") == order_id:
-            order["status"] = "delivered"
-            save_orders(orders)
-            await send_status_notification(order)
-            break
 
     return delivery
 
