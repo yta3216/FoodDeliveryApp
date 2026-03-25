@@ -263,3 +263,26 @@ async def send_refund_notification(order: dict, reason: str = None) -> None:
 
     notification = Notification(message, notified_users)
     await notification.send_to_users()
+
+def _set_order_status(order_id: int, status: str) -> dict:
+    """
+    Updates the status of an order.
+
+    Parameters:
+        order_id (int): the identifier of the order to update
+        status (str): new status value
+
+    Returns:
+        dict: updated order dict
+
+    Raises:
+        HTTPException (status_code = 404): if order is not found
+    """
+    orders = load_orders()
+    for order in orders:
+        if order.get("id") == order_id:
+            order["status"] = status
+            save_orders(orders)
+            return order
+
+    raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
