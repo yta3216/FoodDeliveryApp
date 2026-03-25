@@ -15,6 +15,7 @@ from app.services.receipt_service import get_receipt, refresh_receipt
 from app.services.restaurant_service import get_restaurant_by_id
 from app.services.config_service import get_tax_rate
 
+_processing: set[int] = set()
 
 def _validate_payment(payment: PaymentRequest) -> tuple[bool, str]:
     """
@@ -48,24 +49,39 @@ def _validate_payment(payment: PaymentRequest) -> tuple[bool, str]:
 
     return True, ""
 
-async def process_payment(payment: PaymentRequest, current_user: Customer) -> PaymentResponse:
+async def _check_duplicate(receipt_id: int, current_user: Customer) ->  None:
     """
-    Validates payment and, only on success, creates the order.
+    Checks if a payment for this receipt id is already being processed.
+    Notifies customer if there is a duplicate payment.
 
     Parameters:
-        payment (PaymentRequest): the payment details submitted by the customer
-        current_user (Customer): the authenticated user with role customer
-
-    Returns:
-        PaymentResponse: contains payment_status, message, and the created order on success
+        receipt_id (int): the receipt_id to check
+        current_user (Customer): the authenticated customer
 
     Raises:
-        HTTPException (status_code = 400): if payment validation fails. cart is left untouched and no order is created
-        HTTPException (status_code = 409): if either the delivery fee or tax rate has changed since the receipt was created. Will auto-refresh the receipt.
+        HTTPException (status_code = 400): if receipt_id is already being processed
+    """
+
+    if receipt_id in _processing:
+        notification = Notification(
+            message = f"Duplicate payment detected for receipt #{receipt_id}. Your payment is already being processed.", 
+            user_ids = [current_user.id])
+        await notification.send_to_users()
+        raise HTTPException(status_code=400, detail="Duplicate payment submission. Please wait.")
+
+async def _check_fees(receipt, current_user: Customer) -> None:
+    """
+    Checks if the restaurant's delivery fee or tax rate has changed since the receipt was created.
+    Updates the receipt and raises 409 if it has changed.
+
+    Parameters:
+        receipt (Receipt): the receipt to check
+        current_user (Customer): the authenticated customer
+
+    Raises:
+        HTTPException (status_code = 409): if the delivery fee or tax rate has changed
     """
     
-    receipt = get_receipt(payment.receipt_id)
-
     if (get_restaurant_by_id(receipt.restaurant_id)["delivery_fee"] != receipt.delivery_fee):
         refresh_receipt(receipt.id, current_user)
         raise HTTPException(status_code=409, detail="The restaurant's delivery fee has changed. Please try again.")
@@ -74,8 +90,24 @@ async def process_payment(payment: PaymentRequest, current_user: Customer) -> Pa
         refresh_receipt(receipt.id, current_user)
         raise HTTPException(status_code=409, detail="The tax rate has changed. Please try again.")
 
+async def _execute_payment(payment: PaymentRequest, current_user: Customer, receipt) -> PaymentResponse:
+    """
+    Validates card details and create order if payment is successful
+    Notifies the customer if payment failed
+
+    Parameters:
+        payment (PaymentRequest): the payment details
+        current_user (Customer): the authenticated customer
+        receipt (Receipt): the receipt to create the order from
+    
+    Returns:
+        PaymentResponse: contains payment_status, message, and the create order if successful
+    
+    Raises:
+        HTTPException (status_code = 400): if payment validation fails
+    """
     is_valid, error_message = _validate_payment(payment)
- 
+
     if not is_valid:
         notification = Notification(
             message=f"Payment failed: {error_message} Please try again.",
@@ -91,3 +123,35 @@ async def process_payment(payment: PaymentRequest, current_user: Customer) -> Pa
         message="Payment successful. Your order has been placed.",
         order=order
     )
+    
+async def process_payment(payment: PaymentRequest, current_user: Customer) -> PaymentResponse:
+    """
+    Full payment flow breakdown:
+    1. Checks for duplicated payment
+    2. Loads and validates the receipt
+    3. Checks updates on delivery fee and taxes, refresh receipt
+    4. Validate card details and create order if payment is successful
+
+    Parameters:
+        payment (PaymentRequest): the payment details submitted by the customer
+        current_user (Customer): the authenticated user with role customer
+
+    Returns:
+        PaymentResponse: contains payment_status, message, and the created order on success
+
+    Raises:
+        HTTPException (status_code = 400): if duplicate payments or failed payment validation
+        HTTPException (status_code = 409): if either the delivery fee or tax rate has changed since the receipt was created. Will auto-refresh the receipt.
+    """
+    await _check_duplicate(payment.receipt_id, current_user)
+ 
+    _processing.add(payment.receipt_id)
+ 
+    try:
+        receipt = get_receipt(payment.receipt_id)
+        await _check_fees(receipt, current_user)
+        return await _execute_payment(payment, current_user, receipt)
+ 
+    finally:
+        _processing.discard(payment.receipt_id)
+    

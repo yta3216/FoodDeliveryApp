@@ -7,6 +7,7 @@ from app.schemas.user_schema import UserRole
 from app.repositories.user_repo import load_users
 from app.repositories.order_repo import load_orders
 from app.services.restaurant_service import get_restaurant_by_id
+from app.services import payment_service
 from testing.test_restaurant_crud import setup_restaurant, VALID_RESTAURANT_ADDRESS
 
 client = TestClient(app)
@@ -26,7 +27,7 @@ def customer_with_token():
     test_customer = client.post(
         "/user",
         json={
-            "email": "customer_pay@example.com",
+            "email": "customer_pay2@example.com",
             "password": "testpassword",
             "name": "John Kwon",
             "age": 25,
@@ -54,7 +55,7 @@ def manager_with_token():
     test_manager = client.post(
         "/user",
         json={
-            "email": "manager_pay@example.com",
+            "email": "manager_pay2@example.com",
             "password": "testpassword",
             "name": "Kwon John",
             "age": 30,
@@ -376,3 +377,65 @@ def test_failed_payment_cart_preserved(customer_with_cart_and_token):
 
     cart_after = get_customer_from_db(customer_id)["cart"]
     assert cart_after == cart_before
+
+# test that receipt_id is added to _processing during payment
+def test_receipt_id_in_processing_during_payment(customer_with_cart_and_token):
+    token = customer_with_cart_and_token["token"]
+    receipt_id = get_receipt_id(token)
+ 
+    payment_service._processing.add(receipt_id)
+    assert receipt_id in payment_service._processing
+ 
+    payment_service._processing.discard(receipt_id)
+    assert receipt_id not in payment_service._processing
+ 
+ 
+# test that duplicate submission is blocked when receipt_id is in _processing
+def test_duplicate_submission_blocked(customer_with_cart_and_token):
+    token = customer_with_cart_and_token["token"]
+    customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
+ 
+    payment_service._processing.add(receipt_id)
+ 
+    try:
+        response = client.post(
+            "/payment/checkout",
+            json={**VALID_PAYMENT, "receipt_id": receipt_id},
+            headers={"Authorization": f"Bearer {token}"}
+        )
+ 
+        assert response.status_code == 400
+        assert "Duplicate" in response.json()["detail"]
+        assert len(get_orders_for_customer(customer_id)) == 0
+    finally:
+        payment_service._processing.discard(receipt_id)
+ 
+ 
+# test that receipt_id is removed from _processing after successful payment
+def test_receipt_id_removed_after_successful_payment(customer_with_cart_and_token):
+    token = customer_with_cart_and_token["token"]
+    receipt_id = get_receipt_id(token)
+ 
+    client.post(
+        "/payment/checkout",
+        json={**VALID_PAYMENT, "receipt_id": receipt_id},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+ 
+    assert receipt_id not in payment_service._processing
+ 
+ 
+# test that receipt_id is removed from _processing after failed payment
+def test_receipt_id_removed_after_failed_payment(customer_with_cart_and_token):
+    token = customer_with_cart_and_token["token"]
+    receipt_id = get_receipt_id(token)
+ 
+    client.post(
+        "/payment/checkout",
+        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "0000000000000000"},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+ 
+    assert receipt_id not in payment_service._processing
+ 
