@@ -1,1 +1,39 @@
-[]
+[
+  {
+    "id": 1,
+    "user_ids": [
+      "ed49a235-7b2d-4715-bde2-b70f400bb006",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 1 from Tossings Pizza set to status: delivering",
+    "is_read": {
+      "ed49a235-7b2d-4715-bde2-b70f400bb006": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": true
+    },
+    "time": "2026/03/25 21:55"
+  },
+  {
+    "id": 2,
+    "user_ids": [
+      "ed49a235-7b2d-4715-bde2-b70f400bb006"
+    ],
+    "message": "Order 1 from Tossings Pizza will arrive in approximately 9.0 minutes via bike.",
+    "is_read": {
+      "ed49a235-7b2d-4715-bde2-b70f400bb006": false
+    },
+    "time": "2026/03/25 21:55"
+  },
+  {
+    "id": 3,
+    "user_ids": [
+      "1fa6db81-ed28-4267-ba15-9ee610cc359f",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 2 from Koi Sushi set to status: pending",
+    "is_read": {
+      "1fa6db81-ed28-4267-ba15-9ee610cc359f": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/03/25 21:55"
+  }
+]

@@ -1,1 +1,114 @@
-[]
+[
+  {
+    "id": "553f296c-6f84-48d0-942f-b36530935844",
+    "email": "admin1@example.com",
+    "password": "admin1",
+    "name": "John Admin",
+    "age": 67,
+    "gender": "Prefer not to say",
+    "role": "admin",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "auth_token": "QSTgADz53O_dIkVIMsqgJzXnhEvTX7uV7u1IjwTSblo",
+    "auth_token_expiry": 1806036929
+  },
+  {
+    "id": "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+    "email": "JohnManager32@example.com",
+    "password": "johnmanager32",
+    "name": "John Manager",
+    "age": 40,
+    "gender": "male",
+    "role": "manager",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "auth_token": "j0VjF6iu1ruX0WznY5f85tZz4fE5NKAwzneO-RY9FuI",
+    "auth_token_expiry": 1774587541.914036
+  },
+  {
+    "id": "498c8f4b-0006-4bc8-9b0b-4025b3d64a09",
+    "email": "JaneManager65@example.com",
+    "password": "janemanager65",
+    "name": "Jane Manager",
+    "age": 34,
+    "gender": "female",
+    "role": "manager",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "auth_token": "eElPxGagXa-hStldhQt1-qhiFS4ZvxX6EwDuxtRT8lw",
+    "auth_token_expiry": 1806036929
+  },
+  {
+    "id": "ed49a235-7b2d-4715-bde2-b70f400bb006",
+    "email": "JaneCustomer54@example.com",
+    "password": "janecustomer54",
+    "name": "Jane Customer",
+    "age": 28,
+    "gender": "female",
+    "role": "customer",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "auth_token": "an309GXmZHO5P1I820GiyLowvNUm8bcQdW7Wi8ilAEM",
+    "auth_token_expiry": 1806036929,
+    "cart": {
+      "restaurant_id": 1,
+      "cart_items": [
+        {
+          "menu_item_id": 1,
+          "qty": 2
+        },
+        {
+          "menu_item_id": 3,
+          "qty": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "1fa6db81-ed28-4267-ba15-9ee610cc359f",
+    "email": "JohnCustomer69@example.com",
+    "password": "johncustomer69",
+    "name": "John Customer",
+    "age": 22,
+    "gender": "male",
+    "role": "customer",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "auth_token": "b1qLvSbAwl8SRAadKqxMnw7YojRC1JB38eqbRZNBx1g",
+    "auth_token_expiry": 1806036929,
+    "cart": {
+      "restaurant_id": 0,
+      "cart_items": []
+    }
+  },
+  {
+    "id": "63f32ca9-e8d6-4e22-a0ff-de8d252b30e1",
+    "email": "JaneDriver78@example.com",
+    "password": "janedriver78",
+    "name": "Jane Driver",
+    "age": 23,
+    "gender": "female",
+    "role": "driver",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "auth_token": "EjnOKaO4x-NPKU7jTWqf7l-FIjwPpRJ1OzqUUtwTr6E",
+    "auth_token_expiry": 1806036929,
+    "vehicle": "bike",
+    "driver_status": "available"
+  },
+  {
+    "id": "e580a1ce-62c0-46a2-81d6-dc1893559c28",
+    "email": "JohnDriver8@example.com",
+    "password": "johndriver8",
+    "name": "John Driver",
+    "age": 33,
+    "gender": "male",
+    "role": "driver",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "auth_token": "ZSyn_K6Ygg3ahpCQBDwtb7cNuXrnkfhZPLfn7djU8QA",
+    "auth_token_expiry": 1806036929,
+    "vehicle": "car",
+    "driver_status": "available"
+  }
+]

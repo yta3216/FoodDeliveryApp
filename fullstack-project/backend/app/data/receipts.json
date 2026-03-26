@@ -1,1 +1,56 @@
-[]
+[
+  {
+    "id": 1,
+    "customer_id": "ed49a235-7b2d-4715-bde2-b70f400bb006",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      },
+      {
+        "menu_item_id": 3,
+        "name": "Meat Lover's Pizza",
+        "unit_price": 12.99,
+        "qty": 1,
+        "line_total": 12.99
+      }
+    ],
+    "subtotal": 32.97,
+    "tax": 3.96,
+    "delivery_fee": 2.99,
+    "distance_km": 3.0,
+    "total": 39.92,
+    "date_created": "2026-03-26T04:55:29.764792+00:00"
+  },
+  {
+    "id": 2,
+    "customer_id": "1fa6db81-ed28-4267-ba15-9ee610cc359f",
+    "restaurant_id": 2,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "California Roll",
+        "unit_price": 8.99,
+        "qty": 2,
+        "line_total": 17.98
+      },
+      {
+        "menu_item_id": 5,
+        "name": "Miso Soup",
+        "unit_price": 2.99,
+        "qty": 1,
+        "line_total": 2.99
+      }
+    ],
+    "subtotal": 20.97,
+    "tax": 2.52,
+    "delivery_fee": 3.99,
+    "distance_km": 2.5,
+    "total": 27.48,
+    "date_created": "2026-03-26T04:55:29.764792+00:00"
+  }
+]

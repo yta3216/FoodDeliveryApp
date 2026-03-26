@@ -1,1 +1,218 @@
-[]
+[
+  {
+    "id": 1,
+    "name": "Tossings Pizza",
+    "city": "Kelowna",
+    "address": {
+      "street": "123 Main St",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1V 1A1"
+    },
+    "manager_ids": [
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "delivery_fee": 2.99,
+    "menu": {
+      "items": [
+        {
+          "id": 1,
+          "name": "Pepperoni Pizza",
+          "price": 9.99,
+          "tags": [
+            "cheese",
+            "pepperoni"
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Cheese Pizza",
+          "price": 10.99,
+          "tags": [
+            "cheese",
+            "vegetarian"
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Meat Lover's Pizza",
+          "price": 12.99,
+          "tags": [
+            "pepperoni",
+            "sausage",
+            "bacon"
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Fries",
+          "price": 3.99,
+          "tags": [
+            "side"
+          ]
+        },
+        {
+          "id": 5,
+          "name": "Chicken Wings",
+          "price": 7.99,
+          "tags": [
+            "side"
+          ]
+        },
+        {
+          "id": 6,
+          "name": "Cola",
+          "price": 3.99,
+          "tags": [
+            "drink"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "name": "Koi Sushi",
+    "city": "Kelowna",
+    "address": {
+      "street": "321 Naim Rd",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1V 2A9"
+    },
+    "manager_ids": [
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "max_delivery_radius_km": 8.0,
+    "delivery_fee": 3.99,
+    "menu": {
+      "items": [
+        {
+          "id": 1,
+          "name": "California Roll",
+          "price": 8.99,
+          "tags": [
+            "sushi"
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Spicy Tuna Roll",
+          "price": 10.99,
+          "tags": [
+            "sushi",
+            "spicy"
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Salmon Nigiri",
+          "price": 6.99,
+          "tags": [
+            "sushi"
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Edamame",
+          "price": 3.49,
+          "tags": [
+            "side",
+            "vegetarian"
+          ]
+        },
+        {
+          "id": 5,
+          "name": "Miso Soup",
+          "price": 2.99,
+          "tags": [
+            "side"
+          ]
+        },
+        {
+          "id": 6,
+          "name": "Green Tea",
+          "price": 1.99,
+          "tags": [
+            "drink"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "name": "Montana's Steakhouse",
+    "city": "Kelowna",
+    "address": {
+      "street": "789 Gilbert Ave",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1Y 6S4"
+    },
+    "manager_ids": [
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "max_delivery_radius_km": 15.0,
+    "delivery_fee": 1.99,
+    "menu": {
+      "items": [
+        {
+          "id": 1,
+          "name": "Grilled Salmon",
+          "price": 17.99,
+          "tags": [
+            "seafood",
+            "grilled"
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Ribeye Steak",
+          "price": 32.99,
+          "tags": [
+            "steak",
+            "grilled"
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Chicken Parmesan",
+          "price": 16.99,
+          "tags": [
+            "chicken",
+            "grilled"
+          ]
+        },
+        {
+          "id": 4,
+          "name": "Garlic Bread",
+          "price": 4.99,
+          "tags": [
+            "side",
+            "vegetarian"
+          ]
+        },
+        {
+          "id": 5,
+          "name": "Caesar Salad",
+          "price": 6.99,
+          "tags": [
+            "side",
+            "vegetarian"
+          ]
+        },
+        {
+          "id": 6,
+          "name": "Pepsi",
+          "price": 4.49,
+          "tags": [
+            "drink"
+          ]
+        }
+      ]
+    }
+  }
+]
