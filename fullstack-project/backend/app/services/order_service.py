@@ -91,7 +91,7 @@ def get_orders_for_customer(current_customer: Customer) -> list[Order]:
     return [Order(**order) for order in orders if order.get("customer_id") == current_customer.id]
 
 
-def get_orders_for_restaurant(restaurant_id: int, manager_id: int) -> list[Order]:
+def get_orders_for_restaurant(restaurant_id: int, manager_id: str) -> list[Order]:
     """
     Retrieves all orders associated with a restaurant.
     May only be accessed by a valid manager of that restaurant.
@@ -152,7 +152,7 @@ async def cancel_order(order_id: int, current_user: Customer) -> Order:
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
 
-async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -> Order:
+async def accept_reject_order(order_id: int, new_status: str, manager_id: str) -> Order:
     """
     Accepts or rejects a pending order for a restaurant which the provided manager manages.
     If accepted and the order is within the delivery radius, a driver is assigned if available.
@@ -211,8 +211,8 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: int) -
             driver = find_available_driver(required_vehicle)
 
             if driver:
-                delivery = await create_delivery(order_id, driver["id"], distance_km)
-                set_driver_status_to_delivering(driver["id"])
+                delivery = await create_delivery(order_id, driver.id, distance_km)
+                set_driver_status_to_delivering(driver.id)
                 order.status = "preparing"
                 order.delivery_id = delivery.id
                 order_data["status"] = "preparing"

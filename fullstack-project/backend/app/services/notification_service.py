@@ -61,18 +61,18 @@ class Notification():
         return max(notif["id"] for notif in notifs) + 1
 
     @classmethod
-    def model_to_Notification(cls, notif_dict: Notification_Response):
+    def model_to_Notification(cls, notif_data: Notification_Response):
         """
         Converts the current Notification_Response pydantic model to Notification class
         so that methods can be used.
 
         Parameters:
-            notif_dict (Notification_Response): the notification data as a pydantic model
+            notif_data (Notification_Response): the notification data as a pydantic model
         
         Returns:
             Notification: a Notification object with the same data as the pydantic model
         """
-        notif_data = notif_dict.model_dump()
+        notif_data = notif_data.model_dump()
         notif = cls(notif_data["message"], notif_data["user_ids"])
         notif.id = notif_data["id"]
         notif.is_read = notif_data["is_read"]
