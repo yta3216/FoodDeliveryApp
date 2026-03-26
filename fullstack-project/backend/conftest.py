@@ -2,6 +2,7 @@ import sys
 import shutil
 from pathlib import Path
 import pytest
+import json
 
 # Add the backend directory to sys.path so pytest can find 'app'
 sys.path.insert(0, str(Path(__file__).parent))
@@ -16,6 +17,10 @@ def backup_and_restore_data():
     # Backup
     for f in json_files:
         shutil.copy(f, f.with_suffix(".backup"))
+        if (f.name == "config.json"):
+            f.write_text(json.dumps({}))
+        else:
+            f.write_text(json.dumps([]))
 
     yield  # Run all tests
 
