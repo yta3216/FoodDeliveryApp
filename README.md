@@ -30,6 +30,6 @@ Team Members:
 Run the following prompts in your terminal (from the backend directory):
 *(remove existing coverage reports from git if needed: git rm -r testing/coverage-reports-html)*
 
-pytest testing --cov --cov-report=term --cov-report=html:testing/coverage-reports-html
+pytest testing --cov --cov-report=term --cov-report=markdown:testing/coverage-reports/coverage_report_md --cov-report=html:testing/coverage-reports/html-reports
 
-*Note: if you would like to commit these reports to GitHub, you will need to delete the .gitignore file in the coverage report folder.*
+*Note: if you would like to commit these reports to GitHub, you will need to delete the .gitignore file in the coverage-reports/html folder.*
