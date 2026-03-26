@@ -9,6 +9,7 @@ from fastapi import HTTPException
 
 from app.schemas.user_schema import Customer
 from app.schemas.payment_schema import PaymentRequest, PaymentResponse
+from app.schemas.receipt_schema import Receipt
 from app.services.order_service import create_order_from_receipt
 from app.services.notification_service import Notification
 from app.services.receipt_service import get_receipt, refresh_receipt
@@ -69,7 +70,7 @@ async def _check_duplicate(receipt_id: int, current_user: Customer) ->  None:
         await notification.send_to_users()
         raise HTTPException(status_code=400, detail="Duplicate payment submission. Please wait.")
 
-async def _check_fees(receipt, current_user: Customer) -> None:
+async def _check_fees(receipt: Receipt, current_user: Customer) -> None:
     """
     Checks if the restaurant's delivery fee or tax rate has changed since the receipt was created.
     Updates the receipt and raises 409 if it has changed.
@@ -82,7 +83,8 @@ async def _check_fees(receipt, current_user: Customer) -> None:
         HTTPException (status_code = 409): if the delivery fee or tax rate has changed
     """
     
-    if (get_restaurant_by_id(receipt.restaurant_id)["delivery_fee"] != receipt.delivery_fee):
+    restaurant = get_restaurant_by_id(receipt.restaurant_id)
+    if restaurant.delivery_fee != receipt.delivery_fee:
         refresh_receipt(receipt.id, current_user)
         raise HTTPException(status_code=409, detail="The restaurant's delivery fee has changed. Please try again.")
     
@@ -90,7 +92,7 @@ async def _check_fees(receipt, current_user: Customer) -> None:
         refresh_receipt(receipt.id, current_user)
         raise HTTPException(status_code=409, detail="The tax rate has changed. Please try again.")
 
-async def _execute_payment(payment: PaymentRequest, current_user: Customer, receipt) -> PaymentResponse:
+async def _execute_payment(payment: PaymentRequest, current_user: Customer, receipt: Receipt) -> PaymentResponse:
     """
     Validates card details and create order if payment is successful
     Notifies the customer if payment failed

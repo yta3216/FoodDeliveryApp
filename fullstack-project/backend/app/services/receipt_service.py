@@ -37,7 +37,7 @@ def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
         raise HTTPException(status_code=400, detail="Cart is empty.")
 
     restaurant = get_restaurant_by_id(cart.restaurant_id)
-    menu_items = {item["id"]: item for item in restaurant["menu"]["items"]}
+    menu_items = {item.id: item for item in restaurant.menu.items}
 
     receipt_items = []
     subtotal = 0.0
@@ -45,12 +45,12 @@ def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
     for cart_item in cart.cart_items:
         menu_item = menu_items.get(cart_item.menu_item_id)
         if menu_item:
-            unit_price = menu_item.get("price", 0.0)
+            unit_price = menu_item.price
             line_total = round(unit_price * cart_item.qty, 2)
             subtotal += line_total
             receipt_items.append(ReceiptItem(
                 menu_item_id=cart_item.menu_item_id,
-                name=menu_item.get("name", ""),
+                name=menu_item.name,
                 unit_price=unit_price,
                 qty=cart_item.qty,
                 line_total=line_total
@@ -58,7 +58,7 @@ def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
 
     subtotal = round(subtotal, 2)
     tax = round(get_tax_rate() * subtotal, 2)
-    delivery_fee = restaurant.get("delivery_fee", 0.0)
+    delivery_fee = restaurant.delivery_fee
     total = round(subtotal + tax + delivery_fee, 2)
 
     receipts = load_receipts()
@@ -120,4 +120,4 @@ def refresh_receipt(receipt_id: int, current_user: Customer) -> Receipt:
     if current_receipt.customer_id != current_user.id:
         raise HTTPException(status_code=403, detail="Cannot refresh a receipt that belongs to another user.")
 
-    return create_receipt(current_user)
+    return create_receipt(current_user, current_receipt.distance_km)

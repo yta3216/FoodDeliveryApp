@@ -18,7 +18,7 @@ from app.schemas.user_schema import UserRole
 router = APIRouter(prefix="/order", tags=["order"])
 
 
-@router.get("/customer", response_model=list[Order], status_code=200, dependencies=[Depends(get_customer)])
+@router.get("/customer", response_model=list[Order], status_code=200)
 def get_orders_for_customer_route(current_user: Customer = Depends(get_customer)):
     """
     **Retrieves all orders associated with the logged-in customer.**
@@ -36,7 +36,7 @@ def get_orders_for_customer_route(current_user: Customer = Depends(get_customer)
     return get_orders_for_customer(current_customer=current_user)
 
 
-@router.get("/restaurant/{restaurant_id}", response_model=list[Order], status_code=200, dependencies=[Depends(check_manager)])
+@router.get("/restaurant/{restaurant_id}", response_model=list[Order], status_code=200)
 def get_orders_for_restaurant_route(restaurant_id: int, current_user: User = Depends(check_manager)):
     """
     **Retrieves all orders associated with a given restaurant. Must be called by one of the restaurant's managers.**
@@ -56,7 +56,7 @@ def get_orders_for_restaurant_route(restaurant_id: int, current_user: User = Dep
     return get_orders_for_restaurant(restaurant_id=restaurant_id, manager_id=current_user.id)
 
 
-@router.delete("/{order_id}", response_model=Order, status_code=200, dependencies=[Depends(get_customer)])
+@router.delete("/{order_id}", response_model=Order, status_code=200)
 async def cancel_order_route(order_id: int, current_user: Customer = Depends(get_customer)):
     """
     **Cancels a pending order. Only the customer who placed the order may cancel it.**

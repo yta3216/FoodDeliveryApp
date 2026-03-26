@@ -4,6 +4,7 @@ from fastapi import HTTPException
 
 from app.repositories.user_repo import load_users, save_users
 from app.services.restaurant_service import get_restaurant_by_id
+from app.schemas.restaurant_schema import Restaurant
 from app.schemas.user_schema import Customer
 from app.schemas.cart_schema import (
     CartItem,
@@ -11,6 +12,20 @@ from app.schemas.cart_schema import (
     CartItem_Create,
     Cart
 )
+
+
+def _restaurant_has_menu_item(restaurant: Restaurant, menu_item_id: int) -> bool:
+    """
+    Checks whether a restaurant menu contains the given item id.
+
+    Parameters:
+        restaurant (Restaurant): the restaurant whose menu is being checked for the item
+        menu_item_id (int): the menu item id being checked for in the restaurant's menu
+
+    Returns:
+        bool: true if the restaurant's menu contains the item, false otherwise
+    """
+    return any(menu_item.id == menu_item_id for menu_item in restaurant.menu.items)
 
 def update_cart_restaurant(restaurant_id: int, current_user: Customer) -> Cart:
     """
@@ -31,7 +46,7 @@ def update_cart_restaurant(restaurant_id: int, current_user: Customer) -> Cart:
     for user in users:
         if user.get("id") == current_user.id:
             if user["cart"]["restaurant_id"] == restaurant_id:
-                return user["cart"]
+                return Cart(**user["cart"])
             user["cart"] = Cart(restaurant_id=restaurant_id).model_dump()
             save_users(users)
             return Cart(**user["cart"])
@@ -101,7 +116,7 @@ def create_cart_item(payload: CartItem_Create, current_user: Customer) -> CartIt
         raise HTTPException(400, detail=f"User '{current_user.id}' cart has no associated restaurant")
 
     restaurant = get_restaurant_by_id(restaurant_id)
-    if any(menu_item["id"] == payload.menu_item_id for menu_item in restaurant["menu"]["items"]):
+    if _restaurant_has_menu_item(restaurant, payload.menu_item_id):
         for user in users:
             if user.get("id") == current_user.id:
                 new_item = payload.model_dump()

@@ -98,7 +98,7 @@ def setup_restaurant_menu(setup_restaurant):
         headers={"Authorization": f"Bearer {token}"}
     )
     return {
-        "restaurant": get_restaurant_by_id(restaurant['id']),
+        "restaurant": get_restaurant_by_id(restaurant['id']).model_dump(),
         "token": token
     }
 

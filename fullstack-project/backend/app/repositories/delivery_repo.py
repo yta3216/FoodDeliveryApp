@@ -1,9 +1,10 @@
 import json
 from pathlib import Path
+from typing import Any
 
 DELIVERIES_FILE = Path(__file__).parent.parent / "data" / "deliveries.json"
 
-def load_deliveries() -> list:
+def load_deliveries() -> list[dict[str, Any]]:
     if not DELIVERIES_FILE.exists():
         return []
     try:
@@ -22,6 +23,6 @@ def load_deliveries() -> list:
     except Exception:
         return []
 
-def save_deliveries(deliveries: list) -> None:
+def save_deliveries(deliveries: list[dict[str, Any]]) -> None:
     with open(DELIVERIES_FILE, "w", encoding="utf-8") as f:
         json.dump(deliveries, f, indent=2)

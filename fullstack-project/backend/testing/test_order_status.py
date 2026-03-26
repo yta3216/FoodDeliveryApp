@@ -13,6 +13,8 @@ from testing.test_cart_management import (
 )
 from app.services.notification_service import Notification
 from app.services.order_service import send_status_notification
+from app.schemas.order_schema import Order
+from app.schemas.restaurant_schema import Restaurant, Address, Menu
 from testing.test_restaurant_crud import setup_restaurant
 from testing.test_authorization import register_and_login
 
@@ -170,16 +172,25 @@ async def test_send_status_notification(mocker):
     mock_get_managers = mocker.patch("app.services.order_service.get_managers")
     mock_get_managers.return_value = [user_id] # just send it to the user again for testing purposes
     mock_get_restaurant = mocker.patch("app.services.order_service.get_restaurant_by_id")
-    mock_get_restaurant.return_value = {"name": restaurant_name}
-    order = {
-        "id": 5,
-        "customer_id": user_id,
-        "restaurant_id": 9,
-        "status": "pending"
-    }
+    mock_get_restaurant.return_value = Restaurant(
+        id=9,
+        name=restaurant_name,
+        city="Kelowna",
+        address=Address(street="123 Main St", city="Kelowna", province="BC", postal_code="A1A 1A1"),
+        manager_ids=[user_id],
+        menu=Menu(items=[]),
+        delivery_fee=5.0,
+        max_delivery_radius_km=10.0,
+    )
+    order = Order(
+        id = 5,
+        customer_id = user_id,
+        restaurant_id = 9,
+        status = "pending"
+    )
     with client.websocket_connect(
         f"/ws/{user_id}", 
         headers={"Authorization": f"Bearer {token}"}
     ) as websocket:        
         await send_status_notification(order)
-        assert websocket.receive_json()["message"] == f"Order {order['id']} from {restaurant_name} set to status: {order['status']}"
+        assert websocket.receive_json()["message"] == f"Order {order.id} from {restaurant_name} set to status: {order.status}"
