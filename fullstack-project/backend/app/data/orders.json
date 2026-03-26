@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": 1,
+    "customer_id": "ed49a235-7b2d-4715-bde2-b70f400bb006",
+    "restaurant_id": 1,
+    "delivery_id": 1,
+    "receipt_id": 1,
+    "status": "delivering",
+    "distance_km": 3.0,
+    "date_created": "2026-03-26T04:55:29.764792+00:00"
+  },
+  {
+    "id": 2,
+    "customer_id": "1fa6db81-ed28-4267-ba15-9ee610cc359f",
+    "restaurant_id": 2,
+    "delivery_id": 0,
+    "receipt_id": 2,
+    "status": "pending",
+    "distance_km": 2.5,
+    "date_created": "2026-03-26T04:55:29.764792+00:00"
+  }
+]
