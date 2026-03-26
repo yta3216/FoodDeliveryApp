@@ -34,8 +34,6 @@ from app.services.restaurant_service import (
     bulk_menu_item_update,
     check_manager
 )
-from app.services.order_service import get_orders_for_restaurant
-from app.schemas.order_schema import Order
 
 router = APIRouter(prefix="/restaurant", tags=["restaurant"])
 
@@ -203,25 +201,6 @@ def create_menu_item_route(restaurant_id: int, payload: MenuItem_Create):
     *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
     """
     return create_menu_item(restaurant_id, payload)
-
-@router.get("/{restaurant_id}/orders", response_model=list[Order])
-def restaurant_orders_route(restaurant_id: int, current_user: User = Depends(check_manager)):
-    """
-    **Retrieves all orders for a particular restaurant. Must be one of the restaurant managers to use.**
-
-    Parameters:
-    *   **restaurant_id** (int): the identifier of the restaurant to be updated
-    *   **current_user** (User): the authenticated user with role *manager*. automatically passed as argument.
-    
-    Returns:
-    *   **list[Order]**: all orders for the given restaurant
-
-    Raises:
-    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
-    *   **HTTPException** (status_code = 403): if user's role is not "manager" or user is not a manager of the provided restaurant
-    *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
-    """
-    return get_orders_for_restaurant(restaurant_id=restaurant_id, manager_id=current_user.id)
 
 @router.put("/{restaurant_id}/menu/{menu_item_id}", response_model=MenuItem, dependencies=[Depends(check_manager)])
 def update_menu_item_route(restaurant_id: int, menu_item_id: int, payload: MenuItem_Update):

@@ -252,13 +252,13 @@ def get_notifications(user_id: str) -> list[Notification_Response]:
             user_notifs.append(Notification_Response(**notif))
     return user_notifs
 
-def read_notification(notification_id: str, user_id: str) -> Notification_Response:
+def read_notification(notification_id: int, user_id: str) -> Notification_Response:
     """
     Retrieves a notification for the logged in user and marks it as read.
 
     Parameters:
         user_id (str): the identifier of the account to read a notification. must match the logged in user's id
-        notification_id (str): the identifier of the notification to read. user_id must be a recipient
+        notification_id (int): the identifier of the notification to read. user_id must be a recipient
 
     Raises:
         HTTPException (status_code = 404): if this notifications id not found in notifications.json

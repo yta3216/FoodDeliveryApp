@@ -120,4 +120,4 @@ def refresh_receipt(receipt_id: int, current_user: Customer) -> Receipt:
     if current_receipt.customer_id != current_user.id:
         raise HTTPException(status_code=403, detail="Cannot refresh a receipt that belongs to another user.")
 
-    return create_receipt(current_user)
+    return create_receipt(current_user, current_receipt.distance_km)
