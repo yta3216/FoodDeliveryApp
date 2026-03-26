@@ -43,7 +43,7 @@ def get_car_speed_default() -> float:
     return load_config().get("CAR_SPEED_KMH", 50.0)
 
 def get_bike_max_distance_default() -> float:
-    return load_config().get("BIKE_MAX_DISTANCE_KMH", 5.0)
+    return load_config().get("BIKE_MAX_DISTANCE_KM", 5.0)
 
 def get_reset_token_expiry_default() -> float:
     return load_config().get("RESET_TOKEN_EXPIRY", 900)

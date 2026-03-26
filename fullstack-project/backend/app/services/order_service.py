@@ -57,6 +57,24 @@ async def create_order_from_receipt(current_user: Customer, receipt: Receipt) ->
 
     return new_order
 
+def get_order_by_id(order_id: int) -> Order:
+    """
+    Retrieves an order by its identifier.
+
+    Parameters:
+        order_id (int): the identifier of the order to retrieve
+
+    Returns:
+        Order: the order with the provided identifier
+
+    Raises:
+        HTTPException (status_code = 404): if no order with the provided id exists
+    """
+    orders = load_orders()
+    for order in orders:
+        if order.get("id") == order_id:
+            return Order(**order)
+    raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
 def get_orders_for_customer(current_customer: Customer) -> list[Order]:
     """
@@ -245,3 +263,26 @@ async def send_refund_notification(order: dict, reason: str = None) -> None:
 
     notification = Notification(message, notified_users)
     await notification.send_to_users()
+
+def _set_order_status(order_id: int, status: str) -> dict:
+    """
+    Updates the status of an order.
+
+    Parameters:
+        order_id (int): the identifier of the order to update
+        status (str): new status value
+
+    Returns:
+        dict: updated order dict
+
+    Raises:
+        HTTPException (status_code = 404): if order is not found
+    """
+    orders = load_orders()
+    for order in orders:
+        if order.get("id") == order_id:
+            order["status"] = status
+            save_orders(orders)
+            return order
+
+    raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")

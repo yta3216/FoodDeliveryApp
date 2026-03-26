@@ -13,7 +13,7 @@ default = {
     # defaults for delivery_service
     "BIKE_SPEED_KMH": 20.0,
     "CAR_SPEED_KMH": 50.0,
-    "BIKE_MAX_DISTANCE_KMH": 5.0,
+    "BIKE_MAX_DISTANCE_KM": 5.0,
 
     # defaults for user service
     "RESET_TOKEN_EXPIRY": 900, # 15 minutes
