@@ -159,6 +159,9 @@ async def start_delivery(order_id: int, driver_id: str) -> Delivery:
             delivery["eta_minutes"] = eta
             save_deliveries(deliveries)
 
+            order = _set_order_status(order_id, "delivering")
+            await send_status_notification(order)
+
             await send_delivery_started_notification(delivery, eta)
 
             return Delivery(**delivery)
@@ -313,9 +316,7 @@ async def send_delivery_started_notification(delivery: dict, eta: float):
     Returns: None
     """
     order_id = delivery.get("order_id")
-    order = _set_order_status(order_id, "delivering")
-
-    await send_status_notification(order)
+    order = get_order_by_id(order_id).model_dump()
 
     customer_id = order["customer_id"]
     restaurant_id = order["restaurant_id"]
@@ -337,8 +338,6 @@ async def send_complete_delivery_notification(delivery: dict):
     """
     order_id = delivery.get("order_id")
     order = get_order_by_id(order_id).model_dump()
-
-    await send_status_notification(order)
 
     customer_id = order["customer_id"]
     restaurant_id = order["restaurant_id"]
