@@ -324,7 +324,7 @@ def get_restaurant_by_id(restaurant_id: int) -> Restaurant:
     restaurants = load_restaurants()
     for restaurant in restaurants:
         if restaurant.get("id") == restaurant_id:
-            return restaurant
+            return Restaurant(**restaurant)
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
 
 def get_managers(restaurant_id: int) -> list[str]:

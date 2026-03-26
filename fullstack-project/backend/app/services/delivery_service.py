@@ -121,9 +121,10 @@ async def create_delivery(order_id: int, driver_id: str, distance_km: float) -> 
     deliveries.append(new_delivery)
     save_deliveries(deliveries)
 
-    await send_delivery_created_notification(new_delivery)
+    created_delivery = Delivery(**new_delivery)
+    await send_delivery_created_notification(created_delivery)
 
-    return Delivery(**new_delivery)
+    return created_delivery
 
 
 async def start_delivery(order_id: int, driver_id: str) -> Delivery:
@@ -162,9 +163,10 @@ async def start_delivery(order_id: int, driver_id: str) -> Delivery:
             order = _set_order_status(order_id, "delivering")
             await send_status_notification(order)
 
+            delivery = Delivery(**delivery)
             await send_delivery_started_notification(delivery, eta)
 
-            return Delivery(**delivery)
+            return delivery
 
     raise HTTPException(status_code=404, detail=f"Delivery for order '{order_id}' not found.")
 
@@ -208,6 +210,8 @@ async def complete_delivery(order_id: int, driver_id: str) -> Delivery:
             order = _set_order_status(order_id, "delivered")
             await send_status_notification(order)
 
+            delivery = Delivery(**delivery)
+
             await send_complete_delivery_notification(delivery)
 
             users = load_users()
@@ -217,7 +221,7 @@ async def complete_delivery(order_id: int, driver_id: str) -> Delivery:
                     break
             save_users(users)
 
-            return Delivery(**delivery)
+            return delivery
 
     raise HTTPException(status_code=404, detail=f"Delivery for order '{order_id}' not found.")
 
@@ -279,70 +283,67 @@ async def check_waiting_orders(driver: dict) -> None:
             break
     save_orders(orders)
 
-async def send_delivery_created_notification(delivery: dict):
+async def send_delivery_created_notification(delivery: Delivery):
     """
     Sends a notification to the customer and driver that the driver has
     been assigned to deliver the customer's order.
 
     Parameters:
-        delivery (dict): the delivery that triggered the notification
+        delivery (Delivery): the delivery that triggered the notification
     
     Returns: None
     """
-    order_id = delivery.get("order_id")
-    order = get_order_by_id(order_id).model_dump()
+    order = get_order_by_id(delivery.order_id)
 
-    customer_id = order["customer_id"]
-    driver_id = delivery["driver_id"]
-    restaurant_id = order["restaurant_id"]
+    customer_id = order.customer_id
+    driver_id = delivery.driver_id
+    restaurant_id = order.restaurant_id
     manager_ids = get_managers(restaurant_id)
-    restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
+    restaurant_name = get_restaurant_by_id(restaurant_id).name
     notified_users = [customer_id] + manager_ids
     notification = Notification(
-        f"Order {order['id']} from {restaurant_name} has been assigned to driver {driver_id}"
+        f"Order {order.id} from {restaurant_name} has been assigned to driver {driver_id}"
         f" for delivery. Order will be delivered when food is ready.", notified_users)
     await notification.send_to_users()
 
 
-async def send_delivery_started_notification(delivery: dict, eta: float):
+async def send_delivery_started_notification(delivery: Delivery, eta: float):
     """
     Sends a notification to the customer that order has been set to delivering status,
     and another to notify them of delivery eta and transportation method.
 
     Parameters:
-        delivery (dict): the delivery that triggered the notification
+        delivery (Delivery): the delivery that triggered the notification
         eta (float): the eta for this order
 
     Returns: None
     """
-    order_id = delivery.get("order_id")
-    order = get_order_by_id(order_id).model_dump()
+    order = get_order_by_id(delivery.order_id)
 
-    customer_id = order["customer_id"]
-    restaurant_id = order["restaurant_id"]
-    restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
-    vehicle = delivery["method"]
+    customer_id = order.customer_id
+    restaurant_id = order.restaurant_id
+    restaurant_name = get_restaurant_by_id(restaurant_id).name
+    vehicle = delivery.method
     notification = Notification(
-        f"Order {order['id']} from {restaurant_name} will arrive in approximately "
+        f"Order {order.id} from {restaurant_name} will arrive in approximately "
         f"{eta} minutes via {vehicle}.", [customer_id])
     await notification.send_to_users()
 
-async def send_complete_delivery_notification(delivery: dict):
+async def send_complete_delivery_notification(delivery: Delivery):
     """
     Sends a notification to the customer that order has been delivered.
 
     Parameters:
-        delivery (dict): the delivery that triggered the notification
+        delivery (Delivery): the delivery that triggered the notification
 
     Returns: None
     """
-    order_id = delivery.get("order_id")
-    order = get_order_by_id(order_id).model_dump()
+    order = get_order_by_id(delivery.order_id)
 
-    customer_id = order["customer_id"]
-    restaurant_id = order["restaurant_id"]
-    restaurant_name = get_restaurant_by_id(restaurant_id)["name"]
-    time = delivery["actual_minutes"]
+    customer_id = order.customer_id
+    restaurant_id = order.restaurant_id
+    restaurant_name = get_restaurant_by_id(restaurant_id).name
+    time = delivery.actual_minutes
     notification = Notification(
-        f"Order {order['id']} from {restaurant_name} was delivered in {time} minutes", [customer_id])
+        f"Order {order.id} from {restaurant_name} was delivered in {time} minutes", [customer_id])
     await notification.send_to_users()

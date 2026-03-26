@@ -105,9 +105,9 @@ def customer_with_cart_and_token(customer_with_token, setup_restaurant_menu):
     customer = customer_with_token["customer"]
     token = customer_with_token["token"]
     restaurant = setup_restaurant_menu["restaurant"]
-    restaurant_id = restaurant["id"]
-    item1_id = restaurant["menu"]["items"][0]["id"]
-    item2_id = restaurant["menu"]["items"][1]["id"]
+    restaurant_id = restaurant.id
+    item1_id = restaurant.menu.items[0].id
+    item2_id = restaurant.menu.items[1].id
 
     # set cart restaurant
     set_restaurant_response = client.patch(
@@ -194,12 +194,12 @@ def test_checkout_fails_delivery_fee_changes(customer_with_cart_and_token, setup
     receipt = get_receipt_id(token)
 
     response = client.put(
-        f"/restaurant/{restaurant['id']}",
+        f"/restaurant/{restaurant.id}",
         json={
-            "id": restaurant["id"],
-            "name": restaurant["name"],
-            "city": restaurant["city"],
-            "address": restaurant["address"],
+            "id": restaurant.id,
+            "name": restaurant.name,
+            "city": restaurant.city,
+            "address": restaurant.address.model_dump(),
             "delivery_fee": 6.76
         },
         headers={"Authorization": f"Bearer {manager}"}

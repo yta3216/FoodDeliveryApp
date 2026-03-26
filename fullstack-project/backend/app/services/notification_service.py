@@ -72,10 +72,11 @@ class Notification():
         Returns:
             Notification: a Notification object with the same data as the pydantic model
         """
-        notif = cls(notif_dict.get("message"), notif_dict.get("user_ids"))
-        notif.id = notif_dict.get("id")
-        notif.is_read = notif_dict.get("is_read")
-        notif.time = notif_dict.get("time")
+        notif_data = notif_dict.model_dump()
+        notif = cls(notif_data["message"], notif_data["user_ids"])
+        notif.id = notif_data["id"]
+        notif.is_read = notif_data["is_read"]
+        notif.time = notif_data["time"]
         return notif
 
     def to_model(self) -> Notification_Response:

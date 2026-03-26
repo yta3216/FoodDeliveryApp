@@ -249,7 +249,7 @@ def get_notifications(user_id: str) -> list[Notification_Response]:
     user_notifs = []
     for notif in notifs:
         if user_id in notif["user_ids"]:
-            user_notifs.append(notif)
+            user_notifs.append(Notification_Response(**notif))
     return user_notifs
 
 def read_notification(notification_id: str, user_id: str) -> Notification_Response:
@@ -267,7 +267,7 @@ def read_notification(notification_id: str, user_id: str) -> Notification_Respon
     notifs = load_notifications()
     for notif in notifs:
         if notif.get("id") == notification_id:
-            notif_object = Notification.model_to_Notification(notif)
+            notif_object = Notification.model_to_Notification(Notification_Response(**notif))
             return notif_object.mark_as_read(user_id)
     raise HTTPException(status_code=404, detail=f"Notification '{notification_id}' not found")
 
