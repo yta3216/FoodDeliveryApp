@@ -6,7 +6,7 @@
 | app\realtime\\_\_init\_\_.py             |        0 |        0 |    100% |
 | app\realtime\connection\_manager.py      |       22 |        0 |    100% |
 | app\repositories\\_\_init\_\_.py         |        0 |        0 |    100% |
-| app\repositories\config\_repo.py         |       18 |        1 |     94% |
+| app\repositories\config\_repo.py         |       18 |        2 |     89% |
 | app\repositories\delivery\_repo.py       |       24 |        7 |     71% |
 | app\repositories\notification\_repo.py   |       18 |        2 |     89% |
 | app\repositories\order\_repo.py          |       18 |        2 |     89% |
@@ -42,7 +42,7 @@
 | app\services\receipt\_service.py         |       43 |        2 |     95% |
 | app\services\restaurant\_service.py      |      148 |       22 |     85% |
 | app\services\user\_service.py            |      112 |       12 |     89% |
-| conftest.py                              |       16 |        0 |    100% |
+| conftest.py                              |       20 |        0 |    100% |
 | testing\\_\_init\_\_.py                  |        0 |        0 |    100% |
 | testing\test\_authorization.py           |       42 |        0 |    100% |
 | testing\test\_cancel\_order.py           |       58 |        0 |    100% |
@@ -63,4 +63,4 @@
 | testing\test\_user\_create.py            |       19 |        0 |    100% |
 | testing\test\_user\_validation.py        |       38 |        0 |    100% |
 | testing\test\_websocket\_connection.py   |       39 |        0 |    100% |
-| **TOTAL**                                | **3224** |  **137** | **96%** |
+| **TOTAL**                                | **3228** |  **138** | **96%** |
