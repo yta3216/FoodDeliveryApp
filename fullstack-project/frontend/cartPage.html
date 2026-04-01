@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart Page</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!--  Navbar  -->
+  <nav id="navbar">
+    <!-- logo → customerHomePage.html -->
+    <!-- sign out -->
+  </nav>
+
+  <!--  Cart Items  -->
+  <!--
+    GET  /cart              to load current cart items
+    PUT  /cart/item         to update quantity of an item
+    body: { item_id, quantity }
+    DELETE /cart/item/{item_id} to remove item from cart
+  -->
+  <div id="cart-items">
+    <!-- each row: item name, quantity +/- controls, price, remove button -->
+    <!-- empty state: "your cart is empty" + link back to customerHomePage -->
+  </div>
+
+  <!--  Order Summary  -->
+  <div id="order-summary">
+    <!-- subtotal -->
+    <!-- delivery fee -->
+    <!-- tax -->
+    <!-- total -->
+    <!-- checkout button → paymentPage.html -->
+  </div>
+
+  <!--  Back Link  -->
+  <a href="/static/customerHomePage.html">Continue Shopping (Back Button)</a>
+
+</body>
+</html>

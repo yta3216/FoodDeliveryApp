@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile Page</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!--  Navbar  -->
+  <nav id="navbar">
+    <!-- logo links to customerHomePage.html -->
+    <!-- notifications bell links to notificationsPage.html -->
+    <!-- sign out button: clear localStorage, redirect to loginPage.html -->
+  </nav>
+
+  <!--  Profile Picture  -->
+  <!--
+    placeholder avatar with user initials
+  
+  -->
+  <div id="profile-picture">
+    <!-- circular avatar placeholder -->
+    <!-- display user initials from localStorage name -->
+    <!-- "change photo" button (optional) -->
+  </div>
+
+  <!--  Name  -->
+  <!--
+    GET  /user/me      to load current name
+    PUT  /user/me      to save updated name
+    body: { name }
+  -->
+  <div id="name-section">
+    <!-- name input (pre-filled) -->
+    <!-- edit / save button -->
+  </div>
+
+  <!--  Email  -->
+  <!--
+    GET  /user/me      to load current email
+    PUT  /user/me      to save updated email
+    body: { email }
+  -->
+  <div id="email-section">
+    <!-- email input (pre-filled) -->
+    <!-- edit / save button -->
+  </div>
+
+  <!--  Password  -->
+  <!--
+    POST /user/me/password
+    body: { current_password, new_password }
+  -->
+  <div id="password-section">
+    <!-- current password input -->
+    <!-- new password input -->
+    <!-- confirm new password input -->
+    <!-- save button -->
+  </div>
+
+  <!--  Billing  -->
+  <!--
+    placeholder section 
+  -->
+  <div id="billing-section">
+    <!-- saved card display: last 4 digits + expiry -->
+    <!-- "update card" button that opens card input fields -->
+    <!-- remove card option -->
+  </div>
+
+  <!--  Back Link  -->
+  <a href="/static/customerHomePage.html">← Back to Home button</a>
+
+</body>
+</html>

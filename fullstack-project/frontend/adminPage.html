@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Page</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!--  Navbar  -->
+  <nav id="navbar">
+    <!-- logo to go to home -->
+    <!-- sign out -->
+  </nav>
+
+  <!--  Tab Bar  -->
+  <!-- tabs: Users | Restaurants | Orders | Tax & Config -->
+  <div id="tab-bar">
+    <!-- tab buttons -->
+  </div>
+
+  <!--  Tab: Users  -->
+  <!--
+    GET /admin/users          list all users
+    DELETE /admin/users/{id}  remove a user
+    PATCH  /admin/users/{id}  update user role or status
+  -->
+  <div id="tab-users" class="tab-section">
+    <!-- user table: name, email, role, status, actions -->
+  </div>
+
+  <!--  Tab: Restaurants  -->
+  <!--
+    GET /admin/restaurants        to list all restaurants
+    DELETE /restaurant/{id}       to remove a restaurant
+  -->
+  <div id="tab-restaurants" class="tab-section">
+    <!-- restaurant table: name, city, manager, status, actions -->
+  </div>
+
+  <!--  Tab: Orders  -->
+  <!--
+    GET /admin/orders             to list all orders across the platform
+    POST /admin/orders/{id}/refund to issue a refund
+  -->
+  <div id="tab-orders" class="tab-section">
+    <!-- order table: id, customer, restaurant, total, status, actions -->
+  </div>
+
+  <!--  Tab: Tax & Config  -->
+  <!--
+    GET  /config                  to get current tax rate, delivery fee settings
+    POST /config                  to update config values
+  -->
+  <div id="tab-config" class="tab-section">
+    <!-- tax rate input -->
+    <!-- base delivery fee input -->
+    <!-- save button -->
+  </div>
+
+</body>
+</html>

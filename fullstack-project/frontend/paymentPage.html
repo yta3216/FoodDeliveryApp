@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout Page</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!--  Navbar  -->
+  <nav id="navbar">
+    <!-- logo links to customerHomePage.html -->
+  </nav>
+
+  <!--  Order Review  -->
+  <!-- read-only summary pulled from cart state -->
+  <div id="order-review">
+    <!-- list of items with quantities and prices -->
+    <!-- subtotal / delivery / tax / total -->
+  </div>
+
+  <!--  Delivery Address  -->
+  <div id="delivery-address">
+    <!-- pre-filled from accountPage address, editable -->
+  </div>
+
+  <!--  Payment Form  -->
+  <!--
+    POST /payment/checkout
+    body: { order_id, payment_method, address, ... }
+    on success: redirect to orderStatusPage.html?id={order_id}
+    Su's payment system — coordinate with her on exact payload shape
+  -->
+  <div id="payment-form">
+    <!-- card number -->
+    <!-- expiry + CVV -->
+    <!-- confirm & pay button -->
+    <!-- error message placeholder -->
+  </div>
+
+  <!--  Back Link  -->
+  <a href="/static/cartPage.html">Back to Cart button</a>
+
+</body>
+</html>

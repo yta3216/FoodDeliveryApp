@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sugarcoded — Order Status</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!--  Navbar  -->
+  <nav id="navbar">
+    <!-- logo links to customerHomePage.html -->
+    <!-- my orders links to orderHistoryPage.html -->
+  </nav>
+
+  <!--  Status Stepper  -->
+  <!--
+    order status flow:
+    should highlight the current status
+  -->
+  <div id="status-stepper">
+    <!-- step: Order Placed -->
+    <!-- step: Confirmed by restaurant -->
+    <!-- step: Picked up by driver -->
+    <!-- step: Delivered -->
+  </div>
+
+  <!--  Order Info  -->
+  <!--
+    GET /orders/{order_id}  to load order details
+    order_id read from URL params: ?id={order_id}
+    use websocket for live updates(?)
+  -->
+  <div id="order-info">
+    <!-- order items list -->
+    <!-- total amount -->
+    <!-- restaurant name -->
+  </div>
+
+  <!--  Delivery Info  -->
+  <div id="delivery-info">
+    <!-- driver name (once assigned) -->
+    <!-- estimated arrival time  -->
+    <!-- delivery address -->
+  </div>
+
+  <!--  Back Link  -->
+  <a href="/static/orderHistoryPage.html">← Back to All Orders button</a>
+
+</body>
+</html>

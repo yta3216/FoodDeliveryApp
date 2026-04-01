@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Driver Page</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!--Navbar-->
+  <nav id="navbar">
+    <!-- logo -->
+    <!-- notifications bell to link to notificationsPage.html -->
+    <!-- sign out -->
+  </nav>
+
+  <!--Availability Toggle-->
+  <!--
+    PATCH /delivery/driver/availability
+    body: { is_available: true | false }
+    when toggled off: driver won't be assigned new deliveries
+  -->
+  <div id="availability-section">
+    <!-- toggle switch: Online / Offline -->
+    <!-- current status label -->
+  </div>
+
+  <!--Active Delivery-->
+  <!--
+    GET /delivery/driver/active  to check if driver has an active delivery
+    if yes: show delivery details + action buttons
+    if no:  show "waiting for orders" state
+
+    status flow: assigned to picked_up to delivered
+    PATCH /delivery/{delivery_id}/status
+    body: { status: "picked_up" | "delivered" }
+  -->
+  <div id="active-delivery">
+    <!-- (if active delivery exists) -->
+    <!--   order id, customer name -->
+    <!--   pickup address (restaurant) -->
+    <!--   dropoff address -->
+    <!--   ETA in minutes -->
+    <!--   status stepper: Assigned to Picked Up to Delivered -->
+    <!--   "Confirm Pickup" button ( sets status to picked_up) -->
+    <!--   "Confirm Delivery" button ( sets status to delivered) -->
+
+    <!-- (if no active delivery) -->
+    <!--   "No active delivery" message -->
+  </div>
+
+  <!--Delivery History-->
+  <!--
+    GET /delivery/driver/history  to fetch past completed deliveries
+  -->
+  <div id="delivery-history">
+    <!-- list of past deliveries: order id, date, address, time taken -->
+    <!-- empty state if none -->
+  </div>
+
+</body>
+</html>
