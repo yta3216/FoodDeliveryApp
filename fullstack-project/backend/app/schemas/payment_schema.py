@@ -26,6 +26,14 @@ class WalletTopUpRequest(BaseModel):
     cvv: str
     cardholder_name: str
 
+class OrderPaymentRequest(BaseModel):
+    """
+    Defines the attributes required to checkout an order.
+    Attributes:
+    *   **receipt_id** (int): the indentifier of the receipt to be purchased
+    """
+    receipt_id: int
+
 class PaymentResponse(BaseModel):
     """
     **Defines the attributes returned after a payment is made in the system.**
@@ -36,7 +44,7 @@ class PaymentResponse(BaseModel):
     payment_status: str
     message: str
 
-class OrderPaymentResponse(BaseModel):
+class OrderPaymentResponse(PaymentResponse):
     """
     **Defines the attributes returned after a payment attempt for an order.**
     Attributes:

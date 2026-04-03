@@ -129,10 +129,10 @@ async def topup_wallet(payment: WalletTopUpRequest, current_user: Customer) -> P
 
     return PaymentResponse(
         payment_status="success",
-        message = f"Payment successful. Your new wallet balance is {new_balance}.",
+        message = f"Payment successful. Your new wallet balance is {new_balance:.2f}.",
     )
 
-async def checkout(receipt_id: str, current_user: Customer) -> OrderPaymentResponse:
+async def checkout(receipt_id: int, current_user: Customer) -> OrderPaymentResponse:
     """
     Full payment flow breakdown:
     1. Checks for duplicated payment
@@ -141,7 +141,7 @@ async def checkout(receipt_id: str, current_user: Customer) -> OrderPaymentRespo
     4. Create order if payment is successful
 
     Parameters:
-        receipt_id (str): the identifier of the receipt to be paid for
+        receipt_id (int): the identifier of the receipt to be paid for
         current_user (Customer): the authenticated user with role customer
 
     Returns:

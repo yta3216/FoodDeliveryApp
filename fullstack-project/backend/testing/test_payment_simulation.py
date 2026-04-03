@@ -4,9 +4,10 @@ from fastapi.testclient import TestClient
 import pytest
 from app.main import app
 from app.schemas.user_schema import UserRole
-from app.repositories.user_repo import load_users
+from app.repositories.user_repo import load_users, save_users
 from app.repositories.order_repo import load_orders
 from app.services.restaurant_service import get_restaurant_by_id
+from app.services.user_service import get_user_by_id
 from app.services import payment_service
 from testing.test_restaurant_crud import setup_restaurant, VALID_RESTAURANT_ADDRESS
 
@@ -14,6 +15,7 @@ client = TestClient(app)
 
 # valid payment details to reuse across tests
 VALID_PAYMENT = {
+    "amount": 100.0,
     "card_number": "1234567890123456",
     "expiry_month": 12,
     "expiry_year": 2099,
@@ -45,8 +47,13 @@ def customer_with_token():
         }
     )
     assert login_response.status_code == 200
+    id = test_customer.json()["id"]
+    users = load_users()
+    for user in users:
+        if user.get("id") == id:
+            customer = user
     return {
-        "customer": test_customer.json(),
+        "customer": customer,
         "token": login_response.json()["token"]
     }
 # create a manager
@@ -109,6 +116,13 @@ def customer_with_cart_and_token(customer_with_token, setup_restaurant_menu):
     item1_id = restaurant.menu.items[0].id
     item2_id = restaurant.menu.items[1].id
 
+    # add money to wallet
+    client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
     # set cart restaurant
     set_restaurant_response = client.patch(
         f"/cart/{restaurant_id}",
@@ -149,6 +163,26 @@ def get_receipt_id(token: str) -> int:
     assert receipt_response.status_code == 200
     return receipt_response.json()["id"]
 
+# test successful wallet topup
+def test_successful_deposit(customer_with_token):
+    token = customer_with_token["token"]
+    customer = customer_with_token["customer"]
+    print(customer)
+    current_balance = customer["wallet_balance"]
+    response = client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    updated_customer = get_customer_from_db(customer["id"])
+
+    assert response.status_code == 200
+    assert response.json()["payment_status"] == "success"
+    expected_amount = current_balance + VALID_PAYMENT.get("amount")
+    assert f"{expected_amount:.2f}" in response.json()["message"]
+    assert updated_customer["wallet_balance"] == expected_amount
+
 # test successful checkout: valid payment with an item in cart
 def test_successful_checkout(customer_with_cart_and_token):
     token = customer_with_cart_and_token["token"]
@@ -157,10 +191,10 @@ def test_successful_checkout(customer_with_cart_and_token):
 
     response = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id},
+        json={"receipt_id": receipt_id},
         headers={"Authorization": f"Bearer {token}"}
     )
-
+    print(response.json())
     assert response.status_code == 201
     assert response.json()["payment_status"] == "success"
     assert response.json()["order"] is not None
@@ -178,13 +212,14 @@ def test_successful_checkout_creates_order(customer_with_cart_and_token):
 
     client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id},
+        json={"receipt_id": receipt_id},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     orders_after = get_orders_for_customer(customer_id)
     assert len(orders_after) == len(orders_before) + 1
 
+# test that checkout fails if delivery fee changes
 def test_checkout_fails_delivery_fee_changes(customer_with_cart_and_token, setup_restaurant_menu):
     token = customer_with_cart_and_token["token"]
     customer_id = customer_with_cart_and_token["customer"]["id"]
@@ -208,7 +243,7 @@ def test_checkout_fails_delivery_fee_changes(customer_with_cart_and_token, setup
 
     response_new = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt},
+        json={"receipt_id": receipt},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -225,7 +260,7 @@ def test_successful_checkout_empties_cart(customer_with_cart_and_token):
 
     client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id},
+        json={"receipt_id": receipt_id},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -242,124 +277,134 @@ def test_checkout_with_empty_cart(customer_with_token):
     assert len(get_orders_for_customer(customer_id)) == 0
 
 # test payment fails with card number shorter than 16 digits
-def test_checkout_short_card_number(customer_with_cart_and_token):
-    token = customer_with_cart_and_token["token"]
-    customer_id = customer_with_cart_and_token["customer"]["id"]
-    receipt_id = get_receipt_id(token)
+def test_topup_short_card_number(customer_with_token):
+    token = customer_with_token["token"]
 
-    response = client.post(
-        "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "12345"},
+    response = client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT, "card_number": "12345"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 400
-    assert len(get_orders_for_customer(customer_id)) == 0
+
+# test payment fails with negative amount
+def test_topup_negative_amount(customer_with_token):
+    token = customer_with_token["token"]
+
+    response = client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT, "amount": -4.95},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 400
 
 # test payment fails with card number longer than 16 digits
-def test_checkout_long_card_number(customer_with_cart_and_token):
-    token = customer_with_cart_and_token["token"]
-    customer_id = customer_with_cart_and_token["customer"]["id"]
-    receipt_id = get_receipt_id(token)
+def test_topup_long_card_number(customer_with_token):
+    token = customer_with_token["token"]
 
-    response = client.post(
-        "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "12345678901234567"},
+    response = client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT, "card_number": "12345678901234567"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 400
-    assert len(get_orders_for_customer(customer_id)) == 0
 
 # test payment fails with non-digit characters in card number
-def test_checkout_non_digit_card_number(customer_with_cart_and_token):
-    token = customer_with_cart_and_token["token"]
-    customer_id = customer_with_cart_and_token["customer"]["id"]
-    receipt_id = get_receipt_id(token)
+def test_topup_non_digit_card_number(customer_with_token):
+    token = customer_with_token["token"]
 
-    response = client.post(
-        "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "1234abcd56789012"},
+    response = client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT, "card_number": "1234abcd56789012"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 400
-    assert len(get_orders_for_customer(customer_id)) == 0
 
 # test payment fails with hardcoded declined card
-def test_checkout_declined_card(customer_with_cart_and_token):
-    token = customer_with_cart_and_token["token"]
-    customer_id = customer_with_cart_and_token["customer"]["id"]
-    receipt_id = get_receipt_id(token)
+def test_topup_declined_card(customer_with_token):
+    token = customer_with_token["token"]
 
-    response = client.post(
-        "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "0000000000000000"},
+    response = client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT, "card_number": "0000000000000000"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 400
-    assert len(get_orders_for_customer(customer_id)) == 0
 
 # test payment fails with expired card
-def test_checkout_expired_card(customer_with_cart_and_token):
-    token = customer_with_cart_and_token["token"]
-    customer_id = customer_with_cart_and_token["customer"]["id"]
-    receipt_id = get_receipt_id(token)
+def test_topup_expired_card(customer_with_token):
+    token = customer_with_token["token"]
 
-    response = client.post(
-        "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id, "expiry_month": 1, "expiry_year": 2020},
+    response = client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT, "expiry_month": 1, "expiry_year": 2020},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 400
-    assert len(get_orders_for_customer(customer_id)) == 0
 
 # test payment fails with invalid expiry month
-def test_checkout_invalid_expiry_month(customer_with_cart_and_token):
-    token = customer_with_cart_and_token["token"]
-    customer_id = customer_with_cart_and_token["customer"]["id"]
-    receipt_id = get_receipt_id(token)
+def test_topup_invalid_expiry_month(customer_with_token):
+    token = customer_with_token["token"]
 
-    response = client.post(
-        "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id, "expiry_month": 13},
+    response = client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT, "expiry_month": 13},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 400
-    assert len(get_orders_for_customer(customer_id)) == 0
 
 # test payment fails with invalid CVV (too short)
-def test_checkout_invalid_cvv(customer_with_cart_and_token):
-    token = customer_with_cart_and_token["token"]
-    customer_id = customer_with_cart_and_token["customer"]["id"]
-    receipt_id = get_receipt_id(token)
+def test_topup_invalid_cvv(customer_with_token):
+    token = customer_with_token["token"]
 
-    response = client.post(
-        "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id, "cvv": "12"},
+    response = client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT, "cvv": "12"},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 400
-    assert len(get_orders_for_customer(customer_id)) == 0
 
 # test payment fails with empty cardholder name
-def test_checkout_empty_cardholder_name(customer_with_cart_and_token):
-    token = customer_with_cart_and_token["token"]
-    customer_id = customer_with_cart_and_token["customer"]["id"]
-    receipt_id = get_receipt_id(token)
+def test_topup_empty_cardholder_name(customer_with_token):
+    token = customer_with_token["token"]
 
-    response = client.post(
-        "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id, "cardholder_name": "   "},
+    response = client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT, "cardholder_name": "   "},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     assert response.status_code == 400
-    assert len(get_orders_for_customer(customer_id)) == 0
+
+# test failed payment due to balance too low
+def test_failed_payment_insufficient_funds(customer_with_cart_and_token):
+    token = customer_with_cart_and_token["token"]
+    customer_id = customer_with_cart_and_token["customer"]["id"]
+    receipt_id = get_receipt_id(token)
+
+    users = load_users()
+    for user in users:
+        if user.get("id") == customer_id:
+            cart_before = user.get("cart")
+            user["wallet_balance"] = 1.05
+            save_users(users)
+            break
+
+    response = client.post(
+        "/payment/checkout",
+        json={"receipt_id": receipt_id},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Customer does not have sufficient wallet funds."
 
 # test that a failed payment leaves the cart untouched
 def test_failed_payment_cart_preserved(customer_with_cart_and_token):
@@ -367,11 +412,17 @@ def test_failed_payment_cart_preserved(customer_with_cart_and_token):
     customer_id = customer_with_cart_and_token["customer"]["id"]
     receipt_id = get_receipt_id(token)
 
-    cart_before = get_customer_from_db(customer_id)["cart"]
+    users = load_users()
+    for user in users:
+        if user.get("id") == customer_id:
+            cart_before = user.get("cart")
+            user["wallet_balance"] = 0
+            save_users(users)
+            break
 
     client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "0000000000000000"},
+        json={"receipt_id": receipt_id},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -401,7 +452,7 @@ def test_duplicate_submission_blocked(customer_with_cart_and_token):
     try:
         response = client.post(
             "/payment/checkout",
-            json={**VALID_PAYMENT, "receipt_id": receipt_id},
+            json={"receipt_id": receipt_id},
             headers={"Authorization": f"Bearer {token}"}
         )
  
@@ -419,7 +470,7 @@ def test_receipt_id_removed_after_successful_payment(customer_with_cart_and_toke
  
     client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id},
+        json={"receipt_id": receipt_id},
         headers={"Authorization": f"Bearer {token}"}
     )
  
@@ -433,7 +484,7 @@ def test_receipt_id_removed_after_failed_payment(customer_with_cart_and_token):
  
     client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id, "card_number": "0000000000000000"},
+        json={"receipt_id": receipt_id, "card_number": "0000000000000000"},
         headers={"Authorization": f"Bearer {token}"}
     )
  
