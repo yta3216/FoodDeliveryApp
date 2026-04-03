@@ -33,14 +33,14 @@ async def topup_wallet_route(payment: WalletTopUpRequest, current_user: Customer
 
 @router.post("/checkout", response_model=OrderPaymentResponse, status_code=201)
 async def checkout_route(
-    receipt: Receipt,
+    receipt_id: str,
     current_user: Customer = Depends(get_customer)
 ):
     """
     **Submits payment for the customer's current cart. Creates an order only if payment succeeds.**
 
     Parameters:
-    *   **payment** (PaymentRequest): the card details submitted by the customer
+    *   **receipt_id** (str): the identifier of the receipt to be paid for
     *   **current_user** (Customer): the authenticated user with role *customer*. automatically passed as argument
 
     Returns:
@@ -52,4 +52,4 @@ async def checkout_route(
     *   **HTTPException** (status_code = 400): if payment validation fails or cart is empty. no order is created
     *   **HTTPException** (status_code = 409): if either the delivery fee or tax rate has changed since the receipt was created. Will auto-refresh the receipt.
     """
-    return await checkout(receipt, current_user)
+    return await checkout(receipt_id, current_user)

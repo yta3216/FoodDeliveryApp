@@ -16,7 +16,7 @@ from app.schemas.payment_schema import (
 from app.schemas.receipt_schema import Receipt
 from app.services.order_service import create_order_from_receipt
 from app.services.notification_service import Notification
-from app.services.receipt_service import refresh_receipt
+from app.services.receipt_service import refresh_receipt, get_receipt
 from app.services.restaurant_service import get_restaurant_by_id
 from app.services.user_service import withdraw_from_wallet, deposit_to_wallet
 from app.services.config_service import get_tax_rate
@@ -130,7 +130,7 @@ async def topup_wallet(payment: WalletTopUpRequest, current_user: Customer) -> P
         message = f"Payment successful. Your new wallet balance is {new_balance}.",
     )
 
-async def checkout(receipt: Receipt, current_user: Customer) -> OrderPaymentResponse:
+async def checkout(receipt_id: str, current_user: Customer) -> OrderPaymentResponse:
     """
     Full payment flow breakdown:
     1. Checks for duplicated payment
@@ -139,7 +139,7 @@ async def checkout(receipt: Receipt, current_user: Customer) -> OrderPaymentResp
     4. Create order if payment is successful
 
     Parameters:
-        receipt (Receipt): the receipt to be paid for
+        receipt_id (str): the identifier of the receipt to be paid for
         current_user (Customer): the authenticated user with role customer
 
     Returns:
@@ -150,9 +150,10 @@ async def checkout(receipt: Receipt, current_user: Customer) -> OrderPaymentResp
         HTTPException (status_code = 404): if user id is not found
         HTTPException (status_code = 409): if either the delivery fee or tax rate has changed since the receipt was created. Will auto-refresh the receipt.
     """
-    await _check_duplicate(receipt.id, current_user)
+    receipt = get_receipt(receipt_id)
+    await _check_duplicate(receipt_id, current_user)
  
-    _processing.add(receipt.id)
+    _processing.add(receipt_id)
  
     try:
         await _check_fees(receipt, current_user)
@@ -167,4 +168,4 @@ async def checkout(receipt: Receipt, current_user: Customer) -> OrderPaymentResp
         )
      
     finally:
-        _processing.discard(receipt.id)
+        _processing.discard(receipt_id)
