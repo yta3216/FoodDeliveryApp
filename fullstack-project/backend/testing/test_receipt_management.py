@@ -57,9 +57,15 @@ def test_receipt_different_delivery_fee_refresh(customer_with_cart_and_token, se
     )
     assert response.status_code == 200
 
+    client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
     response_checkout = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt},
+        json={"receipt_id": receipt},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -88,9 +94,15 @@ def test_receipt_different_tax_rate_refresh(customer_with_cart_and_token, admin_
     response = client.patch("/config/tax-rate?new_tax_rate=0.15", headers={"Authorization": f"Bearer {admin_token}"})
     assert response.status_code == 200
 
+    client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
     response_checkout = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt},
+        json={"receipt_id": receipt},
         headers={"Authorization": f"Bearer {token}"}
     )
 
