@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <title>Food Delivery App</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food Delivery App</title>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Food Delivery App</h1>
-        </header>
-        
-        <main>
-            <div id="loading" class="loading">Loading items...</div>
-            <div id="items-container" class="items-container"></div>
-        </main>
-    </div>
-    
-    <script src="/static/js/app.js"></script>
+  <p style="font-family:sans-serif; padding:24px; color:#666;">You are looking at a skeleton</p>
+
+  <script>
+    const token = localStorage.getItem("auth_token");
+    const role  = localStorage.getItem("user_role");
+
+    if (!token) {
+      window.location.href = "/static/loginPage.html";
+    } else {
+      const routes = {
+        customer: "/static/customerHomePage.html",
+        driver:   "/static/driverPage.html",
+        manager:  "/static/managerPage.html",
+        admin:    "/static/adminPage.html",
+      };
+      window.location.href = routes[role] || "/static/loginPage.html";
+    }
+  </script>
 </body>
 </html>

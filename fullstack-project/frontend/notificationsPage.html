@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications page</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <!-- home page button -->
+    <!-- back button -->
+  </nav>
+
+  <!-- Notification List -->
+  <!--
+    GET /notifications           
+    PATCH /notifications/{id}/read 
+
+    notification types here:
+  
+    each item: icon by type, message text, timestamp, read/unread state
+  -->
+  <div id="notifications-list">
+    <!-- notification rows injected here via JS -->
+    <!-- "mark all as read" button at top -->
+    <!-- loading spinner -->
+    <!-- empty state: "you're all caught up" -->
+  </div>
+
+  <!-- Back Link  -->
+  <a href="javascript:history.back()">This is a Back button</a>
+
+</body>
+</html>
