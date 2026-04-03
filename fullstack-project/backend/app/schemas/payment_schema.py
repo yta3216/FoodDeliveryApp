@@ -24,14 +24,22 @@ class WalletTopUpRequest(BaseModel):
     cvv: str
     cardholder_name: str
 
+class PaymentResponse(BaseModel):
+    """
+    **Defines the attributes returned after a payment is made in the system.**
+    Attributes:
+    *   **payment_status** (str): the result of the payment attempt. either "success" or "failed"
+    *   **message** (str): a human-readable message describing the result
+    """
+    payment_status: str
+    message: str
+
 class OrderPaymentResponse(BaseModel):
     """
-    **Defines the attributes returned after a payment attempt.**
+    **Defines the attributes returned after a payment attempt for an order.**
     Attributes:
     *   **payment_status** (str): the result of the payment attempt. either "success" or "failed"
     *   **message** (str): a human-readable message describing the result
     *   **order** (Order | None): the created order if payment was successful, otherwise None
     """
-    payment_status: str
-    message: str
     order: Order | None = None
