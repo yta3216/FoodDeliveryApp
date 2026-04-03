@@ -24,7 +24,7 @@ class WalletTopUpRequest(BaseModel):
     cvv: str
     cardholder_name: str
 
-class PaymentResponse(BaseModel):
+class OrderPaymentResponse(BaseModel):
     """
     **Defines the attributes returned after a payment attempt.**
     Attributes:
