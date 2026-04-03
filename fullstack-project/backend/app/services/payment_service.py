@@ -8,7 +8,7 @@ import datetime
 from fastapi import HTTPException
 
 from app.schemas.user_schema import Customer
-from app.schemas.payment_schema import PaymentRequest, PaymentResponse
+from app.schemas.payment_schema import PaymentRequest, OrderPaymentResponse
 from app.schemas.receipt_schema import Receipt
 from app.services.order_service import create_order_from_receipt
 from app.services.notification_service import Notification
@@ -92,7 +92,7 @@ async def _check_fees(receipt: Receipt, current_user: Customer) -> None:
         refresh_receipt(receipt.id, current_user)
         raise HTTPException(status_code=409, detail="The tax rate has changed. Please try again.")
 
-async def _execute_payment(payment: PaymentRequest, current_user: Customer, receipt: Receipt) -> PaymentResponse:
+async def _execute_payment(payment: PaymentRequest, current_user: Customer, receipt: Receipt) -> OrderPaymentResponse:
     """
     Validates card details and create order if payment is successful
     Notifies the customer if payment failed
@@ -103,7 +103,7 @@ async def _execute_payment(payment: PaymentRequest, current_user: Customer, rece
         receipt (Receipt): the receipt to create the order from
     
     Returns:
-        PaymentResponse: contains payment_status, message, and the create order if successful
+        OrderPaymentResponse: contains payment_status, message, and the create order if successful
     
     Raises:
         HTTPException (status_code = 400): if payment validation fails
@@ -120,13 +120,13 @@ async def _execute_payment(payment: PaymentRequest, current_user: Customer, rece
  
     order = await create_order_from_receipt(current_user, receipt)
  
-    return PaymentResponse(
+    return OrderPaymentResponse(
         payment_status="success",
         message="Payment successful. Your order has been placed.",
         order=order
     )
     
-async def process_payment(payment: PaymentRequest, current_user: Customer) -> PaymentResponse:
+async def process_payment(payment: PaymentRequest, current_user: Customer) -> OrderPaymentResponse:
     """
     Full payment flow breakdown:
     1. Checks for duplicated payment
@@ -139,7 +139,7 @@ async def process_payment(payment: PaymentRequest, current_user: Customer) -> Pa
         current_user (Customer): the authenticated user with role customer
 
     Returns:
-        PaymentResponse: contains payment_status, message, and the created order on success
+        OrderPaymentResponse: contains payment_status, message, and the created order on success
 
     Raises:
         HTTPException (status_code = 400): if duplicate payments or failed payment validation
