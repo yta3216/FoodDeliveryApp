@@ -9,7 +9,6 @@ from fastapi import HTTPException
 
 from app.schemas.user_schema import Customer
 from app.schemas.payment_schema import (
-    PaymentRequest, 
     WalletTopUpRequest, 
     OrderPaymentResponse, 
     PaymentResponse
@@ -17,18 +16,19 @@ from app.schemas.payment_schema import (
 from app.schemas.receipt_schema import Receipt
 from app.services.order_service import create_order_from_receipt
 from app.services.notification_service import Notification
-from app.services.receipt_service import get_receipt, refresh_receipt
+from app.services.receipt_service import refresh_receipt
 from app.services.restaurant_service import get_restaurant_by_id
+from app.services.user_service import withdraw_from_wallet, deposit_to_wallet
 from app.services.config_service import get_tax_rate
 
 _processing: set[int] = set()
 
-def _validate_payment(payment: PaymentRequest) -> tuple[bool, str]:
+def _validate_payment(payment: WalletTopUpRequest) -> tuple[bool, str]:
     """
     Validates simulated payment details.
 
     Parameters:
-        payment (PaymentRequest): the payment details to validate
+        payment (WalletTopUpRequest): the payment details to validate
 
     Returns:
         tuple[bool, str]: a tuple of (is_valid, error_message). error_message is empty on success
@@ -97,21 +97,21 @@ async def _check_fees(receipt: Receipt, current_user: Customer) -> None:
         refresh_receipt(receipt.id, current_user)
         raise HTTPException(status_code=409, detail="The tax rate has changed. Please try again.")
 
-async def _execute_payment(payment: PaymentRequest, current_user: Customer, receipt: Receipt) -> OrderPaymentResponse:
+async def topup_wallet(payment: WalletTopUpRequest, current_user: Customer) -> PaymentResponse:
     """
-    Validates card details and creates order if payment is successful
+    Validates card details and updates wallet balance if payment is successful
     Notifies the customer if payment failed
 
     Parameters:
-        payment (PaymentRequest): the payment details
+        payment (WalletTopUpRequest): the payment details
         current_user (Customer): the authenticated customer
-        receipt (Receipt): the receipt to create the order from
     
     Returns:
-        OrderPaymentResponse: contains payment_status, message, and the create order if successful
+        PaymentResponse: contains payment_status and message
     
     Raises:
         HTTPException (status_code = 400): if payment validation fails
+        HTTPException (status_code = 404): if user id is not found
     """
     is_valid, error_message = _validate_payment(payment)
 
@@ -122,25 +122,24 @@ async def _execute_payment(payment: PaymentRequest, current_user: Customer, rece
         )
         await notification.send_to_users()
         raise HTTPException(status_code=400, detail=error_message)
- 
-    order = await create_order_from_receipt(current_user, receipt)
- 
-    return OrderPaymentResponse(
-        payment_status="success",
-        message="Payment successful. Your order has been placed.",
-        order=order
-    )
     
-async def checkout(payment: PaymentRequest, current_user: Customer) -> OrderPaymentResponse:
+    new_balance = deposit_to_wallet(payment.amount, current_user)
+
+    return PaymentResponse(
+        payment_status="success",
+        message = f"Payment successful. Your new wallet balance is {new_balance}.",
+    )
+
+async def checkout(receipt: Receipt, current_user: Customer) -> OrderPaymentResponse:
     """
     Full payment flow breakdown:
     1. Checks for duplicated payment
     2. Loads and validates the receipt
     3. Checks updates on delivery fee and taxes, refresh receipt
-    4. Validate card details and create order if payment is successful
+    4. Create order if payment is successful
 
     Parameters:
-        payment (PaymentRequest): the payment details submitted by the customer
+        receipt (Receipt): the receipt to be paid for
         current_user (Customer): the authenticated user with role customer
 
     Returns:
@@ -148,32 +147,24 @@ async def checkout(payment: PaymentRequest, current_user: Customer) -> OrderPaym
 
     Raises:
         HTTPException (status_code = 400): if duplicate payments or failed payment validation
+        HTTPException (status_code = 404): if user id is not found
         HTTPException (status_code = 409): if either the delivery fee or tax rate has changed since the receipt was created. Will auto-refresh the receipt.
     """
-    await _check_duplicate(payment.receipt_id, current_user)
+    await _check_duplicate(receipt.id, current_user)
  
-    _processing.add(payment.receipt_id)
+    _processing.add(receipt.id)
  
     try:
-        receipt = get_receipt(payment.receipt_id)
         await _check_fees(receipt, current_user)
-        return await _execute_payment(payment, current_user, receipt)
- 
+        withdraw_from_wallet(receipt.total, current_user)
+
+        order = await create_order_from_receipt(current_user, receipt)
+
+        return OrderPaymentResponse(
+            payment_status="success",
+            message="Payment successful. Your order has been placed.", 
+            order=order
+        )
+     
     finally:
-        _processing.discard(payment.receipt_id)
-
-def topup_wallet(payment: WalletTopUpRequest, current_user: Customer) -> PaymentResponse:
-    """
-    Adds funds to the current customer's wallet. 
-
-    Parameters:
-        payment (WalletTopUpRequest): the payment details submitted by the customer
-        current_user (Customer): the authenticated user with role customer
-
-    Returns:
-        PaymentResponse: contains payment_status and message
-
-    Raises:
-        HTTPException (status_code = 400): if payment validation failed
-    """
-    
+        _processing.discard(receipt.id)

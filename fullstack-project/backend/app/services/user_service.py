@@ -235,6 +235,54 @@ def update_user(user_id: str, payload: User_Update) -> UserPublic:
             )
     raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
 
+def withdraw_from_wallet(payment_amount: float, current_user: Customer) -> float:
+    """
+    Withdraws payment amount from customer's wallet. Verifies that balance is adequate.
+
+    Parameters:
+        payment_amount: float
+        current_user: the authenticated customer
+    
+    Returns: 
+        float: the amount paid
+    
+    Raises:
+        HTTPException (status_code = 400): if balance is not adequate
+        HTTPException (status_code = 404): if user id is not found
+    """
+    users = load_users()
+    for user in users:
+        if user.get("id") == current_user.id:
+            balance = user.get("wallet_balance")
+            if balance - payment_amount < 0:
+                raise HTTPException(status_code=400, detail="Customer does not have sufficient wallet funds.")
+            user["wallet_balance"] = balance - payment_amount
+            save_users(users)
+            return balance - payment_amount
+    raise HTTPException(status_code=404, detail=f"User '{current_user.id}' not found")
+
+def deposit_to_wallet(balance_increase: float, current_user: Customer) -> float:
+    """
+    Increases customer's wallet balance.
+
+    Parameters:
+        balance_increase: float
+        current_user: the authenticated customer
+    
+    Returns: 
+        float: the new wallet balance.
+    
+    Raises:
+        HTTPException (status_code = 404): if user id is not found
+    """
+    users = load_users()
+    for user in users:
+        if user.get("id") == current_user.id:
+            new_balance = user.get("wallet_balance") + balance_increase
+            user["wallet_balance"] = new_balance
+            return new_balance
+    raise HTTPException(status_code=404, detail=f"User '{current_user.id}' not found")
+
 def get_notifications(user_id: str) -> list[Notification_Response]:
     """
     Retrieves all notifications in notifications.json with the provided user as a recipient.
