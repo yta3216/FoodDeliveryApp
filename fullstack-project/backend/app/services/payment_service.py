@@ -33,6 +33,8 @@ def _validate_payment(payment: WalletTopUpRequest) -> tuple[bool, str]:
     Returns:
         tuple[bool, str]: a tuple of (is_valid, error_message). error_message is empty on success
     """
+    if payment.amount <= 0:
+        return False, "Deposit to wallet must be greater than $0.00"
 
     if not payment.cardholder_name.strip():
         return False, "Cardholder name cannot be empty."

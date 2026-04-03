@@ -247,9 +247,12 @@ def withdraw_from_wallet(payment_amount: float, current_user: Customer) -> float
         float: the amount paid
     
     Raises:
-        HTTPException (status_code = 400): if balance is not adequate
+        HTTPException (status_code = 400): if balance is not adequate or payment amount is negative
         HTTPException (status_code = 404): if user id is not found
     """
+    if payment_amount < 0:
+        raise HTTPException(status_code=400, detail="A negative amount cannot be withdrawn from wallet")
+
     users = load_users()
     for user in users:
         if user.get("id") == current_user.id:
@@ -273,13 +276,18 @@ def deposit_to_wallet(balance_increase: float, current_user: Customer) -> float:
         float: the new wallet balance.
     
     Raises:
+        HTTPException (status_code = 400): if deposit amount is 0 or less
         HTTPException (status_code = 404): if user id is not found
     """
+    if balance_increase <= 0:
+        raise HTTPException(status_code=400, detail="Deposit to wallet must be greater than 0")
+
     users = load_users()
     for user in users:
         if user.get("id") == current_user.id:
             new_balance = user.get("wallet_balance") + balance_increase
             user["wallet_balance"] = new_balance
+            save_users(users)
             return new_balance
     raise HTTPException(status_code=404, detail=f"User '{current_user.id}' not found")
 
