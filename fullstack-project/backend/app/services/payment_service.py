@@ -8,7 +8,12 @@ import datetime
 from fastapi import HTTPException
 
 from app.schemas.user_schema import Customer
-from app.schemas.payment_schema import PaymentRequest, OrderPaymentResponse
+from app.schemas.payment_schema import (
+    PaymentRequest, 
+    WalletTopUpRequest, 
+    OrderPaymentResponse, 
+    PaymentResponse
+)
 from app.schemas.receipt_schema import Receipt
 from app.services.order_service import create_order_from_receipt
 from app.services.notification_service import Notification
@@ -94,7 +99,7 @@ async def _check_fees(receipt: Receipt, current_user: Customer) -> None:
 
 async def _execute_payment(payment: PaymentRequest, current_user: Customer, receipt: Receipt) -> OrderPaymentResponse:
     """
-    Validates card details and create order if payment is successful
+    Validates card details and creates order if payment is successful
     Notifies the customer if payment failed
 
     Parameters:
@@ -126,7 +131,7 @@ async def _execute_payment(payment: PaymentRequest, current_user: Customer, rece
         order=order
     )
     
-async def process_payment(payment: PaymentRequest, current_user: Customer) -> OrderPaymentResponse:
+async def checkout(payment: PaymentRequest, current_user: Customer) -> OrderPaymentResponse:
     """
     Full payment flow breakdown:
     1. Checks for duplicated payment
@@ -156,4 +161,19 @@ async def process_payment(payment: PaymentRequest, current_user: Customer) -> Or
  
     finally:
         _processing.discard(payment.receipt_id)
+
+def topup_wallet(payment: WalletTopUpRequest, current_user: Customer) -> PaymentResponse:
+    """
+    Adds funds to the current customer's wallet. 
+
+    Parameters:
+        payment (WalletTopUpRequest): the payment details submitted by the customer
+        current_user (Customer): the authenticated user with role customer
+
+    Returns:
+        PaymentResponse: contains payment_status and message
+
+    Raises:
+        HTTPException (status_code = 400): if payment validation failed
+    """
     

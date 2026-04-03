@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends
 from app.schemas.payment_schema import PaymentRequest, PaymentResponse, OrderPaymentResponse
 from app.schemas.user_schema import Customer
 from app.services.user_service import get_customer
-from app.services.payment_service import process_payment
+from app.services.payment_service import checkout, topup_wallet
 
 router = APIRouter(prefix="/payment", tags=["payment"])
 
@@ -28,7 +28,7 @@ def topup_wallet_route(payment: PaymentRequest, current_user: Customer = Depends
     *   **HTTPException** (status_code = 403): if user's role is not *customer*
     *   **HTTPException** (status_code = 400): if payment validation fails
     """
-    return process_payment(payment, current_user)
+    return topup_wallet(payment, current_user)
 
 @router.post("/checkout", response_model=OrderPaymentResponse, status_code=201)
 async def checkout_route(
@@ -50,4 +50,4 @@ async def checkout_route(
     *   **HTTPException** (status_code = 403): if user's role is not *customer*
     *   **HTTPException** (status_code = 400): if payment validation fails or cart is empty. no order is created
     """
-    return await process_payment(payment, current_user)
+    return await checkout(payment, current_user)
