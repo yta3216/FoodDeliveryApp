@@ -1,7 +1,10 @@
 """Test cases for user profile management, viewing, and updating profile details."""
 
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
+import pytest
 from app.main import app
+from app.services.user_service import withdraw_from_wallet, deposit_to_wallet, get_user_by_id
 
 client = TestClient(app)
 
@@ -87,3 +90,83 @@ def test_update_requires_authentication():
         }
     )
     assert response.status_code == 401  # missing authorization header
+
+
+# ---------- Updating wallet balance ------------- #
+
+# test depositing to an empty wallet (newly created)
+def test_deposit_to_empty_wallet():
+    token, user_id = register_and_login("deposit1@example.com")
+    customer = get_user_by_id(user_id)
+    deposit_amount = 5.45
+    wallet_balance = deposit_to_wallet(deposit_amount, customer)
+    assert wallet_balance == deposit_amount
+    
+# test depositing multiple times
+def test_multi_deposit():
+    token, user_id = register_and_login("deposit2@example.com")
+    customer = get_user_by_id(user_id)
+    first_deposit_amount = 10.5
+    wallet_balance = deposit_to_wallet(first_deposit_amount, customer)
+    assert wallet_balance == first_deposit_amount
+
+    second_deposit_amount = 7.35
+    wallet_balance = deposit_to_wallet(second_deposit_amount, customer)
+    assert wallet_balance == first_deposit_amount + second_deposit_amount
+
+# test depositing but amount is negative
+def test_invalid_deposit():
+    token, user_id = register_and_login("deposit3@example.com")
+    customer = get_user_by_id(user_id)
+    deposit_amount = -1.55
+    with pytest.raises(HTTPException) as e:
+        deposit_to_wallet(deposit_amount, customer)
+    assert e.value.status_code == 400
+
+# test multiple successful withdraws sequentially
+def test_multi_withdraw():
+    token, user_id = register_and_login("withdraw1@example.com")
+    customer = get_user_by_id(user_id)
+    deposit_amount = 100
+    withdraw_amount = 20
+    initial_balance = deposit_to_wallet(deposit_amount, customer)
+    single_withdraw_balance = withdraw_from_wallet(withdraw_amount, customer)
+    assert single_withdraw_balance == initial_balance - withdraw_amount
+
+    second_withdraw_balance = withdraw_from_wallet(withdraw_amount, customer)
+    assert second_withdraw_balance == initial_balance - 2*withdraw_amount
+
+# test withdrawing from empty wallet (newly created)
+def test_withdraw_from_empty_wallet():
+    token, user_id = register_and_login("withdraw2@example.com")
+    customer = get_user_by_id(user_id)
+    withdraw_amount = 5.00
+    with pytest.raises(HTTPException) as e:
+        wallet_balance = withdraw_from_wallet(withdraw_amount, customer)
+    assert e.value.status_code == 400
+    assert e.value.detail == "Customer does not have sufficient wallet funds."
+
+# test withdrawing a negative amount
+def test_withdraw_negative_amount():
+    token, user_id = register_and_login("withdraw3@example.com")
+    customer = get_user_by_id(user_id)
+    withdraw_amount = -5.00
+    with pytest.raises(HTTPException) as e:
+        wallet_balance = withdraw_from_wallet(withdraw_amount, customer)
+    assert e.value.status_code == 400
+    assert e.value.detail == "A negative amount cannot be withdrawn from wallet"
+
+# test withdrawing once successfully then balance is too low to withdraw again
+def test_second_withdraw_unsuccessful():
+    token, user_id = register_and_login("withdraw4@example.com")
+    customer = get_user_by_id(user_id)
+    deposit_amount = 30
+    withdraw_amount = 20
+    initial_balance = deposit_to_wallet(deposit_amount, customer)
+    single_withdraw_balance = withdraw_from_wallet(withdraw_amount, customer)
+    assert single_withdraw_balance == initial_balance - withdraw_amount
+    
+    with pytest.raises(HTTPException) as e:
+        wallet_balance = withdraw_from_wallet(withdraw_amount, customer)
+    assert e.value.status_code == 400
+    assert e.value.detail == "Customer does not have sufficient wallet funds."

@@ -27,16 +27,21 @@ def place_order(token: str) -> dict:
     assert receipt_response.status_code == 200
     receipt_id = receipt_response.json()["id"]
  
-    checkout_response = client.post(
-        "/payment/checkout",
+    client.patch(
+        "/payment/topup-wallet",
         json={
-            "receipt_id": receipt_id,
+            "amount": 100.0,
             "card_number": "1234567890123456",
             "expiry_month": 12,
             "expiry_year": 2099,
             "cvv": "123",
-            "cardholder_name": "Test Customer"
-        },
+            "cardholder_name": "Test Customer"},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    checkout_response = client.post(
+        "/payment/checkout",
+        json={"receipt_id": receipt_id},
         headers={"Authorization": f"Bearer {token}"}
     )
     assert checkout_response.status_code == 201

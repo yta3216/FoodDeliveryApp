@@ -6,6 +6,7 @@ from app.schemas.user_schema import UserRole
 client = TestClient(app)
 
 VALID_PAYMENT = {
+    "amount": 100.0,
     "card_number": "1234567890123456",
     "expiry_month": 12,
     "expiry_year": 2099,
@@ -20,7 +21,7 @@ def place_order(customer_token: str, distance_km: float = 0.0) -> dict:
     receipt_id = receipt_resp.json()["id"]
     checkout_resp = client.post(
         "/payment/checkout",
-        json={**VALID_PAYMENT, "receipt_id": receipt_id},
+        json={"receipt_id": receipt_id},
         headers={"Authorization": f"Bearer {customer_token}"}
     )
     assert checkout_resp.status_code == 201
@@ -79,6 +80,12 @@ def delivery_setup():
     customer_token = client.post("/user/login", json={
         "email": "delivery_customer@example.com", "password": "password"
     }).json()["token"]
+    # add money to wallet
+    client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT},
+        headers={"Authorization": f"Bearer {customer_token}"}
+    )
 
     # create bike driver
     client.post("/user", json={
@@ -174,6 +181,11 @@ def test_no_driver_sets_waiting_status():
     customer_token = client.post("/user/login", json={
         "email": "nodriver_customer@example.com", "password": "password"
     }).json()["token"]
+    client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT},
+        headers={"Authorization": f"Bearer {customer_token}"}
+    )
 
     client.patch(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
     client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 1},
@@ -328,6 +340,11 @@ def test_waiting_order_assigned_when_driver_becomes_available():
     customer_token = client.post("/user/login", json={
         "email": "wait_customer@example.com", "password": "password"
     }).json()["token"]
+    client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT},
+        headers={"Authorization": f"Bearer {customer_token}"}
+    )
 
     # place order with no driver available — should go to waiting_for_driver
     client.patch(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
@@ -413,6 +430,11 @@ def test_order_outside_delivery_radius_auto_declined():
     customer_token = client.post("/user/login", json={
         "email": "radius_customer@example.com", "password": "password"
     }).json()["token"]
+    client.patch(
+        "/payment/topup-wallet",
+        json={**VALID_PAYMENT},
+        headers={"Authorization": f"Bearer {customer_token}"}
+    )
 
     # place order with 10km distance — outside the 5km radius
     client.patch(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})

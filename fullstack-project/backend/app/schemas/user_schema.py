@@ -57,8 +57,10 @@ class Customer(User):
     Attributes:
     *   **role** (UserRole): always set to UserRole.CUSTOMER
     *   **cart** (Cart): the user's cart, for order creation purposes
+    *   **wallet_balance** (float): the user's current wallet balance, used for order payment purposes
     """
     role: UserRole = UserRole.CUSTOMER
+    wallet_balance: float = 0.0
     cart: Cart = Cart()
 
 class RestaurantManager(User):
