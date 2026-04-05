@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "code": "WELCOME10",
+    "description": "Get $10 off your first order (minimum spend $20)",
+    "type": "fixed_amount",
+    "value": 10.0,
+    "min_order_value": 20.0,
+    "expiry_date": "2026-12-31",
+    "is_active": true,
+    "is_public": true,
+    "is_first_order_only": true,
+    "used_by_customer_ids": []
+  },
+  {
+    "id": 2,
+    "code": "FREEDEL",
+    "description": "Free delivery on any order (minimum spend $15)",
+    "type": "free_delivery",
+    "value": 0.0,
+    "min_order_value": 15.0,
+    "expiry_date": null,
+    "is_active": true,
+    "is_public": true,
+    "is_first_order_only": false,
+    "used_by_customer_ids": []
+  }
+]
