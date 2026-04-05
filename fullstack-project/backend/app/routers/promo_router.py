@@ -7,11 +7,28 @@ from app.schemas.promo_schema import PromoApplyRequest, PromoPublic, PromoCode, 
 from app.schemas.cart_schema import Cart
 from app.schemas.user_schema import Customer, User, UserRole
 from app.services.user_service import get_customer
-from app.services.promo_service import get_public_promos, _get_promo_by_code, create_promo, update_promo_status
+from app.services.promo_service import get_public_promos, _get_promo_by_code, create_promo, update_promo_status, get_all_promos
 from app.services.cart_service import apply_promo_to_cart, remove_promo_from_cart
 from app.auth import require_role
 
 router = APIRouter(prefix="/promo", tags=["promo"])
+
+@router.get("/all", response_model=list[PromoCode], status_code=200)
+def get_all_promos_route(current_user: User = Depends(require_role(UserRole.ADMIN))):
+    """
+    **Returns all promo codes in the system active or public status. Admin only.**
+ 
+    Parameters:
+    *   **current_user** (User): the authenticated user with role *admin*. automatically passed as argument.
+ 
+    Returns:
+    *   **list[PromoCode]**: all promo codes including inactive and private ones
+ 
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *admin*
+    """
+    return get_all_promos()
 
 @router.get("", response_model=list[PromoPublic], status_code=200)
 def get_promos_route():

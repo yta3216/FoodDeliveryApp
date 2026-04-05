@@ -10,7 +10,19 @@ from fastapi import HTTPException
 from app.repositories.promo_repo import load_promo_codes, save_promo_codes
 from app.schemas.promo_schema import PromoCode, PromoType, PromoPublic, PromoCode_Create
 from app.schemas.user_schema import Customer
+from app.services.order_service import get_orders_for_customer
 
+def get_all_promos() -> list[PromoCode]:
+    """
+    **Returns all promo codes regardless of active or public status.**
+    Used by admins to view the full state of all codes in the system.
+ 
+    Parameters: None
+ 
+    Returns:
+    *   **list[PromoCode]**: all promo codes
+    """
+    return [PromoCode(**promo) for promo in load_promo_codes()]
 
 def get_public_promos() -> list[PromoPublic]:
     """
@@ -28,7 +40,6 @@ def get_public_promos() -> list[PromoPublic]:
         for promo in promos
         if promo.get("is_public") and promo.get("is_active")
     ]
-
 
 def _get_promo_by_code(code: str) -> PromoCode:
     """
@@ -49,11 +60,29 @@ def _get_promo_by_code(code: str) -> PromoCode:
             return PromoCode(**promo)
     raise HTTPException(status_code=404, detail=f"Promo code '{code}' not found.")
 
-
+def _deactivate_promo(code: str) -> None:
+    """
+    Sets a promo code's is_active field to False in storage.
+    Called automatically when a code is found to be expired during validation.
+ 
+    Parameters:
+        code (str): the promo code string to deactivate
+ 
+    Returns:
+        None
+    """
+    promos = load_promo_codes()
+    for promo in promos:
+        if promo.get("code", "").upper() == code.strip().upper():
+            promo["is_active"] = False
+            save_promo_codes(promos)
+            return
+        
 def validate_promo(code: str, subtotal: float, current_user: Customer) -> PromoCode:
     """
     **Validates a promo code against all business rules.**
     Checks: active status, expiry date, minimum order value, first-order restriction, and whether this customer has already used the code.
+    Deactivates the code if it has expired.
 
     Parameters:
         code (str): the promo code string to validate
@@ -75,6 +104,7 @@ def validate_promo(code: str, subtotal: float, current_user: Customer) -> PromoC
     if promo.expiry_date:
         expiry = datetime.date.fromisoformat(promo.expiry_date)
         if datetime.date.today() > expiry:
+            _deactivate_promo(promo.code)
             raise HTTPException(status_code=400, detail="This promo code has expired.")
 
     if subtotal < promo.min_order_value:
@@ -87,7 +117,6 @@ def validate_promo(code: str, subtotal: float, current_user: Customer) -> PromoC
         raise HTTPException(status_code=400, detail="You have already used this promo code.")
 
     if promo.is_first_order_only:
-        from app.services.order_service import get_orders_for_customer
         past_orders = get_orders_for_customer(current_user)
         if len(past_orders) > 0:
             raise HTTPException(status_code=400, detail="This promo code is only valid on your first order.")
@@ -213,7 +242,6 @@ def create_promo(payload: PromoCode_Create) -> PromoCode:
         is_active=True,
         is_public=payload.is_public,
         is_first_order_only=payload.is_first_order_only,
-        usage_count=0,
         used_by_customer_ids=[]
     )
  
