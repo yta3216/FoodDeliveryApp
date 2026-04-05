@@ -8,7 +8,7 @@ import datetime
 from fastapi import HTTPException
 
 from app.repositories.promo_repo import load_promo_codes, save_promo_codes
-from app.schemas.promo_schema import PromoCode, PromoType, PromoPublic
+from app.schemas.promo_schema import PromoCode, PromoType, PromoPublic, PromoCode_Create
 from app.schemas.user_schema import Customer
 
 
@@ -164,3 +164,83 @@ def get_first_order_promo() -> PromoCode | None:
         if promo.get("is_first_order_only") and promo.get("is_active"):
             return PromoCode(**promo)
     return None
+
+def create_promo(payload: PromoCode_Create) -> PromoCode:
+    """
+    **Creates a new promotional code and saves it to storage.**
+    Validates that the code string is unique and that the value is appropriate for the discount type.
+    Can be created only by admin users.
+ 
+    Parameters:
+        payload (PromoCode_Create): the details of the promo code to create
+ 
+    Returns:
+        PromoCode: the newly created promo code
+ 
+    Raises:
+        HTTPException (status_code = 400): if value is invalid for the given type, or expiry date format is invalid
+        HTTPException (status_code = 409): if a promo code with the same code string already exists
+    """
+    promos = load_promo_codes()
+ 
+    normalised_code = payload.code.strip().upper()
+    for promo in promos:
+        if promo.get("code", "").upper() == normalised_code:
+            raise HTTPException(status_code=409, detail=f"Promo code '{normalised_code}' already exists.")
+ 
+    if payload.type in (PromoType.FIXED_AMOUNT, PromoType.PERCENTAGE) and payload.value <= 0:
+        raise HTTPException(status_code=400, detail=f"Value must be greater than 0 for type '{payload.type}'.")
+ 
+    if payload.type == PromoType.PERCENTAGE and payload.value > 100:
+        raise HTTPException(status_code=400, detail="Percentage value cannot exceed 100.")
+ 
+    if payload.expiry_date:
+        try:
+            datetime.date.fromisoformat(payload.expiry_date)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="expiry_date must be in YYYY-MM-DD format.")
+ 
+    new_id = max((p.get("id", 0) for p in promos), default=0) + 1
+ 
+    new_promo = PromoCode(
+        id=new_id,
+        code=normalised_code,
+        description=payload.description,
+        type=payload.type,
+        value=payload.value,
+        min_order_value=payload.min_order_value,
+        expiry_date=payload.expiry_date,
+        is_active=True,
+        is_public=payload.is_public,
+        is_first_order_only=payload.is_first_order_only,
+        usage_count=0,
+        used_by_customer_ids=[]
+    )
+ 
+    promos.append(new_promo.model_dump())
+    save_promo_codes(promos)
+    return new_promo
+ 
+ 
+def update_promo_status(promo_id: int, is_active: bool) -> PromoCode:
+    """
+    **Activates or deactivates a promo code by its identifier.**
+    Can be updated only by admin users.
+ 
+    Parameters:
+        promo_id (int): the identifier of the promo code to update
+        is_active (bool): the new active status
+ 
+    Returns:
+        PromoCode: the updated promo code
+ 
+    Raises:
+        HTTPException (status_code = 404): if no promo code with the given id exists
+    """
+    promos = load_promo_codes()
+    for promo in promos:
+        if promo.get("id") == promo_id:
+            promo["is_active"] = is_active
+            save_promo_codes(promos)
+            return PromoCode(**promo)
+    raise HTTPException(status_code=404, detail=f"Promo code '{promo_id}' not found.")
