@@ -14,6 +14,7 @@ from app.repositories.receipt_repo import load_receipts, save_receipts
 from app.services.cart_service import get_cart
 from app.services.restaurant_service import get_restaurant_by_id
 from app.services.config_service import get_tax_rate
+from app.services.promo_service import validate_promo, calculate_discount
 
 
 def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
@@ -59,7 +60,15 @@ def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
     subtotal = round(subtotal, 2)
     tax = round(get_tax_rate() * subtotal, 2)
     delivery_fee = restaurant.delivery_fee
-    total = round(subtotal + tax + delivery_fee, 2)
+    discount = 0.0
+    applied_promo_code = None
+
+    if cart.promo_code:
+        promo = validate_promo(cart.promo_code, subtotal, current_user)
+        delivery_fee, discount = calculate_discount(promo, subtotal, delivery_fee)
+        applied_promo_code = promo.code
+        
+    total = round(subtotal + tax + delivery_fee - discount, 2)
 
     receipts = load_receipts()
     new_id = max((r.get("id", 0) for r in receipts), default=0) + 1
@@ -72,6 +81,8 @@ def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
         subtotal=subtotal,
         tax=tax,
         delivery_fee=delivery_fee,
+        discount=discount,
+        promo_code=applied_promo_code,
         distance_km=distance_km,
         total=total,
     )

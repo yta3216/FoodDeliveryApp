@@ -91,7 +91,50 @@ def empty_cart(current_user: Customer) -> None:
             return None
     raise HTTPException(404, detail=f"User '{current_user.id}' not found")
 
-# Create new cart item in cart
+def apply_promo_to_cart(code: str, current_user: Customer) -> Cart:
+    """
+    Saves a promo code string to the customer's cart.
+    Replaces any previously applied promo code — only one code is allowed per cart.
+ 
+    Parameters:
+        code (str): the promo code to apply
+        current_user (Customer): the current logged-in user. must have role "customer"
+ 
+    Returns:
+        Cart: the updated cart with promo code applied
+ 
+    Raises:
+        HTTPException (status_code = 404): current_user's user_id not found in users.json
+    """
+    users = load_users()
+    for user in users:
+        if user.get("id") == current_user.id:
+            user["cart"]["promo_code"] = code.strip().upper()
+            save_users(users)
+            return Cart(**user["cart"])
+    raise HTTPException(404, detail=f"User '{current_user.id}' not found")
+
+def remove_promo_from_cart(current_user: Customer) -> Cart:
+    """
+    Removes any applied promo code from the customer's cart.
+ 
+    Parameters:
+        current_user (Customer): the current logged-in user. must have role "customer"
+ 
+    Returns:
+        Cart: the updated cart with promo code cleared
+ 
+    Raises:
+        HTTPException (status_code = 404): current_user's user_id not found in users.json
+    """
+    users = load_users()
+    for user in users:
+        if user.get("id") == current_user.id:
+            user["cart"]["promo_code"] = None
+            save_users(users)
+            return Cart(**user["cart"])
+    raise HTTPException(404, detail=f"User '{current_user.id}' not found")
+
 def create_cart_item(payload: CartItem_Create, current_user: Customer) -> CartItem:
     """
     Adds a new item to the customer's cart.

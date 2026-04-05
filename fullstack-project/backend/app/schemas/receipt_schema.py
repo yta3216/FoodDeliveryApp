@@ -43,6 +43,8 @@ class Receipt(BaseModel):
     *   **tax** (float): tax applied to the order
     *   **delivery_fee** (float): fee for delivering the order
     *   **total** (float): subtotal + tax + delivery_fee
+    *   **discount** (float): discount applied to the order
+    *   **promo_code** (str | None): promo code applied to the order, if any
     """
     id: int
     customer_id: str
@@ -51,6 +53,9 @@ class Receipt(BaseModel):
     subtotal: float = 0.0
     tax: float = 0.0
     delivery_fee: float = 0.0
+    discount: float = 0.0
+    promo_code: str | None = None
     distance_km: float = 0.0
     total: float = 0.0
     date_created: str | None = None
+
