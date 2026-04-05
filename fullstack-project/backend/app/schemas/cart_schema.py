@@ -49,6 +49,8 @@ class Cart(BaseModel):
     Attributes:
     *   **restaurant_id** (int): the identifier of the restaurant which this cart orders from.
     *   **cart_items** (list[CartItem]): intitial items to be added to the cart *(optional)*.
+    *   **promo_code** (str | None): the promo code applied to this cart, if any *(optional)*.
     """
     restaurant_id: int = 0
     cart_items: list[CartItem] = Field(default_factory=list)
+    promo_code: str | None = None
