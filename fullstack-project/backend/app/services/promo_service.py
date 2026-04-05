@@ -10,7 +10,6 @@ from fastapi import HTTPException
 from app.repositories.promo_repo import load_promo_codes, save_promo_codes
 from app.schemas.promo_schema import PromoCode, PromoType, PromoPublic, PromoCode_Create
 from app.schemas.user_schema import Customer
-from app.services.order_service import get_orders_for_customer
 
 def get_all_promos() -> list[PromoCode]:
     """
@@ -117,6 +116,7 @@ def validate_promo(code: str, subtotal: float, current_user: Customer) -> PromoC
         raise HTTPException(status_code=400, detail="You have already used this promo code.")
 
     if promo.is_first_order_only:
+        from app.services.order_service import get_orders_for_customer
         past_orders = get_orders_for_customer(current_user)
         if len(past_orders) > 0:
             raise HTTPException(status_code=400, detail="This promo code is only valid on your first order.")
