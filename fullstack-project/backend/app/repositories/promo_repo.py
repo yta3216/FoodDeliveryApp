@@ -7,7 +7,7 @@ from typing import Any
 
 PROMO_DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "promo_codes.json"
 
-def load_promos_codes() -> list[dict[str, Any]]:
+def load_promo_codes() -> list[dict[str, Any]]:
     """
     **Loads all saved promo codes.**
 
@@ -25,7 +25,7 @@ def load_promos_codes() -> list[dict[str, Any]]:
         else:
             return json.loads(content)
 
-def save_promos_codes(items: list[dict[str, Any]]) -> None:
+def save_promo_codes(items: list[dict[str, Any]]) -> None:
     """
     **Overwrites current saved list of promo codes with the passed list of promo codes.**
 
