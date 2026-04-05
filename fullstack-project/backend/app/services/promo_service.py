@@ -40,7 +40,7 @@ def get_public_promos() -> list[PromoPublic]:
         if promo.get("is_public") and promo.get("is_active")
     ]
 
-def _get_promo_by_code(code: str) -> PromoCode:
+def get_promo_by_code(code: str) -> PromoCode:
     """
     Retrieves a promo code record by its code string.
 
@@ -95,7 +95,7 @@ def validate_promo(code: str, subtotal: float, current_user: Customer) -> PromoC
         HTTPException (status_code = 400): if the code fails any validation rule
         HTTPException (status_code = 404): if the code does not exist
     """
-    promo = _get_promo_by_code(code)
+    promo = get_promo_by_code(code)
 
     if not promo.is_active:
         raise HTTPException(status_code=400, detail="This promo code is no longer active.")

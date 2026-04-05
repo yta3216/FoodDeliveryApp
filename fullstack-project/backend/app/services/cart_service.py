@@ -106,10 +106,15 @@ def apply_promo_to_cart(code: str, current_user: Customer) -> Cart:
     Raises:
         HTTPException (status_code = 404): current_user's user_id not found in users.json
     """
+    from app.services.promo_service import get_promo_by_code
+    promo = get_promo_by_code(code)
+    if not promo.is_active:
+        raise HTTPException(status_code=400, detail="This promo code is no longer active.")
+    
     users = load_users()
     for user in users:
         if user.get("id") == current_user.id:
-            user["cart"]["promo_code"] = code.strip().upper()
+            user["cart"]["promo_code"] = promo.code
             save_users(users)
             return Cart(**user["cart"])
     raise HTTPException(404, detail=f"User '{current_user.id}' not found")

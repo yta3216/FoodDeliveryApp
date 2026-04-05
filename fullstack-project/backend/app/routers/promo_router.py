@@ -7,7 +7,7 @@ from app.schemas.promo_schema import PromoApplyRequest, PromoPublic, PromoCode, 
 from app.schemas.cart_schema import Cart
 from app.schemas.user_schema import Customer, User, UserRole
 from app.services.user_service import get_customer
-from app.services.promo_service import get_public_promos, _get_promo_by_code, create_promo, update_promo_status, get_all_promos
+from app.services.promo_service import get_public_promos, create_promo, update_promo_status, get_all_promos
 from app.services.cart_service import apply_promo_to_cart, remove_promo_from_cart
 from app.auth import require_role
 
@@ -65,11 +65,6 @@ def apply_promo_route(body: PromoApplyRequest, current_user: Customer = Depends(
     *   **HTTPException** (status_code = 403): if user's role is not *customer*
     *   **HTTPException** (status_code = 404): if the promo code does not exist
     """
-    promo = _get_promo_by_code(body.code)
-    if not promo.is_active:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=400, detail="This promo code is no longer active.")
-
     return apply_promo_to_cart(body.code, current_user)
 
 
