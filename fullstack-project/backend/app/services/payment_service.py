@@ -20,6 +20,7 @@ from app.services.receipt_service import refresh_receipt, get_receipt
 from app.services.restaurant_service import get_restaurant_by_id
 from app.services.user_service import withdraw_from_wallet, deposit_to_wallet
 from app.services.config_service import get_tax_rate
+from app.services.promo_service import redeem_promo
 
 _processing: set[int] = set()
 
@@ -139,6 +140,7 @@ async def checkout(receipt_id: int, current_user: Customer) -> OrderPaymentRespo
     2. Loads and validates the receipt
     3. Checks updates on delivery fee and taxes, refresh receipt
     4. Create order if payment is successful
+    6. Redeems promo code if any was applied
 
     Parameters:
         receipt_id (int): the identifier of the receipt to be paid for
@@ -163,9 +165,12 @@ async def checkout(receipt_id: int, current_user: Customer) -> OrderPaymentRespo
 
         order = await create_order_from_receipt(current_user, receipt)
 
+        if receipt.promo_code:
+            redeem_promo(receipt.promo_code, current_user.id)
+
         return OrderPaymentResponse(
             payment_status="success",
-            message="Payment successful. Your order has been placed.", 
+            message="Payment successful. Your order has been placed.",
             order=order
         )
      
