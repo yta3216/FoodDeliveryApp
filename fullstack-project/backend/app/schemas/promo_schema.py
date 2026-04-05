@@ -83,3 +83,38 @@ class PromoPublic(BaseModel):
     min_order_value: float
     expiry_date: str | None
     is_first_order_only: bool
+
+class PromoCode_Create(BaseModel):
+    """
+    **Defines the attributes required for an admin to create a new promotional code.**
+    id and usage tracking fields are assigned automatically.
+ 
+    Attributes:
+    *   **code** (str): the alphanumeric code customers will enter at checkout
+    *   **description** (str): a description of the discount
+    *   **type** (PromoType): the type of discount this code applies
+    *   **value** (float): the discount value. for fixed_amount: dollar amount. for percentage: percent (0-100). unused for free_delivery
+    *   **min_order_value** (float): minimum subtotal required to apply this code *(default 0.0)*
+    *   **expiry_date** (str | None): optional expiry date in YYYY-MM-DD format
+    *   **is_public** (bool): whether the code is visible to customers on the promotions listing *(default True)*
+    *   **is_first_order_only** (bool): whether the code can only be used on a customer's first order *(default False)*
+    """
+    code: str
+    description: str = ""
+    type: PromoType
+    value: float = 0.0
+    min_order_value: float = 0.0
+    expiry_date: str | None = None
+    is_public: bool = True
+    is_first_order_only: bool = False
+ 
+ 
+class PromoCode_StatusUpdate(BaseModel):
+    """
+    **Defines the attributes required for an admin to activate or deactivate a promo code.**
+ 
+    Attributes:
+    *   **is_active** (bool): the new active status of the promo code
+    """
+    is_active: bool
+
