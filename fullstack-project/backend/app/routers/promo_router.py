@@ -3,15 +3,15 @@ This module defines the API routes for promotional code management.
 """
 from fastapi import APIRouter, Depends
 
-from app.schemas.promo_schema import PromoApplyRequest, PromoPublic
+from app.schemas.promo_schema import PromoApplyRequest, PromoPublic, PromoCode, PromoCode_Create, PromoCode_StatusUpdate
 from app.schemas.cart_schema import Cart
-from app.schemas.user_schema import Customer
+from app.schemas.user_schema import Customer, User, UserRole
 from app.services.user_service import get_customer
-from app.services.promo_service import get_public_promos, _get_promo_by_code
+from app.services.promo_service import get_public_promos, _get_promo_by_code, create_promo, update_promo_status
 from app.services.cart_service import apply_promo_to_cart, remove_promo_from_cart
+from app.auth import require_role
 
 router = APIRouter(prefix="/promo", tags=["promo"])
-
 
 @router.get("", response_model=list[PromoPublic], status_code=200)
 def get_promos_route():
@@ -73,3 +73,45 @@ def remove_promo_route(current_user: Customer = Depends(get_customer)):
     *   **HTTPException** (status_code = 404): if user is not found
     """
     return remove_promo_from_cart(current_user)
+
+@router.post("", response_model=PromoCode, status_code=201)
+def create_promo_route(body: PromoCode_Create, current_user: User = Depends(require_role(UserRole.ADMIN))):
+    """
+    **Creates a new promotional code. Admin only.**
+ 
+    Parameters:
+    *   **body** (PromoCode_Create): the details of the promo code to create
+    *   **current_user** (User): the authenticated user with role *admin*. automatically passed as argument.
+ 
+    Returns:
+    *   **PromoCode**: the newly created promo code
+ 
+    Raises:
+    *   **HTTPException** (status_code = 400): if value is invalid for the discount type, or expiry date is invalid
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *admin*
+    *   **HTTPException** (status_code = 409): if a code with the same string already exists
+    """
+    return create_promo(body)
+ 
+ 
+@router.patch("/{promo_id}/status", response_model=PromoCode, status_code=200)
+def update_promo_status_route(promo_id: int, body: PromoCode_StatusUpdate, current_user: User = Depends(require_role(UserRole.ADMIN))):
+    """
+    **Activates or deactivates a promotional code by its identifier. Admin only.**
+ 
+    Parameters:
+    *   **promo_id** (int): the identifier of the promo code to update
+    *   **body** (PromoCode_StatusUpdate): contains the new active status
+    *   **current_user** (User): the authenticated user with role *admin*. automatically passed as argument.
+ 
+    Returns:
+    *   **PromoCode**: the updated promo code
+ 
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *admin*
+    *   **HTTPException** (status_code = 404): if the promo code is not found
+    """
+    return update_promo_status(promo_id, body.is_active)
+ 
