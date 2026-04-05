@@ -36,7 +36,6 @@ class PromoCode(BaseModel):
     *   **is_active** (bool): whether the code can currently be used
     *   **is_public** (bool): whether the code is visible to customers on the promotions listing
     *   **is_first_order_only** (bool): whether the code can only be used on a customer's first order
-    *   **usage_count** (int): total number of times this code has been used
     *   **used_by_customer_ids** (list[str]): list of customer ids who have already used this code
     """
     id: int
@@ -49,7 +48,6 @@ class PromoCode(BaseModel):
     is_active: bool = True
     is_public: bool = True
     is_first_order_only: bool = False
-    usage_count: int = 0
     used_by_customer_ids: list[str] = []
 
 

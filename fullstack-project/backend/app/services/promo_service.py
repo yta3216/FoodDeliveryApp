@@ -127,7 +127,7 @@ def calculate_discount(promo: PromoCode, subtotal: float, delivery_fee: float) -
 def redeem_promo(code: str, customer_id: str) -> None:
     """
     **Records a promo code redemption after a successful payment.**
-    Increments usage count and adds the customer to the used_by list.
+    Adds the customer to the used_by list and deactivates code
     Called by payment_service after checkout succeeds.
 
     Parameters:
@@ -140,11 +140,11 @@ def redeem_promo(code: str, customer_id: str) -> None:
     promos = load_promo_codes()
     for promo in promos:
         if promo.get("code", "").upper() == code.strip().upper():
-            promo["usage_count"] = promo.get("usage_count", 0) + 1
             used_by = promo.get("used_by_customer_ids", [])
             if customer_id not in used_by:
                 used_by.append(customer_id)
             promo["used_by_customer_ids"] = used_by
+            promo["is_active"] = False
             save_promo_codes(promos)
             return
 
