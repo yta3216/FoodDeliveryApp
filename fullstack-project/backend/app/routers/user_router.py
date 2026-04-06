@@ -30,7 +30,7 @@ from app.services.user_service import (
     add_favourite,
     remove_favourite
 )
-from app.auth import get_current_user
+from app.auth import get_current_user, require_role
 
 router = APIRouter(prefix="/user", tags=["user"])
 
