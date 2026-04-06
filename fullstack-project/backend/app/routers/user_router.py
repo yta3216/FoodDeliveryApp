@@ -25,7 +25,10 @@ from app.services.user_service import (
     update_password_when_logged_in,
     update_user,
     get_notifications,
-    read_notification
+    read_notification,
+    get_favourites,
+    add_favourite,
+    remove_favourite
 )
 from app.auth import get_current_user
 
@@ -194,3 +197,62 @@ def read_notification_route(user_id: str, notification_id: int, current_user: Us
     if current_user.id != user_id:
         raise HTTPException(status_code=403, detail="You are not authorized to read this user's notifications")
     return read_notification(notification_id, user_id)
+
+@router.get("/favourites", response_model=list)
+def get_favourites_route(current_user: User = Depends(require_role(UserRole.CUSTOMER))):
+    """
+    **Returns the full restaurant objects for all of the logged-in customer's favourited restaurants.**
+
+    Parameters:
+    *   **current_user** (User): the authenticated user with role *customer*. automatically passed as argument.
+
+    Returns:
+    *   **list**: the list of favourited restaurant objects
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *customer*
+    *   **HTTPException** (status_code = 404): if user not found
+    """
+    return get_favourites(current_user)
+
+
+@router.post("/favourites/{restaurant_id}", response_model=list[int], status_code=201)
+def add_favourite_route(restaurant_id: int, current_user: User = Depends(require_role(UserRole.CUSTOMER))):
+    """
+    **Adds a restaurant to the logged-in customer's favourites list.**
+
+    Parameters:
+    *   **restaurant_id** (int): the id of the restaurant to favourite
+    *   **current_user** (User): the authenticated user with role *customer*. automatically passed as argument.
+
+    Returns:
+    *   **list[int]**: the updated favourites list
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *customer*
+    *   **HTTPException** (status_code = 404): if restaurant or user not found
+    *   **HTTPException** (status_code = 409): if restaurant is already in favourites
+    """
+    return add_favourite(restaurant_id, current_user)
+
+
+@router.delete("/favourites/{restaurant_id}", response_model=list[int])
+def remove_favourite_route(restaurant_id: int, current_user: User = Depends(require_role(UserRole.CUSTOMER))):
+    """
+    **Removes a restaurant from the logged-in customer's favourites list.**
+
+    Parameters:
+    *   **restaurant_id** (int): the id of the restaurant to unfavourite
+    *   **current_user** (User): the authenticated user with role *customer*. automatically passed as argument.
+
+    Returns:
+    *   **list[int]**: the updated favourites list
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *customer*
+    *   **HTTPException** (status_code = 404): if restaurant not in favourites or user not found
+    """
+    return remove_favourite(restaurant_id, current_user)
