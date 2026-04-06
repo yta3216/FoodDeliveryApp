@@ -63,7 +63,8 @@
           "qty": 1
         }
       ]
-    }
+    },
+    "favourites": []
   },
   {
     "id": "1fa6db81-ed28-4267-ba15-9ee610cc359f",
@@ -81,7 +82,8 @@
     "cart": {
       "restaurant_id": 0,
       "cart_items": []
-    }
+    },
+    "favourites": []
   },
   {
     "id": "63f32ca9-e8d6-4e22-a0ff-de8d252b30e1",
