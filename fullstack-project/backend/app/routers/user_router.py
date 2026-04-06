@@ -198,7 +198,7 @@ def read_notification_route(user_id: str, notification_id: int, current_user: Us
         raise HTTPException(status_code=403, detail="You are not authorized to read this user's notifications")
     return read_notification(notification_id, user_id)
 
-@router.get("/favourites", response_model=list)
+@router.get("/me/favourites", response_model=list)
 def get_favourites_route(current_user: User = Depends(require_role(UserRole.CUSTOMER))):
     """
     **Returns the full restaurant objects for all of the logged-in customer's favourited restaurants.**
@@ -217,7 +217,7 @@ def get_favourites_route(current_user: User = Depends(require_role(UserRole.CUST
     return get_favourites(current_user)
 
 
-@router.post("/favourites/{restaurant_id}", response_model=list[int], status_code=201)
+@router.post("/me/favourites/{restaurant_id}", response_model=list[int], status_code=201)
 def add_favourite_route(restaurant_id: int, current_user: User = Depends(require_role(UserRole.CUSTOMER))):
     """
     **Adds a restaurant to the logged-in customer's favourites list.**
@@ -238,7 +238,7 @@ def add_favourite_route(restaurant_id: int, current_user: User = Depends(require
     return add_favourite(restaurant_id, current_user)
 
 
-@router.delete("/favourites/{restaurant_id}", response_model=list[int])
+@router.delete("/me/favourites/{restaurant_id}", response_model=list[int])
 def remove_favourite_route(restaurant_id: int, current_user: User = Depends(require_role(UserRole.CUSTOMER))):
     """
     **Removes a restaurant from the logged-in customer's favourites list.**
