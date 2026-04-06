@@ -8,14 +8,13 @@ from app.routers.websocket_router import connection_manager as cm
 from testing.test_cart_management import (
     customer_with_cart_and_token,
     customer_with_token,
-    setup_restaurant_menu,
     manager_with_token,
 )
 from app.services.notification_service import Notification
 from app.services.order_service import send_status_notification
 from app.schemas.order_schema import Order
 from app.schemas.restaurant_schema import Restaurant, Address, Menu
-from testing.test_restaurant_crud import setup_restaurant
+from testing.test_restaurant_crud import setup_restaurant, setup_restaurant_menu
 from testing.test_authorization import register_and_login
 
 client = TestClient(app)

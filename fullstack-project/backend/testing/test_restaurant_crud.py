@@ -4,8 +4,7 @@ from fastapi.testclient import TestClient
 import pytest
 from app.main import app
 from app.schemas.user_schema import UserRole
-from app.services.restaurant_service import get_managers
-
+from app.services.restaurant_service import get_managers, get_restaurant_by_id
 client = TestClient(app)
 
 VALID_RESTAURANT_ADDRESS = {
@@ -60,11 +59,43 @@ def setup_restaurant():
         "token": token
     }
 
+
+# create a restaurant with menu to add menu items from
+@pytest.fixture
+def setup_restaurant_menu(setup_restaurant):
+    restaurant = setup_restaurant["restaurant"]
+    token = setup_restaurant["token"]
+
+    # Create new menu items
+    client.post(
+        f"/restaurant/{restaurant['id']}/menu",
+        json={
+            "name": "Test Menu Item 1",
+            "price": 9.99,
+            "tags": ["test"]
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    client.post(
+        f"/restaurant/{restaurant['id']}/menu",
+        json={
+            "name": "Test Menu Item 2",
+            "price": 10.99,
+            "tags": ["test"]
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    return {
+        "restaurant": get_restaurant_by_id(restaurant['id']).model_dump(),
+        "token": token
+    }
+
 # test a standard restaurant creation process
 def test_create_restaurant(setup_restaurant):
     restaurant = setup_restaurant["restaurant"]
     assert restaurant["name"] == "Test Restaurant"
-    assert restaurant["menu"]['items'] == []  # Restaurant should have an associated menu, which starts empty
+    assert restaurant["menu"]['items'] == []
+    assert restaurant["menu"]['combos'] == []
     assert restaurant["address"]["street"] == "123 Main St"
     assert restaurant["address"]["city"] == "Kelowna"
     assert restaurant["address"]["province"] == "BC"
@@ -185,7 +216,7 @@ def test_manager_not_in_list(setup_restaurant):
     
     assert update_response.status_code == 403
 
-# ------- MENU OPERATIONS ------- #
+# ------- MENU ITEM OPERATIONS ------- #
 
 # test creating menu item
 def test_create_menu_item(setup_restaurant):
@@ -315,3 +346,131 @@ def test_bulk_update_menu_items(setup_restaurant):
     assert updated_items[1]["name"] == "Updated Bulk Item 2"
     assert updated_items[1]["price"] == 7.99
     assert updated_items[1]["tags"] == ["test", "bulk", "updated"]
+
+# ------- MENU COMBO OPERATIONS ------- #
+
+# test creating a fixed amount menu combo 
+def test_create_combo_fixed_amount(setup_restaurant_menu):
+    restaurant = setup_restaurant_menu["restaurant"]
+    token = setup_restaurant_menu["token"]
+    item1_id = setup_restaurant_menu["restaurant"]["menu"]["items"][0]["id"]
+    item2_id = setup_restaurant_menu["restaurant"]["menu"]["items"][1]["id"]
+
+    response = client.post(
+        f"/restaurant/{restaurant['id']}/menu/combo",
+        json={
+            "name": "Lunch Combo",
+            "discount": 2.0,
+            "type": "fixed_amount",
+            "item_ids": [item1_id, item2_id],
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 201
+    combo = response.json()
+    assert combo["name"] == "Lunch Combo"
+    assert combo["discount"] == 2.0
+    assert combo["type"] == "fixed_amount"
+
+# test creating a percentage menu combo
+def test_create_combo_percentage(setup_restaurant_menu):
+    restaurant = setup_restaurant_menu["restaurant"]
+    token = setup_restaurant_menu["token"]
+    item1_id = setup_restaurant_menu["restaurant"]["menu"]["items"][0]["id"]
+    item2_id = setup_restaurant_menu["restaurant"]["menu"]["items"][1]["id"]
+
+    response = client.post(
+        f"/restaurant/{restaurant['id']}/menu/combo",
+        json={
+            "name": "Lunch Combo",
+            "discount": 15.0,
+            "type": "percentage",
+            "item_ids": [item1_id, item2_id],
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 201
+    combo = response.json()
+    assert combo["name"] == "Lunch Combo"
+    assert combo["discount"] == 15.0
+    assert combo["type"] == "percentage"
+
+# test updating a menu combo
+def test_update_combo_same_type(setup_restaurant_menu):
+    restaurant = setup_restaurant_menu["restaurant"]
+    token = setup_restaurant_menu["token"]
+    item1_id = setup_restaurant_menu["restaurant"]["menu"]["items"][0]["id"]
+    item2_id = setup_restaurant_menu["restaurant"]["menu"]["items"][1]["id"]
+
+    created_combo = client.post(
+        f"/restaurant/{restaurant['id']}/menu/combo",
+        json={
+            "name": "Lunch Combo",
+            "discount": 15,
+            "type": "percentage",
+            "item_ids": [item1_id, item2_id],
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert created_combo.status_code == 201
+    combo_id = created_combo.json()["id"]
+
+    updated_combo = client.put(
+        f"/restaurant/{restaurant['id']}/menu/combo/{combo_id}",
+        json={
+            "id": combo_id,
+            "name": "Dinner Combo",
+            "discount": 20.0,
+            "type": "fixed_amount",
+            "item_ids": [item1_id, item2_id],
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert updated_combo.status_code == 200
+    body = updated_combo.json()
+    assert body["id"] == combo_id
+    assert body["name"] == "Dinner Combo"
+    assert body["discount"] == 20.0
+    assert body["type"] == "fixed_amount"
+
+# test updating a menu combo to a different type
+def test_update_combo_different_type(setup_restaurant_menu):
+    restaurant = setup_restaurant_menu["restaurant"]
+    token = setup_restaurant_menu["token"]
+    item1_id = setup_restaurant_menu["restaurant"]["menu"]["items"][0]["id"]
+    item2_id = setup_restaurant_menu["restaurant"]["menu"]["items"][1]["id"]
+
+    created_combo = client.post(
+        f"/restaurant/{restaurant['id']}/menu/combo",
+        json={
+            "name": "Lunch Combo",
+            "discount": 15,
+            "type": "percentage",
+            "item_ids": [item1_id, item2_id],
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert created_combo.status_code == 201
+    combo_id = created_combo.json()["id"]
+
+    updated_combo = client.put(
+        f"/restaurant/{restaurant['id']}/menu/combo/{combo_id}",
+        json={
+            "id": combo_id,
+            "name": "Dinner Combo",
+            "discount": 6.7,
+            "type": "fixed_amount",
+            "item_ids": [item1_id, item2_id],
+        },
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert updated_combo.status_code == 200
+    body = updated_combo.json()
+    assert body["id"] == combo_id
+    assert body["name"] == "Dinner Combo"
+    assert body["discount"] == 6.7
+    assert body["type"] == "fixed_amount"
