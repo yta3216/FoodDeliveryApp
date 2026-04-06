@@ -362,7 +362,7 @@ def get_favourites(current_user: Customer) -> list:
         if user.get("id") == current_user.id:
             favourite_ids = user.get("favourites", [])
             restaurants = load_restaurants()
-            return [r for r in restaurants if r.get("restaurant_id") in favourite_ids]
+            return [r for r in restaurants if r.get("id") in favourite_ids]
     raise HTTPException(status_code=404, detail=f"User '{current_user.id}' not found")
 
 
@@ -383,7 +383,7 @@ def add_favourite(restaurant_id: int, current_user: Customer) -> list[int]:
     """
     from app.repositories.restaurant_repo import load_restaurants
     restaurants = load_restaurants()
-    if not any(r.get("restaurant_id") == restaurant_id for r in restaurants):
+    if not any(r.get("id") == restaurant_id for r in restaurants):
         raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
 
     users = load_users()
