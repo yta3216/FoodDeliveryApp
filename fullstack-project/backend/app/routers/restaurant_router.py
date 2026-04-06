@@ -9,6 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.schemas.user_schema import User, UserRole
 from app.schemas.restaurant_schema import (
+    Combo,
+    Combo_Create,
     Restaurant,
     Restaurant_Create,
     Restaurant_Details_Update,
@@ -24,8 +26,10 @@ from app.schemas.restaurant_schema import (
 
 from app.auth import require_role
 from app.services.restaurant_service import (
+    create_combo,
     create_restaurant,
     search_restaurants,
+    update_combo,
     update_restaurant_details,
     update_restaurant_managers,
     create_menu_item,
@@ -224,3 +228,45 @@ def update_menu_item_route(restaurant_id: int, menu_item_id: int, payload: MenuI
     if menu_item_id != payload.id:
         raise HTTPException(status_code=400, detail="Menu item ID in path and body must match")
     return update_menu_item(restaurant_id, payload)
+
+@router.post("/{restaurant_id}/menu/combo", response_model=Combo, status_code=201, dependencies=[Depends(check_manager)])
+def create_combo_route(restaurant_id: int, payload: Combo_Create):
+    """
+    **Creates a new combo to add to restaurant's menu. Must be one of the restaurant managers to use.**
+
+    Parameters:
+    *   **restaurant_id** (int): the identifier of the restaurant associated with the new item
+    *   **payload** (Combo_Create): the new combo details
+
+    Returns:
+    *   **Combo**: the newly created combo
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not "manager" or user is not a manager of the provided restaurant
+    *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
+    """
+    return create_combo(restaurant_id, payload)
+
+@router.put("/{restaurant_id}/menu/combo/{combo_item_id}", response_model=Combo, dependencies=[Depends(check_manager)])
+def update_combo_route(restaurant_id: int, combo_item_id: int, payload: Combo_Create):
+    """
+    **Updates a combo in the restaurant's menu. Must be one of the restaurant managers to use.**
+
+    Parameters:
+    *   **restaurant_id** (int): the identifier of the restaurant to receive the updates
+    *   **combo_item_id** (int): the identifier of the combo to be updated
+    *   **payload** (Combo_Create): the updated combo details
+
+    Returns:
+    *   **Combo**: the updated combo
+
+    Raises:
+    *   **HTTPException** (status_code = 400): restaurant_id in payload and URL do not match
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not "manager" or user is not a manager of the provided restaurant
+    *   **HTTPException** (status_code = 404): restaurant_id not found in restaurants.json
+    """
+    if combo_item_id != payload.id:
+        raise HTTPException(status_code=400, detail="Combo item ID in path and body must match")
+    return update_combo(restaurant_id, payload)

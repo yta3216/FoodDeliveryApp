@@ -4,6 +4,7 @@ This includes the menu details as well.
 
 Any updates to the restaurant details should follow this schema.
 """
+from enum import Enum
 import re
 from pydantic import BaseModel, Field, field_validator
 
@@ -13,6 +14,17 @@ _STREET_RE = re.compile(r"^\d+\s+\S+",re.UNICODE)  # Allows letters, numbers, sp
 _POSTAL_CODE_RE = re.compile(r"^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$") # Canadian postal code format
 
 PROVINCES = {"AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"}
+
+class ComboType(str, Enum):
+    """
+    **Enumeration of supported combo types.**
+
+    Attributes:
+    *   **FIXED_AMOUNT**: deducts a fixed dollar amount from the order total
+    *   **PERCENTAGE**: deducts a percentage of the subtotal
+    """
+    FIXED_AMOUNT = "fixed_amount"
+    PERCENTAGE = "percentage"
 
 class Address(BaseModel):
     """
@@ -90,14 +102,121 @@ class MenuItem(BaseModel):
     price: float
     tags: list[str] = Field(default_factory=list)
 
+class Combo(BaseModel):
+    """
+    **Defines the attributes of a generic combo.**
+
+    Attributes:
+    *   **id** (int): the identifier of the combo
+    *   **name** (str): the name of the combo
+    *   **price** (float): the price of the combo
+    *   **type** (ComboType): the type of the combo
+    *   **item_ids** (list[int]): list of menu item ids that make up this combo
+    """
+    id: int
+    name: str
+    price: float
+    type: ComboType
+    item_ids: list[int] = Field(default_factory=list)
+
 class Menu(BaseModel):
     """
     **Defines the attributes of a menu object.**
 
     Attributes:
     *   **items** (list[MenuItem]): a list of the items in this menu
+    *   **combos** (list[Combo]): a list of the combos in this menu
     """
     items: list[MenuItem] = []
+    combos: list[Combo] = []
+
+class Combo_Create(BaseModel):
+    """
+    **Defines the attributes required to create a combo.**
+
+    Attributes:
+    *   **name** (str): the name of the combo
+    *   **discount** (float): the discount for the combo
+    *   **type** (ComboType): the type of the combo
+    *   **item_ids** (list[int]): list of menu item ids that make up this combo
+    """
+    name: str
+    discount: float
+    type: ComboType
+    item_ids: list[int] = Field(default_factory=list)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Combo name cannot be empty")
+        if len(v) > 100:
+            raise ValueError("Combo name cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("Combo name contains invalid characters")
+        return v
+    
+    @field_validator("discount")
+    @classmethod
+    def validate_discount(cls,v:float) -> float:
+        if v < 0:
+            raise ValueError("Combo discount must be greater than 0")
+        if v > 1:
+            raise ValueError("Combo price cannot exceed 1000")
+        return round(v,2)
+    
+    @field_validator("item_ids")
+    @classmethod
+    def validate_item_ids(cls, v: list[int]) -> list[int]:
+        if not v:
+            raise ValueError("Combo must include at least one menu item")
+        return v
+    
+class Combo_Update(BaseModel):
+    """
+    **Defines the attributes required to update a combo.**
+
+    Attributes:
+    *   **id** (int): the identifier of the combo to be updated
+    *   **name** (str): the name of the combo
+    *   **price** (float): the price of the combo
+    *   **type** (ComboType): the type of the combo
+    *   **item_ids** (list[int]): list of menu item ids that make up this combo
+    """
+    id: int
+    name: str
+    price: float
+    type: ComboType
+    item_ids: list[int] = Field(default_factory=list)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls,v:str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Combo name cannot be empty")
+        if len(v) > 100:
+            raise ValueError("Combo name cannot be longer than 100 characters")
+        if not _NAME_RE.match(v):
+            raise ValueError("Combo name contains invalid characters")
+        return v
+
+    @field_validator("price")
+    @classmethod
+    def validate_price(cls,v:float) -> float:
+        if v < 0:
+            raise ValueError("Combo price must be greater than 0")
+        if v > 1000:
+            raise ValueError("Combo price cannot exceed 1000")
+        return round(v,2)
+    
+    @field_validator("item_ids")
+    @classmethod
+    def validate_item_ids(cls, v: list[int]) -> list[int]:
+        if not v:
+            raise ValueError("Combo must include at least one menu item")
+        return v
 
 class MenuItem_Create(BaseModel):
     """
@@ -233,8 +352,10 @@ class Menu_Create(BaseModel):
 
     Attributes:
     *   **items** (list[MenuItem_Create]): list of menu items that will comprise the restaurant's new menu
+    *   **combos** (list[Combo_Create]): list of combos that will comprise the restaurant's new menu
     """
     items: list[MenuItem_Create] = []
+    combos: list[Combo_Create] = []
 
 class Restaurant(BaseModel):
     """
