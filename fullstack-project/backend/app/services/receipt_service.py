@@ -10,12 +10,32 @@ from fastapi import HTTPException
 
 from app.schemas.user_schema import Customer
 from app.schemas.receipt_schema import Receipt, ReceiptItem
+from app.schemas.restaurant_schema import Combo, ComboType, MenuItem
 from app.repositories.receipt_repo import load_receipts, save_receipts
 from app.services.cart_service import get_cart
 from app.services.restaurant_service import get_restaurant_by_id
 from app.services.config_service import get_tax_rate
 from app.services.promo_service import validate_promo, calculate_discount
 
+
+def _calculate_combo_discount(cart_item_qty: dict[int, int], combos: list[Combo], menu_items: dict[int, MenuItem]) -> float:
+    """
+    Calculates the highest single applicable combo discount for the current cart.
+    Only one combo can be applied per receipt.
+    """
+    if not combos:
+        return 0.0
+
+    best_discount = 0.0
+    for combo in combos:
+        if combo.type == ComboType.PERCENTAGE:
+            combo_price = sum(menu_items[item_id].price * qty for item_id, qty in cart_item_qty.items() if item_id in combo.item_ids)
+            discount_amount = combo_price * (combo.discount / 100)
+            best_discount = max(best_discount, discount_amount)
+        elif combo.type == ComboType.FIXED_AMOUNT:
+            best_discount = max(best_discount, combo.discount)
+
+    return round(best_discount, 2)
 
 def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
     """
@@ -39,6 +59,7 @@ def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
 
     restaurant = get_restaurant_by_id(cart.restaurant_id)
     menu_items = {item.id: item for item in restaurant.menu.items}
+    cart_items = {item.menu_item_id: item.qty for item in cart.cart_items}
 
     receipt_items = []
     subtotal = 0.0
@@ -58,14 +79,17 @@ def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
             ))
 
     subtotal = round(subtotal, 2)
+    combo_discount = _calculate_combo_discount(cart_items, restaurant.menu.combos, menu_items)
+    promo_subtotal = round(max(0.0, subtotal - combo_discount), 2)
     tax = round(get_tax_rate() * subtotal, 2)
     delivery_fee = restaurant.delivery_fee
-    discount = 0.0
+    discount = combo_discount
     applied_promo_code = None
 
     if cart.promo_code:
-        promo = validate_promo(cart.promo_code, subtotal, current_user)
-        delivery_fee, discount = calculate_discount(promo, subtotal, delivery_fee)
+        promo = validate_promo(cart.promo_code, promo_subtotal, current_user)
+        delivery_fee, promo_discount = calculate_discount(promo, promo_subtotal, delivery_fee)
+        discount = round(discount + promo_discount, 2)
         applied_promo_code = promo.code
         
     total = round(subtotal + tax + delivery_fee - discount, 2)
@@ -91,7 +115,6 @@ def create_receipt(current_user: Customer, distance_km: float = 0.0) -> Receipt:
     save_receipts(receipts)
 
     return new_receipt
-
 
 def get_receipt(receipt_id: int) -> Receipt:
     """

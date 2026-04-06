@@ -11,6 +11,7 @@ from app.schemas.user_schema import User, UserRole
 from app.schemas.restaurant_schema import (
     Combo,
     Combo_Create,
+    Combo_Update,
     Restaurant,
     Restaurant_Create,
     Restaurant_Details_Update,
@@ -249,14 +250,14 @@ def create_combo_route(restaurant_id: int, payload: Combo_Create):
     return create_combo(restaurant_id, payload)
 
 @router.put("/{restaurant_id}/menu/combo/{combo_item_id}", response_model=Combo, dependencies=[Depends(check_manager)])
-def update_combo_route(restaurant_id: int, combo_item_id: int, payload: Combo_Create):
+def update_combo_route(restaurant_id: int, combo_item_id: int, payload: Combo_Update):
     """
     **Updates a combo in the restaurant's menu. Must be one of the restaurant managers to use.**
 
     Parameters:
     *   **restaurant_id** (int): the identifier of the restaurant to receive the updates
     *   **combo_item_id** (int): the identifier of the combo to be updated
-    *   **payload** (Combo_Create): the updated combo details
+    *   **payload** (Combo_Update): the updated combo details
 
     Returns:
     *   **Combo**: the updated combo

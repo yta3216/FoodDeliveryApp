@@ -6,7 +6,7 @@ Any updates to the restaurant details should follow this schema.
 """
 from enum import Enum
 import re
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 # Helpers for address input contraints
 _NAME_RE = re.compile(r"^[\w\s\-',\.&]+$",re.UNICODE)  # Allows letters, numbers, spaces, and common punctuation
@@ -109,13 +109,13 @@ class Combo(BaseModel):
     Attributes:
     *   **id** (int): the identifier of the combo
     *   **name** (str): the name of the combo
-    *   **price** (float): the price of the combo
+    *   **discount** (float): the combo discount value
     *   **type** (ComboType): the type of the combo
     *   **item_ids** (list[int]): list of menu item ids that make up this combo
     """
     id: int
     name: str
-    price: float
+    discount: float
     type: ComboType
     item_ids: list[int] = Field(default_factory=list)
 
@@ -161,10 +161,16 @@ class Combo_Create(BaseModel):
     @classmethod
     def validate_discount(cls,v:float) -> float:
         if v < 0:
-            raise ValueError("Combo discount must be greater than 0")
-        if v > 1:
-            raise ValueError("Combo price cannot exceed 1000")
+            raise ValueError("Combo discount must be greater than or equal to 0")
         return round(v,2)
+
+    @model_validator(mode="after")
+    def validate_discount_by_type(self):
+        if self.type == ComboType.PERCENTAGE and self.discount > 100:
+            raise ValueError("Combo percentage discount cannot exceed 100")
+        if self.type == ComboType.FIXED_AMOUNT and self.discount > 1000:
+            raise ValueError("Combo fixed discount cannot exceed 1000")
+        return self
     
     @field_validator("item_ids")
     @classmethod
@@ -180,13 +186,13 @@ class Combo_Update(BaseModel):
     Attributes:
     *   **id** (int): the identifier of the combo to be updated
     *   **name** (str): the name of the combo
-    *   **price** (float): the price of the combo
+    *   **discount** (float): the combo discount value
     *   **type** (ComboType): the type of the combo
     *   **item_ids** (list[int]): list of menu item ids that make up this combo
     """
     id: int
     name: str
-    price: float
+    discount: float
     type: ComboType
     item_ids: list[int] = Field(default_factory=list)
 
@@ -202,14 +208,20 @@ class Combo_Update(BaseModel):
             raise ValueError("Combo name contains invalid characters")
         return v
 
-    @field_validator("price")
+    @field_validator("discount")
     @classmethod
-    def validate_price(cls,v:float) -> float:
+    def validate_discount(cls,v:float) -> float:
         if v < 0:
-            raise ValueError("Combo price must be greater than 0")
-        if v > 1000:
-            raise ValueError("Combo price cannot exceed 1000")
+            raise ValueError("Combo discount must be greater than or equal to 0")
         return round(v,2)
+
+    @model_validator(mode="after")
+    def validate_discount_by_type(self):
+        if self.type == ComboType.PERCENTAGE and self.discount > 100:
+            raise ValueError("Combo percentage discount cannot exceed 100")
+        if self.type == ComboType.FIXED_AMOUNT and self.discount > 1000:
+            raise ValueError("Combo fixed discount cannot exceed 1000")
+        return self
     
     @field_validator("item_ids")
     @classmethod
