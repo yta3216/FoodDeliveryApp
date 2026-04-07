@@ -114,8 +114,8 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
             "name": combo.name.strip(),
             "type": combo.type,
             "discount": combo.discount,
-            "item_ids": combo.item_ids,
-            "is_active": combo.is_active
+            "is_active": combo.is_active,
+            "item_ids": combo.item_ids
         })
 
     new_restaurant = {
@@ -376,8 +376,8 @@ def create_combo(restaurant_id: int, payload: Combo_Create) -> Combo:
                 "name": payload.name.strip(),
                 "type": payload.type,
                 "discount": payload.discount,
-                "item_ids": payload.item_ids,
-                "is_active": payload.is_active
+                "is_active": payload.is_active,
+                "item_ids": payload.item_ids
             }
             combos.append(new_combo)
             save_restaurants(restaurants)
