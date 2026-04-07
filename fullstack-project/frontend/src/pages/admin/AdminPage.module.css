@@ -1,0 +1,91 @@
+.page { padding-bottom: 80px; }
+.header { margin-bottom: 24px; padding-top: 8px; }
+.header h1 { font-size: 1.8rem; margin-bottom: 4px; }
+.sub { color: var(--text2); font-size: 0.9rem; }
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.stat {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--accent2);
+}
+.stat > div { display: flex; flex-direction: column; gap: 2px; }
+.statNum { font-size: 1.5rem; font-weight: 800; font-family: var(--font-display); color: var(--text); line-height: 1; }
+.stat label { font-size: 0.78rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.tab {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 18px;
+  background: none; border: none;
+  color: var(--text2);
+  font-size: 0.88rem; font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all var(--transition);
+}
+.tab:hover { color: var(--text); }
+.tabActive { color: var(--text) !important; border-bottom-color: var(--accent) !important; }
+
+.tabContent { }
+
+.table {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.tableHead {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  padding: 12px 18px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg3);
+}
+.tableRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  padding: 13px 18px;
+  align-items: center;
+  font-size: 0.88rem;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+.tableRow:last-child { border-bottom: none; }
+.tableRow:hover { background: var(--bg3); }
+.restaurantName { font-weight: 600; }
+
+.configCard {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 460px;
+}
+.configCard h2 { font-size: 1.1rem; margin-bottom: 8px; }
+.configCard p { font-size: 0.88rem; color: var(--text2); line-height: 1.6; margin-bottom: 20px; }
+.configForm { display: flex; flex-direction: column; gap: 14px; }
+
+@media (max-width: 768px) {
+  .tableHead { display: none; }
+  .tableRow { grid-template-columns: 1fr; gap: 6px; }
+}

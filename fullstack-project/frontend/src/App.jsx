@@ -1,0 +1,54 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/layout/ProtectedRoute';
+import Navbar from './components/layout/Navbar';
+
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import CustomerHomePage from './pages/customer/CustomerHomePage';
+import RestaurantPage from './pages/customer/RestaurantPage';
+import CartPage from './pages/customer/CartPage';
+import OrderHistoryPage from './pages/customer/OrderHistoryPage';
+import ManagerDashboard from './pages/manager/ManagerDashboard';
+import ManagerOrdersPage from './pages/manager/ManagerOrdersPage';
+import DriverDashboard from './pages/driver/DriverDashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import ProfilePage from './pages/ProfilePage';
+import NotificationsPage from './pages/NotificationsPage';
+
+function Layout({ children }) {
+  return <><Navbar />{children}</>;
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<><Navbar /><LoginPage /></>} />
+          <Route path="/register" element={<><Navbar /><RegisterPage /></>} />
+          <Route path="/forgot-password" element={<><Navbar /><ForgotPasswordPage /></>} />
+
+          <Route path="/home" element={<ProtectedRoute roles={['customer']}><Layout><CustomerHomePage /></Layout></ProtectedRoute>} />
+          <Route path="/restaurant/:id" element={<ProtectedRoute roles={['customer']}><Layout><RestaurantPage /></Layout></ProtectedRoute>} />
+          <Route path="/cart" element={<ProtectedRoute roles={['customer']}><Layout><CartPage /></Layout></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute roles={['customer']}><Layout><OrderHistoryPage /></Layout></ProtectedRoute>} />
+
+          <Route path="/manager" element={<ProtectedRoute roles={['manager']}><Layout><ManagerDashboard /></Layout></ProtectedRoute>} />
+          <Route path="/manager/orders" element={<ProtectedRoute roles={['manager']}><Layout><ManagerOrdersPage /></Layout></ProtectedRoute>} />
+
+          <Route path="/driver" element={<ProtectedRoute roles={['driver']}><Layout><DriverDashboard /></Layout></ProtectedRoute>} />
+
+          <Route path="/admin" element={<ProtectedRoute roles={['admin']}><Layout><AdminDashboard /></Layout></ProtectedRoute>} />
+
+          <Route path="/profile" element={<ProtectedRoute><Layout><ProfilePage /></Layout></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><Layout><NotificationsPage /></Layout></ProtectedRoute>} />
+
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}

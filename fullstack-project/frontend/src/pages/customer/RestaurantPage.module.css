@@ -1,0 +1,159 @@
+.page { padding-bottom: 80px; }
+
+.header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 32px 0;
+  margin-bottom: 36px;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.restaurantEmoji {
+  font-size: 3.5rem;
+  width: 80px; height: 80px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.restaurantInfo { flex: 1; }
+.restaurantInfo h1 { font-size: 1.8rem; margin-bottom: 8px; }
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--text2);
+}
+.meta span { display: flex; align-items: center; gap: 5px; }
+
+.menuSection { }
+.menuTitle {
+  font-size: 1.3rem;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.menuTitle span { font-size: 0.9rem; color: var(--text3); font-weight: 400; font-family: var(--font-body); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.menuCard {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: all var(--transition);
+  animation: fadeUp 0.35s ease both;
+}
+.menuCard:hover {
+  border-color: var(--surface2);
+  background: var(--bg3);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.menuCardTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.menuEmoji {
+  font-size: 1.8rem;
+  width: 48px; height: 48px;
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.menuInfo { flex: 1; }
+.menuInfo h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--surface);
+  color: var(--text3);
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 100px;
+  text-transform: capitalize;
+}
+
+.price {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent2);
+  flex-shrink: 0;
+  font-family: var(--font-display);
+}
+
+.menuCardActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.qtyControl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+}
+.qtyControl button {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none;
+  color: var(--text2);
+  border-radius: 4px;
+  transition: all var(--transition);
+}
+.qtyControl button:hover:not(:disabled) { background: var(--surface); color: var(--text); }
+.qtyControl button:disabled { opacity: 0.3; cursor: not-allowed; }
+.qtyControl span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .headerContent { flex-direction: column; align-items: flex-start; }
+}
