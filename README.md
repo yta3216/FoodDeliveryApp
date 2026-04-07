@@ -26,6 +26,7 @@ Terminal 2 (runs the frontend):
    2. From the frontend directory, run the following commands:
       * *npm install*
       * *npm run dev*
+
 Go to http://localhost:5173 to view the webpage.
 
 ### Option 2: Using Docker (from terminal)
