@@ -6,7 +6,7 @@ from app.main import app
 from app.schemas.user_schema import UserRole, Customer
 from app.repositories.user_repo import load_users
 from app.services.restaurant_service import get_restaurant_by_id
-from testing.test_restaurant_crud import setup_restaurant, VALID_RESTAURANT_ADDRESS
+from testing.test_restaurant_crud import setup_restaurant, setup_restaurant_menu, VALID_RESTAURANT_ADDRESS
 
 client = TestClient(app)
 
@@ -70,36 +70,6 @@ def manager_with_token():
     return {
         "customer": test_manager.json,
         "token": login_response.json()["token"]
-    }
-
-# create a restaurant with menu to add menu items from
-@pytest.fixture
-def setup_restaurant_menu(setup_restaurant):
-    restaurant = setup_restaurant["restaurant"]
-    token = setup_restaurant["token"]
-
-    # Create new menu items
-    client.post(
-        f"/restaurant/{restaurant['id']}/menu",
-        json={
-            "name": "Test Menu Item 1",
-            "price": 9.99,
-            "tags": ["test"]
-        },
-        headers={"Authorization": f"Bearer {token}"}
-    )
-    client.post(
-        f"/restaurant/{restaurant['id']}/menu",
-        json={
-            "name": "Test Menu Item 2",
-            "price": 10.99,
-            "tags": ["test"]
-        },
-        headers={"Authorization": f"Bearer {token}"}
-    )
-    return {
-        "restaurant": get_restaurant_by_id(restaurant['id']).model_dump(),
-        "token": token
     }
 
 # a customer with two items in their cart

@@ -68,6 +68,31 @@
             "drink"
           ]
         }
+      ],
+      "combos": [
+        {
+          "id": 1,
+          "name": "Pizza + Cola",
+          "discount": 2.0,
+          "type": "fixed_amount",
+          "is_active": true,
+          "item_ids": [
+            1,
+            6
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Pizza Party",
+          "discount": 10.0,
+          "type": "percentage",
+          "is_active": true,
+          "item_ids": [
+            2,
+            4,
+            6
+          ]
+        }
       ]
     }
   },
@@ -136,6 +161,31 @@
           "price": 1.99,
           "tags": [
             "drink"
+          ]
+        }
+      ],
+      "combos": [
+        {
+          "id": 1,
+          "name": "Roll + Tea",
+          "discount": 1.5,
+          "type": "fixed_amount",
+          "is_active": true,
+          "item_ids": [
+            1,
+            6
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Lunch Set",
+          "discount": 12.0,
+          "type": "percentage",
+          "is_active": true,
+          "item_ids": [
+            2,
+            4,
+            5
           ]
         }
       ]
@@ -210,6 +260,31 @@
           "price": 4.49,
           "tags": [
             "drink"
+          ]
+        }
+      ],
+      "combos": [
+        {
+          "id": 1,
+          "name": "Steak Dinner",
+          "discount": 5.0,
+          "type": "fixed_amount",
+          "is_active": true,
+          "item_ids": [
+            2,
+            6
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Grill Combo",
+          "discount": 8.0,
+          "type": "percentage",
+          "is_active": true,
+          "item_ids": [
+            1,
+            4,
+            6
           ]
         }
       ]

@@ -5,8 +5,8 @@ import pytest
 from app.main import app
 from app.schemas.user_schema import UserRole
 from app.auth import get_user_from_token
-from testing.test_cart_management import customer_with_cart_and_token, customer_with_token, setup_restaurant_menu, manager_with_token
-from testing.test_restaurant_crud import setup_restaurant
+from testing.test_cart_management import customer_with_cart_and_token, customer_with_token, manager_with_token
+from testing.test_restaurant_crud import setup_restaurant, setup_restaurant_menu
 
 client = TestClient(app)
 

@@ -2,6 +2,9 @@
 
 from fastapi import Depends, HTTPException
 from app.schemas.restaurant_schema import (
+    Combo,
+    Combo_Create,
+    Combo_Update,
     Restaurant, 
     Restaurant_Create, 
     Restaurant_Details_Update, 
@@ -43,6 +46,25 @@ def _calculate_average_price(restaurant: dict) -> float:
     total_price = sum(item.get("price", 0) for item in items)
     return total_price / len(items)
 
+def _validate_combo_item_ids(restaurant: dict, item_ids: list[int]) -> None:
+    """
+    Validates that all combo item ids exist in this restaurant's menu.
+
+    Parameters:
+        restaurant (dict): the restaurant whose menu is being validated against
+        item_ids (list[int]): the list of menu item ids to be validated
+
+    Raises:
+        HTTPException (status_code = 400): if any item id in item_ids is not found in restaurant's menu items. Returns a sorted list of offending ids.
+    """
+    valid_item_ids = {item.get("id") for item in restaurant.get("menu", {}).get("items", [])}
+    invalid = sorted({item_id for item_id in item_ids if item_id not in valid_item_ids})
+    if invalid:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Combo contains unknown menu item ids: {invalid}"
+        )
+
 def get_new_id(restaurants) -> int:
     """
     Generates the next available id for the next restaurant to be created based on the given list of restaurants.
@@ -73,6 +95,29 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
     restaurants = load_restaurants()
     new_id = get_new_id(restaurants)
 
+    menu_items = [{
+        "id": idx + 1, **item.model_dump()}
+        for idx, item in enumerate(payload.menu.items)
+    ]
+
+    menu_item_ids = {item["id"] for item in menu_items}
+    combos: list[dict] = []
+    for idx, combo in enumerate(payload.menu.combos):
+        invalid = sorted({item_id for item_id in combo.item_ids if item_id not in menu_item_ids})
+        if invalid:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Combo contains unknown menu item ids: {invalid}"
+            )
+        combos.append({
+            "id": idx + 1,
+            "name": combo.name.strip(),
+            "type": combo.type,
+            "discount": combo.discount,
+            "is_active": combo.is_active,
+            "item_ids": combo.item_ids
+        })
+
     new_restaurant = {
         "id": new_id,
         "name": payload.name,
@@ -81,10 +126,10 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
         "manager_ids": [manager_id],
         "max_delivery_radius_km": payload.max_delivery_radius_km,
         "delivery_fee": payload.delivery_fee,
-        "menu": {"items": [{
-            "id": idx + 1, **item.model_dump()}
-            for idx, item in enumerate(payload.menu.items)
-        ]}
+        "menu": {
+            "items": menu_items,
+            "combos": combos,
+        }
     }
     restaurants.append(new_restaurant)
     save_restaurants(restaurants)
@@ -306,6 +351,66 @@ def bulk_menu_item_update(restaurant_id: int, payload: MenuItem_Bulk_Update) -> 
                     raise HTTPException(status_code=404, detail=f"Menu item '{item_payload.id}' not found in restaurant '{restaurant_id}'")
             save_restaurants(restaurants)
             return updated_items
+    raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
+
+def create_combo(restaurant_id: int, payload: Combo_Create) -> Combo:
+    """
+    Creates a new combo and adds it to the provided restaurant's menu.
+
+    Parameters:
+        restaurant_id (int): the identifier of the restaurant to receive this new
+        payload (Combo_Create): the details of the combo to be created
+    Returns:
+        Combo: the newly created combo
+    Raises:
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json
+    """
+    restaurants = load_restaurants()
+    for restaurant in restaurants:
+        if restaurant.get("id") == restaurant_id:
+            _validate_combo_item_ids(restaurant, payload.item_ids)
+            combos = restaurant["menu"]["combos"]
+            new_combo_id = max((combo.get("id", 0) for combo in combos), default=0) + 1
+            new_combo = {
+                "id": new_combo_id,
+                "name": payload.name.strip(),
+                "type": payload.type,
+                "discount": payload.discount,
+                "is_active": payload.is_active,
+                "item_ids": payload.item_ids
+            }
+            combos.append(new_combo)
+            save_restaurants(restaurants)
+            return Combo(**new_combo)
+    raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
+
+def update_combo(restaurant_id: int, payload: Combo_Update) -> Combo:
+    """
+    Updates an existing combo in the provided restaurant's menu.
+
+    Parameters:
+        restaurant_id (int): the identifier of the restaurant containing the combo to be updated
+        payload (Combo_Update): the details of the combo and associated updates
+    Returns:
+        Combo: the newly updated combo
+    Raises:
+        HTTPException (status_code = 404): restaurant_id not found in restaurants.json or combo not found in restaurant
+    """
+    restaurants = load_restaurants()
+    for restaurant in restaurants:
+        if restaurant.get("id") == restaurant_id:
+            _validate_combo_item_ids(restaurant, payload.item_ids)
+            combos = restaurant["menu"]["combos"]
+            for combo in combos:
+                if combo.get("id") == payload.id:
+                    combo["name"] = payload.name.strip()
+                    combo["type"] = payload.type
+                    combo["discount"] = payload.discount
+                    combo["item_ids"] = payload.item_ids
+                    combo["is_active"] = payload.is_active
+                    save_restaurants(restaurants)
+                    return Combo(**combo)
+            raise HTTPException(status_code=404, detail=f"Combo '{payload.id}' not found in restaurant '{restaurant_id}'")
     raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
 
 def get_restaurant_by_id(restaurant_id: int) -> Restaurant:

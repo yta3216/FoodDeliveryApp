@@ -6,8 +6,8 @@ from app.main import app
 from app.schemas.user_schema import UserRole
 from app.services.user_service import get_customer
 from app.services.restaurant_service import get_restaurant_by_id
-from testing.test_restaurant_crud import setup_restaurant
-from testing.test_cart_management import customer_with_cart_and_token, customer_with_token, setup_restaurant_menu
+from testing.test_restaurant_crud import setup_restaurant, setup_restaurant_menu
+from testing.test_cart_management import customer_with_cart_and_token, customer_with_token
 
 client = TestClient(app)
 
