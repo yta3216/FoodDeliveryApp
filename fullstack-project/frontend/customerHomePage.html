@@ -38,5 +38,22 @@
     <!-- empty state if no restaurants -->
   </div>
 
+    <!-- ─── Favourites Section ──────────────────────────────────── -->
+  <!--
+    GET /user/me/favourites   → load customer's favourited restaurants
+    renders a horizontal scrollable row of favourite restaurant cards
+    above the main restaurant list for quick access
+    each card: name, address, details
+    clicking a card goes to restaurantPage.html with that restaurant pre-selected
+    only shown if the customer has at least one favourite
+    "favourite" toggle button on each restaurant card in the main list below:
+      POST   /user/me/favourites/{restaurant_id}  → add to favourites
+      DELETE /user/me/favourites/{restaurant_id}  → remove from favourites
+  -->
+  <div id="favourites-section">
+    <!-- favourite restaurant cards injected here via JS -->
+    <!-- hidden if favourites list is empty -->
+  </div>
+
 </body>
 </html>

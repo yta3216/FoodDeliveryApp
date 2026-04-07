@@ -342,3 +342,85 @@ def get_customer(customer: Customer = Depends(require_role(UserRole.CUSTOMER))) 
         HTTPException (status_code = 403): if user's role does not match the requested role
     """
     return customer
+
+def get_favourites(current_user: Customer) -> list:
+    """
+    Returns the full restaurant objects for all of a customer's favourited restaurants.
+
+    Parameters:
+        current_user (Customer): the authenticated customer
+
+    Returns:
+        list: the list of favourited restaurant objects
+
+    Raises:
+        HTTPException (status_code = 404): if current_user id not found in users.json
+    """
+    from app.repositories.restaurant_repo import load_restaurants
+    users = load_users()
+    for user in users:
+        if user.get("id") == current_user.id:
+            favourite_ids = user.get("favourites", [])
+            restaurants = load_restaurants()
+            return [r for r in restaurants if r.get("id") in favourite_ids]
+    raise HTTPException(status_code=404, detail=f"User '{current_user.id}' not found")
+
+
+def add_favourite(restaurant_id: int, current_user: Customer) -> list[int]:
+    """
+    Adds a restaurant to the customer's favourites list.
+
+    Parameters:
+        restaurant_id (int): the id of the restaurant to favourite
+        current_user (Customer): the authenticated customer
+
+    Returns:
+        list[int]: the updated favourites list
+
+    Raises:
+        HTTPException (status_code = 404): if restaurant_id not found or user not found
+        HTTPException (status_code = 409): if restaurant is already in favourites
+    """
+    from app.repositories.restaurant_repo import load_restaurants
+    restaurants = load_restaurants()
+    if not any(r.get("id") == restaurant_id for r in restaurants):
+        raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not found")
+
+    users = load_users()
+    for user in users:
+        if user.get("id") == current_user.id:
+            favourites = user.get("favourites", [])
+            if restaurant_id in favourites:
+                raise HTTPException(status_code=409, detail=f"Restaurant '{restaurant_id}' is already in favourites")
+            favourites.append(restaurant_id)
+            user["favourites"] = favourites
+            save_users(users)
+            return favourites
+    raise HTTPException(status_code=404, detail=f"User '{current_user.id}' not found")
+
+
+def remove_favourite(restaurant_id: int, current_user: Customer) -> list[int]:
+    """
+    Removes a restaurant from the customer's favourites list.
+
+    Parameters:
+        restaurant_id (int): the id of the restaurant to unfavourite
+        current_user (Customer): the authenticated customer
+
+    Returns:
+        list[int]: the updated favourites list
+
+    Raises:
+        HTTPException (status_code = 404): if restaurant is not in favourites or user not found
+    """
+    users = load_users()
+    for user in users:
+        if user.get("id") == current_user.id:
+            favourites = user.get("favourites", [])
+            if restaurant_id not in favourites:
+                raise HTTPException(status_code=404, detail=f"Restaurant '{restaurant_id}' not in favourites")
+            favourites.remove(restaurant_id)
+            user["favourites"] = favourites
+            save_users(users)
+            return favourites
+    raise HTTPException(status_code=404, detail=f"User '{current_user.id}' not found")

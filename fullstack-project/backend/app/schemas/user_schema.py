@@ -62,6 +62,7 @@ class Customer(User):
     role: UserRole = UserRole.CUSTOMER
     wallet_balance: float = 0.0
     cart: Cart = Cart()
+    favourites: list[int] = []
 
 class RestaurantManager(User):
     """
