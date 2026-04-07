@@ -114,7 +114,8 @@ def create_restaurant(payload: Restaurant_Create, manager_id: str) -> Restaurant
             "name": combo.name.strip(),
             "type": combo.type,
             "discount": combo.discount,
-            "item_ids": combo.item_ids
+            "item_ids": combo.item_ids,
+            "is_active": combo.is_active
         })
 
     new_restaurant = {
@@ -375,7 +376,8 @@ def create_combo(restaurant_id: int, payload: Combo_Create) -> Combo:
                 "name": payload.name.strip(),
                 "type": payload.type,
                 "discount": payload.discount,
-                "item_ids": payload.item_ids
+                "item_ids": payload.item_ids,
+                "is_active": payload.is_active
             }
             combos.append(new_combo)
             save_restaurants(restaurants)
@@ -405,6 +407,7 @@ def update_combo(restaurant_id: int, payload: Combo_Update) -> Combo:
                     combo["type"] = payload.type
                     combo["discount"] = payload.discount
                     combo["item_ids"] = payload.item_ids
+                    combo["is_active"] = payload.is_active
                     save_restaurants(restaurants)
                     return Combo(**combo)
             raise HTTPException(status_code=404, detail=f"Combo '{payload.id}' not found in restaurant '{restaurant_id}'")

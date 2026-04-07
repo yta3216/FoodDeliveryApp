@@ -28,6 +28,8 @@ def _calculate_combo_discount(cart_item_qty: dict[int, int], combos: list[Combo]
 
     best_discount = 0.0
     for combo in combos:
+        if not combo.is_active:
+            continue
         if combo.type == ComboType.PERCENTAGE:
             combo_price = sum(menu_items[item_id].price * qty for item_id, qty in cart_item_qty.items() if item_id in combo.item_ids)
             discount_amount = combo_price * (combo.discount / 100)

@@ -112,12 +112,14 @@ class Combo(BaseModel):
     *   **discount** (float): the combo discount value
     *   **type** (ComboType): the type of the combo
     *   **item_ids** (list[int]): list of menu item ids that make up this combo
+    *   **is_active** (bool): whether the combo is currently valid
     """
     id: int
     name: str
     discount: float
     type: ComboType
     item_ids: list[int] = Field(default_factory=list)
+    is_active: bool = True
 
 class Menu(BaseModel):
     """
@@ -139,11 +141,13 @@ class Combo_Create(BaseModel):
     *   **discount** (float): the discount for the combo
     *   **type** (ComboType): the type of the combo
     *   **item_ids** (list[int]): list of menu item ids that make up this combo
+    *   **is_active** (bool): whether the combo is currently valid
     """
     name: str
     discount: float
     type: ComboType
     item_ids: list[int] = Field(default_factory=list)
+    is_active: bool = True
 
     @field_validator("name")
     @classmethod
@@ -189,12 +193,14 @@ class Combo_Update(BaseModel):
     *   **discount** (float): the combo discount value
     *   **type** (ComboType): the type of the combo
     *   **item_ids** (list[int]): list of menu item ids that make up this combo
+    *   **is_active** (bool): whether the combo is currently valid
     """
     id: int
     name: str
     discount: float
     type: ComboType
     item_ids: list[int] = Field(default_factory=list)
+    is_active: bool = True
 
     @field_validator("name")
     @classmethod

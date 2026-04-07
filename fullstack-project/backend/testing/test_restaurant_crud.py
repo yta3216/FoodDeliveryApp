@@ -372,6 +372,7 @@ def test_create_combo_fixed_amount(setup_restaurant_menu):
     assert combo["name"] == "Lunch Combo"
     assert combo["discount"] == 2.0
     assert combo["type"] == "fixed_amount"
+    assert combo["is_active"] is True
 
 # test creating a percentage menu combo
 def test_create_combo_percentage(setup_restaurant_menu):
@@ -387,6 +388,7 @@ def test_create_combo_percentage(setup_restaurant_menu):
             "discount": 15.0,
             "type": "percentage",
             "item_ids": [item1_id, item2_id],
+            "is_active": True,
         },
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -396,6 +398,7 @@ def test_create_combo_percentage(setup_restaurant_menu):
     assert combo["name"] == "Lunch Combo"
     assert combo["discount"] == 15.0
     assert combo["type"] == "percentage"
+    assert combo["is_active"] is True
 
 # test updating a menu combo
 def test_update_combo_same_type(setup_restaurant_menu):
@@ -411,6 +414,7 @@ def test_update_combo_same_type(setup_restaurant_menu):
             "discount": 15,
             "type": "percentage",
             "item_ids": [item1_id, item2_id],
+            "is_active": True,
         },
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -425,6 +429,7 @@ def test_update_combo_same_type(setup_restaurant_menu):
             "discount": 20.0,
             "type": "fixed_amount",
             "item_ids": [item1_id, item2_id],
+            "is_active": False,
         },
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -435,6 +440,7 @@ def test_update_combo_same_type(setup_restaurant_menu):
     assert body["name"] == "Dinner Combo"
     assert body["discount"] == 20.0
     assert body["type"] == "fixed_amount"
+    assert body["is_active"] is False
 
 # test updating a menu combo to a different type
 def test_update_combo_different_type(setup_restaurant_menu):
@@ -450,6 +456,7 @@ def test_update_combo_different_type(setup_restaurant_menu):
             "discount": 15,
             "type": "percentage",
             "item_ids": [item1_id, item2_id],
+            "is_active": True,
         },
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -464,6 +471,7 @@ def test_update_combo_different_type(setup_restaurant_menu):
             "discount": 6.7,
             "type": "fixed_amount",
             "item_ids": [item1_id, item2_id],
+            "is_active": True,
         },
         headers={"Authorization": f"Bearer {token}"}
     )
@@ -474,3 +482,4 @@ def test_update_combo_different_type(setup_restaurant_menu):
     assert body["name"] == "Dinner Combo"
     assert body["discount"] == 6.7
     assert body["type"] == "fixed_amount"
+    assert body["is_active"] is True

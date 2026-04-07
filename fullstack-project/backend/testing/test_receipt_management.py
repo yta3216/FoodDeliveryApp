@@ -41,8 +41,8 @@ def test_receipt_applies_combo_discount(customer_with_cart_and_token, setup_rest
     token = customer_with_cart_and_token["token"]
     restaurant = setup_restaurant_menu["restaurant"]
     manager_token = setup_restaurant_menu["token"]
-    item_one = restaurant["menu"]["items"][0]
-    item_two = restaurant["menu"]["items"][1]
+    item_one = restaurant["menu"]["items"][0]["id"]
+    item_two = restaurant["menu"]["items"][1]["id"]
 
     combo_response = client.post(
         f"/restaurant/{restaurant['id']}/menu/combo",
@@ -50,11 +50,13 @@ def test_receipt_applies_combo_discount(customer_with_cart_and_token, setup_rest
             "name": "Receipt Combo",
             "discount": 2.00,
             "type": "fixed_amount",
-            "item_ids": [item_one["id"], item_two["id"]],
+            "item_ids": [item_one, item_two],
+            "is_active": True,
         },
         headers={"Authorization": f"Bearer {manager_token}"}
     )
     assert combo_response.status_code == 201
+    assert combo_response.json()["is_active"] is True
 
     receipt_response = client.get("/receipt", headers={"Authorization": f"Bearer {token}"})
     assert receipt_response.status_code == 200
@@ -62,6 +64,34 @@ def test_receipt_applies_combo_discount(customer_with_cart_and_token, setup_rest
 
     assert receipt["discount"] == 2.0
     assert receipt["total"] == round(receipt["subtotal"] + receipt["tax"] + receipt["delivery_fee"] - 2.0, 2)
+
+def test_receipt_ignores_inactive_combo(customer_with_cart_and_token, setup_restaurant_menu):
+    token = customer_with_cart_and_token["token"]
+    restaurant = setup_restaurant_menu["restaurant"]
+    manager_token = setup_restaurant_menu["token"]
+    item_one = restaurant["menu"]["items"][0]["id"]
+    item_two = restaurant["menu"]["items"][1]["id"]
+
+    combo_response = client.post(
+        f"/restaurant/{restaurant['id']}/menu/combo",
+        json={
+            "name": "Inactive Combo",
+            "discount": 5.00,
+            "type": "fixed_amount",
+            "item_ids": [item_one, item_two],
+            "is_active": False,
+        },
+        headers={"Authorization": f"Bearer {manager_token}"}
+    )
+    assert combo_response.status_code == 201
+    assert combo_response.json()["is_active"] is False
+
+    receipt_response = client.get("/receipt", headers={"Authorization": f"Bearer {token}"})
+    assert receipt_response.status_code == 200
+    receipt = receipt_response.json()
+
+    assert receipt["discount"] == 0.0
+    assert receipt["total"] == round(receipt["subtotal"] + receipt["tax"] + receipt["delivery_fee"], 2)
 
 def test_receipt_different_delivery_fee_refresh(customer_with_cart_and_token, setup_restaurant_menu):
     token = customer_with_cart_and_token["token"]
