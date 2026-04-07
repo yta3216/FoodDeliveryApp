@@ -1,0 +1,78 @@
+.page { padding-bottom: 80px; }
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+  padding-top: 8px;
+}
+.header h1 { font-size: 1.8rem; }
+
+.unreadBadge {
+  background: var(--accent-glow);
+  color: var(--accent2);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,77,46,0.3);
+}
+
+.list { display: flex; flex-direction: column; gap: 24px; }
+
+.group { display: flex; flex-direction: column; gap: 10px; }
+
+.groupLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  font-weight: 600;
+  font-family: var(--font-body);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: border-color var(--transition);
+  animation: fadeUp 0.3s ease both;
+}
+.card:hover { border-color: var(--surface2); }
+.cardUnread {
+  border-left: 3px solid var(--accent);
+  background: var(--bg3);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cardIcon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cardBody { flex: 1; }
+
+.cardMessage {
+  font-size: 0.92rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.cardDate {
+  font-size: 0.78rem;
+  color: var(--text3);
+}

@@ -1,28 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Food Delivery App</title>
-</head>
-<body>
-  <p style="font-family:sans-serif; padding:24px; color:#666;">You are looking at a skeleton</p>
-
-  <script>
-    const token = localStorage.getItem("auth_token");
-    const role  = localStorage.getItem("user_role");
-
-    if (!token) {
-      window.location.href = "/static/loginPage.html";
-    } else {
-      const routes = {
-        customer: "/static/customerHomePage.html",
-        driver:   "/static/driverPage.html",
-        manager:  "/static/managerPage.html",
-        admin:    "/static/adminPage.html",
-      };
-      window.location.href = routes[role] || "/static/loginPage.html";
-    }
-  </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>food-delivery-frontend</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

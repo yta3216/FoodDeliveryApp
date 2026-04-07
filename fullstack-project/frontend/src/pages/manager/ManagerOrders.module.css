@@ -1,0 +1,29 @@
+.page { padding-bottom: 80px; }
+.title { font-size: 1.8rem; margin-bottom: 28px; padding-top: 8px; }
+.section { margin-bottom: 32px; }
+.sectionTitle {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1rem; margin-bottom: 14px; color: var(--text2);
+  font-family: var(--font-body); font-weight: 600;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.list { display: flex; flex-direction: column; gap: 10px; }
+
+.row {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  transition: border-color var(--transition);
+}
+.row:hover { border-color: var(--surface2); }
+
+.rowMain { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; flex: 1; }
+.orderId { font-weight: 700; font-size: 0.95rem; }
+.restaurantName { font-size: 0.88rem; color: var(--text2); }
+.meta { font-size: 0.82rem; color: var(--text3); }
+
+.rowRight { display: flex; align-items: center; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
+.actions { display: flex; gap: 8px; }
