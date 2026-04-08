@@ -1,11 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './context/AuthContext';
+import { useEffect } from 'react';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import Navbar from './components/layout/Navbar';
 
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import CustomerHomePage from './pages/customer/CustomerHomePage';
 import RestaurantPage from './pages/customer/RestaurantPage';
 import CartPage from './pages/customer/CartPage';
@@ -16,19 +19,39 @@ import DriverDashboard from './pages/driver/DriverDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ProfilePage from './pages/ProfilePage';
 import NotificationsPage from './pages/NotificationsPage';
+import { Toast } from './components/common/UI';
 
 function Layout({ children }) {
   return <><Navbar />{children}</>;
+}
+
+function GlobalNotifications() {
+  const { wsNotification, clearWsNotification } = useAuth();
+
+  useEffect(() => {
+    if (!wsNotification) return;
+    const timer = setTimeout(clearWsNotification, 5000);
+    return () => clearTimeout(timer);
+  }, [wsNotification]);
+
+  if (!wsNotification) return null;
+  return (
+    <div style={{ position: 'fixed', top: 72, right: 20, zIndex: 9999, minWidth: 280, maxWidth: 400 }}>
+      <Toast message={`🔔 ${wsNotification.message}`} type="info" onClose={clearWsNotification} />
+    </div>
+  );
 }
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <GlobalNotifications />
         <Routes>
           <Route path="/login" element={<><Navbar /><LoginPage /></>} />
           <Route path="/register" element={<><Navbar /><RegisterPage /></>} />
           <Route path="/forgot-password" element={<><Navbar /><ForgotPasswordPage /></>} />
+          <Route path="/reset-password" element={<><Navbar /><ResetPasswordPage /></>} />
 
           <Route path="/home" element={<ProtectedRoute roles={['customer']}><Layout><CustomerHomePage /></Layout></ProtectedRoute>} />
           <Route path="/restaurant/:id" element={<ProtectedRoute roles={['customer']}><Layout><RestaurantPage /></Layout></ProtectedRoute>} />
