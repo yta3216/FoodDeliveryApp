@@ -162,7 +162,7 @@ export default function CustomerHomePage() {
               />
               <select
                 className={styles.searchInput}
-                style={{ flex: '1 1 160px', marginTop: 0, background: 'var(--bg-card, #fff)' }}
+                style={{ flex: '1 1 160px', marginTop: 0 }}
                 value={filters.sort_price}
                 onChange={setF('sort_price')}
               >

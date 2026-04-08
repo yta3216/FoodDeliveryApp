@@ -51,7 +51,7 @@ def get_receipt_by_id_route(receipt_id: int, current_user: Customer = Depends(ge
         **HTTPException** (status_code = 403): if user's role is not *customer* or does not belong to the user
         **HTTPException** (status_code = 404): if the receipt is not found
     """
-    receipt = get_receipt(receipt_id, current_user)
+    receipt = get_receipt(receipt_id)
     if receipt.customer_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to view this receipt")
     return receipt
