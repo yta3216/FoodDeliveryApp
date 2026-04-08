@@ -66,7 +66,7 @@ export default function CartPage() {
       } else {
         await cartApi.updateItem(itemId, newQty);
       }
-      setReceipt(null);
+      generateReceipt();
       await fetchCart();
     } catch (err) {
       show(err.message, 'error');
@@ -89,7 +89,7 @@ export default function CartPage() {
     try {
       await promoApi.apply(promoCode.trim());
       setPromoApplied(true);
-      setReceipt(null);
+      generateReceipt();
       show('Promo code applied! ✅', 'success');
     } catch (err) {
       show(err.message, 'error');
@@ -103,7 +103,7 @@ export default function CartPage() {
       await promoApi.remove();
       setPromoCode('');
       setPromoApplied(false);
-      setReceipt(null);
+      generateReceipt();
       show('Promo code removed', 'success');
     } catch (err) {
       show(err.message, 'error');
@@ -264,9 +264,9 @@ export default function CartPage() {
               {receipt ? (
                 <div className={styles.receipt}>
                   <h3>Order Summary</h3>
-                  <div className={styles.receiptItems}>
+                  <div className={styles.receiptLines}>
                     {receipt.items?.map(item => (
-                      <div key={item.menu_item_id} className={styles.receiptRow}>
+                      <div key={item.menu_item_id} className={styles.receiptLine}>
                         <span>{item.qty}× {item.name}</span>
                         <span>${item.line_total?.toFixed(2)}</span>
                       </div>
@@ -274,13 +274,13 @@ export default function CartPage() {
                   </div>
                   <div className={styles.receiptTotals}>
                     <div><span>Subtotal</span><span>${receipt.subtotal?.toFixed(2)}</span></div>
+                    <div><span>Delivery fee</span><span>${receipt.delivery_fee?.toFixed(2)}</span></div>
+                    <div><span>Tax</span><span>${receipt.tax?.toFixed(2)}</span></div>
                     {receipt.discount > 0 && (
                       <div style={{ color: 'var(--green)' }}>
                         <span>Discount</span><span>-${receipt.discount?.toFixed(2)}</span>
                       </div>
                     )}
-                    <div><span>Delivery fee</span><span>${receipt.delivery_fee?.toFixed(2)}</span></div>
-                    <div><span>Tax</span><span>${receipt.tax?.toFixed(2)}</span></div>
                     <div className={styles.totalLine}><span>Total</span><span>${receipt.total?.toFixed(2)}</span></div>
                   </div>
                   {receipt.promo_code && (

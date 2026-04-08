@@ -35,5 +35,155 @@
       "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
     },
     "time": "2026/03/25 21:55"
+  },
+  {
+    "id": 4,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 3 from Tossings Pizza set to status: pending",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:23"
+  },
+  {
+    "id": 5,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 3 from Tossings Pizza set to status: cancelled",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:25"
+  },
+  {
+    "id": 6,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Refund of $24.49 for order 3 from Tossings Pizza is being processed. Reason: Order cancelled by customer.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 01:25"
+  },
+  {
+    "id": 7,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 4 from Koi Sushi set to status: pending",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 01:30"
+  },
+  {
+    "id": 8,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 4 from Koi Sushi set to status: cancelled",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 01:34"
+  },
+  {
+    "id": 9,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Refund of $24.86 for order 4 from Koi Sushi is being processed. Reason: Order cancelled by customer.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 01:34"
+  },
+  {
+    "id": 10,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 5 from Tossings Pizza set to status: pending",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:34"
+  },
+  {
+    "id": 11,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 5 from Tossings Pizza set to status: rejected",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:34"
+  },
+  {
+    "id": 12,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Refund of $27.84 for order 5 from Tossings Pizza is being processed. Reason: Restaurant max delivery distance exceeded.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 01:34"
+  },
+  {
+    "id": 13,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 6 from Tossings Pizza set to status: pending",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:40"
+  },
+  {
+    "id": 14,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 6 from Tossings Pizza has been assigned to driver 63f32ca9-e8d6-4e22-a0ff-de8d252b30e1 for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:40"
+  },
+  {
+    "id": 15,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 6 from Tossings Pizza set to status: preparing",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:40"
   }
 ]

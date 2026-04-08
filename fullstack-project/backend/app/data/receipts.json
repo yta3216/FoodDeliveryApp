@@ -52,5 +52,921 @@
     "distance_km": 2.5,
     "total": 27.48,
     "date_created": "2026-03-26T04:55:29.764792+00:00"
+  },
+  {
+    "id": 3,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 3,
+        "line_total": 29.97
+      },
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      }
+    ],
+    "subtotal": 33.96,
+    "tax": 4.08,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 39.03,
+    "date_created": null
+  },
+  {
+    "id": 4,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 3,
+        "line_total": 29.97
+      }
+    ],
+    "subtotal": 29.97,
+    "tax": 3.6,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 34.56,
+    "date_created": null
+  },
+  {
+    "id": 5,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 19.98,
+    "tax": 2.4,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 23.37,
+    "date_created": null
+  },
+  {
+    "id": 6,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 1,
+        "line_total": 9.99
+      }
+    ],
+    "subtotal": 9.99,
+    "tax": 1.2,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 12.18,
+    "date_created": null
+  },
+  {
+    "id": 7,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 2,
+        "name": "Cheese Pizza",
+        "unit_price": 10.99,
+        "qty": 1,
+        "line_total": 10.99
+      },
+      {
+        "menu_item_id": 5,
+        "name": "Chicken Wings",
+        "unit_price": 7.99,
+        "qty": 1,
+        "line_total": 7.99
+      }
+    ],
+    "subtotal": 18.98,
+    "tax": 2.28,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 22.25,
+    "date_created": null
+  },
+  {
+    "id": 8,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 5,
+        "name": "Chicken Wings",
+        "unit_price": 7.99,
+        "qty": 1,
+        "line_total": 7.99
+      }
+    ],
+    "subtotal": 7.99,
+    "tax": 0.96,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 9.94,
+    "date_created": null
+  },
+  {
+    "id": 9,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 1,
+        "line_total": 9.99
+      }
+    ],
+    "subtotal": 13.98,
+    "tax": 1.68,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 16.65,
+    "date_created": null
+  },
+  {
+    "id": 10,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 1,
+        "line_total": 9.99
+      }
+    ],
+    "subtotal": 13.98,
+    "tax": 1.68,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 16.65,
+    "date_created": null
+  },
+  {
+    "id": 11,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 1,
+        "line_total": 9.99
+      }
+    ],
+    "subtotal": 13.98,
+    "tax": 1.68,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 16.65,
+    "date_created": null
+  },
+  {
+    "id": 12,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 23.97,
+    "tax": 2.88,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 27.84,
+    "date_created": null
+  },
+  {
+    "id": 13,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 23.97,
+    "tax": 2.88,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 27.84,
+    "date_created": null
+  },
+  {
+    "id": 14,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 2,
+        "line_total": 7.98
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 27.96,
+    "tax": 3.36,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 32.31,
+    "date_created": null
+  },
+  {
+    "id": 15,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 23.97,
+    "tax": 2.88,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 27.84,
+    "date_created": null
+  },
+  {
+    "id": 16,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 2,
+        "line_total": 7.98
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 27.96,
+    "tax": 3.36,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 32.31,
+    "date_created": null
+  },
+  {
+    "id": 17,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 23.97,
+    "tax": 2.88,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 27.84,
+    "date_created": null
+  },
+  {
+    "id": 18,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 23.97,
+    "tax": 2.88,
+    "delivery_fee": 0.0,
+    "discount": 4.99,
+    "promo_code": "FREEDEL",
+    "distance_km": 11.0,
+    "total": 21.86,
+    "date_created": null
+  },
+  {
+    "id": 19,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 23.97,
+    "tax": 2.88,
+    "delivery_fee": 0.0,
+    "discount": 4.99,
+    "promo_code": "FREEDEL",
+    "distance_km": 11.0,
+    "total": 21.86,
+    "date_created": null
+  },
+  {
+    "id": 20,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 23.97,
+    "tax": 2.88,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 27.84,
+    "date_created": null
+  },
+  {
+    "id": 21,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 23.97,
+    "tax": 2.88,
+    "delivery_fee": 0.0,
+    "discount": 4.99,
+    "promo_code": "FREEDEL",
+    "distance_km": 11.0,
+    "total": 21.86,
+    "date_created": null
+  },
+  {
+    "id": 22,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 19.98,
+    "tax": 2.4,
+    "delivery_fee": 0.0,
+    "discount": 4.99,
+    "promo_code": "FREEDEL",
+    "distance_km": 11.0,
+    "total": 17.39,
+    "date_created": null
+  },
+  {
+    "id": 23,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 3,
+        "line_total": 29.97
+      }
+    ],
+    "subtotal": 29.97,
+    "tax": 3.6,
+    "delivery_fee": 0.0,
+    "discount": 4.99,
+    "promo_code": "FREEDEL",
+    "distance_km": 11.0,
+    "total": 28.58,
+    "date_created": null
+  },
+  {
+    "id": 24,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 4,
+        "line_total": 39.96
+      }
+    ],
+    "subtotal": 39.96,
+    "tax": 4.8,
+    "delivery_fee": 0.0,
+    "discount": 4.99,
+    "promo_code": "FREEDEL",
+    "distance_km": 11.0,
+    "total": 39.77,
+    "date_created": null
+  },
+  {
+    "id": 25,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 5,
+        "line_total": 49.95
+      }
+    ],
+    "subtotal": 49.95,
+    "tax": 5.99,
+    "delivery_fee": 0.0,
+    "discount": 4.99,
+    "promo_code": "FREEDEL",
+    "distance_km": 11.0,
+    "total": 50.95,
+    "date_created": null
+  },
+  {
+    "id": 26,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 4,
+        "line_total": 39.96
+      }
+    ],
+    "subtotal": 39.96,
+    "tax": 4.8,
+    "delivery_fee": 0.0,
+    "discount": 4.99,
+    "promo_code": "FREEDEL",
+    "distance_km": 11.0,
+    "total": 39.77,
+    "date_created": null
+  },
+  {
+    "id": 27,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 3,
+        "line_total": 29.97
+      }
+    ],
+    "subtotal": 29.97,
+    "tax": 3.6,
+    "delivery_fee": 0.0,
+    "discount": 4.99,
+    "promo_code": "FREEDEL",
+    "distance_km": 11.0,
+    "total": 28.58,
+    "date_created": null
+  },
+  {
+    "id": 28,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 19.98,
+    "tax": 2.4,
+    "delivery_fee": 0.0,
+    "discount": 4.99,
+    "promo_code": "FREEDEL",
+    "distance_km": 11.0,
+    "total": 17.39,
+    "date_created": null
+  },
+  {
+    "id": 29,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 2,
+        "name": "Cheese Pizza",
+        "unit_price": 10.99,
+        "qty": 2,
+        "line_total": 21.98
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 3,
+        "line_total": 29.97
+      }
+    ],
+    "subtotal": 51.95,
+    "tax": 6.23,
+    "delivery_fee": 2.99,
+    "discount": 2.2,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 58.97,
+    "date_created": null
+  },
+  {
+    "id": 30,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 2,
+        "name": "Cheese Pizza",
+        "unit_price": 10.99,
+        "qty": 1,
+        "line_total": 10.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 3,
+        "line_total": 29.97
+      }
+    ],
+    "subtotal": 40.96,
+    "tax": 4.92,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 46.87,
+    "date_created": null
+  },
+  {
+    "id": 31,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 2,
+        "name": "Cheese Pizza",
+        "unit_price": 10.99,
+        "qty": 1,
+        "line_total": 10.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 30.97,
+    "tax": 3.72,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 35.68,
+    "date_created": null
+  },
+  {
+    "id": 32,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 2,
+        "name": "Cheese Pizza",
+        "unit_price": 10.99,
+        "qty": 1,
+        "line_total": 10.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 1,
+        "line_total": 9.99
+      }
+    ],
+    "subtotal": 20.98,
+    "tax": 2.52,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 24.49,
+    "date_created": null
+  },
+  {
+    "id": 33,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 2,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "California Roll",
+        "unit_price": 8.99,
+        "qty": 2,
+        "line_total": 17.98
+      },
+      {
+        "menu_item_id": 6,
+        "name": "Green Tea",
+        "unit_price": 1.99,
+        "qty": 1,
+        "line_total": 1.99
+      }
+    ],
+    "subtotal": 19.97,
+    "tax": 2.4,
+    "delivery_fee": 3.99,
+    "discount": 1.5,
+    "promo_code": null,
+    "distance_km": 3.5,
+    "total": 24.86,
+    "date_created": null
+  },
+  {
+    "id": 34,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 2,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "California Roll",
+        "unit_price": 8.99,
+        "qty": 2,
+        "line_total": 17.98
+      },
+      {
+        "menu_item_id": 6,
+        "name": "Green Tea",
+        "unit_price": 1.99,
+        "qty": 1,
+        "line_total": 1.99
+      }
+    ],
+    "subtotal": 19.97,
+    "tax": 2.4,
+    "delivery_fee": 3.99,
+    "discount": 1.5,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 24.86,
+    "date_created": null
+  },
+  {
+    "id": 35,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 2,
+        "line_total": 19.98
+      }
+    ],
+    "subtotal": 23.97,
+    "tax": 2.88,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 11.0,
+    "total": 27.84,
+    "date_created": null
+  },
+  {
+    "id": 36,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 4,
+        "name": "Fries",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 1,
+        "line_total": 9.99
+      }
+    ],
+    "subtotal": 17.97,
+    "tax": 2.16,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 3.0,
+    "total": 21.12,
+    "date_created": null
   }
 ]

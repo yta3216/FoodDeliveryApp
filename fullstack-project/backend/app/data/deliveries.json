@@ -10,5 +10,17 @@
     "delivered_at": 0.0,
     "actual_minutes": 0.0,
     "delay_minutes": 0.0
+  },
+  {
+    "id": 2,
+    "order_id": 6,
+    "driver_id": "63f32ca9-e8d6-4e22-a0ff-de8d252b30e1",
+    "method": "bike",
+    "distance_km": 3.0,
+    "eta_minutes": 0.0,
+    "started_at": 0.0,
+    "delivered_at": 0.0,
+    "actual_minutes": 0.0,
+    "delay_minutes": 0.0
   }
 ]

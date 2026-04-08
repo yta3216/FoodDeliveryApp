@@ -9,8 +9,8 @@
     "role": "admin",
     "reset_token": null,
     "reset_token_expiry": null,
-    "auth_token": "QSTgADz53O_dIkVIMsqgJzXnhEvTX7uV7u1IjwTSblo",
-    "auth_token_expiry": 1806036929
+    "auth_token": "hlLkq33SV8seUvUDfXp6n5fqIcc8Agld-sZCPOrS4U4",
+    "auth_token_expiry": 1775642931.2143555
   },
   {
     "id": "a7b36374-170b-4cfa-97a4-4a72712a2d77",
@@ -22,8 +22,8 @@
     "role": "manager",
     "reset_token": null,
     "reset_token_expiry": null,
-    "auth_token": "j0VjF6iu1ruX0WznY5f85tZz4fE5NKAwzneO-RY9FuI",
-    "auth_token_expiry": 1774587541.914036
+    "auth_token": "YYP3kNF7G_GE0t6xw31r_qsC8tJLahQREaqI1QEUQNI",
+    "auth_token_expiry": 1775723476.9342036
   },
   {
     "id": "498c8f4b-0006-4bc8-9b0b-4025b3d64a09",
@@ -49,8 +49,8 @@
     "wallet_balance": 75.65,
     "reset_token": null,
     "reset_token_expiry": null,
-    "auth_token": "an309GXmZHO5P1I820GiyLowvNUm8bcQdW7Wi8ilAEM",
-    "auth_token_expiry": 1806036929,
+    "auth_token": "0RS0J7I16SesZ1k8JEErMtrm1P384mW4kv2pdd16LVM",
+    "auth_token_expiry": 1775642467.732122,
     "cart": {
       "restaurant_id": 1,
       "cart_items": [
@@ -98,7 +98,7 @@
     "auth_token": "EjnOKaO4x-NPKU7jTWqf7l-FIjwPpRJ1OzqUUtwTr6E",
     "auth_token_expiry": 1806036929,
     "vehicle": "bike",
-    "driver_status": "available"
+    "driver_status": "delivering"
   },
   {
     "id": "e580a1ce-62c0-46a2-81d6-dc1893559c28",
@@ -114,5 +114,40 @@
     "auth_token_expiry": 1806036929,
     "vehicle": "car",
     "driver_status": "available"
+  },
+  {
+    "id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "email": "leonkennedy@example.com",
+    "name": "Leon Kennedy",
+    "password": "leonkennedy",
+    "age": 21,
+    "gender": "male",
+    "role": "customer",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "wallet_balance": 1212.6900000000003,
+    "cart": {
+      "restaurant_id": 0,
+      "cart_items": [],
+      "promo_code": null
+    },
+    "favourites": [],
+    "auth_token": "DFg42mPGK0Bg9EnFZoSmgQE5Pg0D3IL5X-FYfCEZzIw",
+    "auth_token_expiry": 1775723760.3888805
+  },
+  {
+    "id": "ee6c6675-2f20-4ed8-8adc-429d8010e7a4",
+    "email": "adawong@example.com",
+    "name": "Ada Wong",
+    "password": "adawong@",
+    "age": 25,
+    "gender": "female",
+    "role": "driver",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "vehicle": "bike",
+    "driver_status": "available",
+    "auth_token": "T8U-KZOA41pRfj0IQPutl4cn7nsyJDYydHgOIRpSIPg",
+    "auth_token_expiry": 1775723098.3508494
   }
 ]

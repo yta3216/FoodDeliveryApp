@@ -28,7 +28,8 @@ export default function RestaurantPage() {
   };
 
   const handleAdd = async (item) => {
-    const qty = quantities[item.id] || 1;
+    const qty = quantities[item.id] || 0;
+    if (qty <= 0) return show("Can't add zero or negative quantities", 'error');
     setAddingItem(item.id);
     try {
       await cartApi.setRestaurant(Number(id));
@@ -96,7 +97,7 @@ export default function RestaurantPage() {
                       <button onClick={() => setQty(item.id, -1)} disabled={!quantities[item.id]}>
                         <Minus size={14} />
                       </button>
-                      <span>{quantities[item.id] || 1}</span>
+                      <span>{quantities[item.id] || 0}</span>
                       <button onClick={() => setQty(item.id, 1)}>
                         <Plus size={14} />
                       </button>

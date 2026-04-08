@@ -109,7 +109,7 @@
 @media (max-width: 768px) {
   .links { display: none; }
   .mobileToggle { display: flex; }
-  .mobileMenu { display: flex; }
+  .mobileMenu { display: flex; background-color: rgba(13, 13, 15); }
   .actions { gap: 4px; }
   .userChip span { display: none; }
 }
