@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { deliveryApi, userApi } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { Button, Spinner, EmptyState, StatusBadge, Toast, Input } from '../../components/common/UI';
+import { Button, EmptyState, StatusBadge, Toast, Input } from '../../components/common/UI';
 import { useToast } from '../../hooks/useToast';
 import { Truck, CheckCircle, Radio, Search, Save } from 'lucide-react';
 import styles from './DriverPage.module.css';

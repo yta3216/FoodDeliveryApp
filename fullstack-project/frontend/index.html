@@ -8,6 +8,18 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module">
+      (async () => {
+        if (window.location.hostname === 'localhost' && window.location.port === '5173') {
+          const RefreshRuntime = await import('/@react-refresh')
+          RefreshRuntime.injectIntoGlobalHook(window)
+          window.$RefreshReg$ = () => {}
+          window.$RefreshSig$ = () => (type) => type
+          window.__vite_plugin_react_preamble_installed__ = true
+        }
+
+        await import('/src/main.jsx')
+      })()
+    </script>
   </body>
 </html>
