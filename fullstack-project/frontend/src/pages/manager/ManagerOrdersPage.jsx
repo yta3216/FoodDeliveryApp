@@ -3,13 +3,12 @@ import { restaurantApi, orderApi } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Spinner, EmptyState, StatusBadge, Button, Toast } from '../../components/common/UI';
 import { useToast } from '../../hooks/useToast';
-import { Check, X } from 'lucide-react';
+import { Check, X, ChefHat } from 'lucide-react';
 import styles from './ManagerOrders.module.css';
 
 export default function ManagerOrdersPage() {
   const { user } = useAuth();
   const { toast, show, hide } = useToast();
-  const [restaurants, setRestaurants] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(null);
@@ -19,7 +18,6 @@ export default function ManagerOrdersPage() {
       try {
         const all = await restaurantApi.getAll();
         const mine = all.filter(r => r.manager_ids?.includes(user?.user_id));
-        setRestaurants(mine);
         const allOrders = [];
         for (const r of mine) {
           try {
@@ -41,8 +39,23 @@ export default function ManagerOrdersPage() {
     setProcessing(orderId);
     try {
       await orderApi.acceptReject(orderId, status);
-      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: status === 'accepted' ? 'accepted' : 'rejected' } : o));
+      setOrders(prev => prev.map(o =>
+        o.id === orderId ? { ...o, status: status === 'accepted' ? 'preparing' : 'rejected' } : o
+      ));
       show(`Order ${status}!`, 'success');
+    } catch (err) {
+      show(err.message, 'error');
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  const handleMarkReady = async (orderId) => {
+    setProcessing(orderId);
+    try {
+      await orderApi.markReady(orderId);
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'ready' } : o));
+      show('Order marked as ready for pickup! 🍽️', 'success');
     } catch (err) {
       show(err.message, 'error');
     } finally {
@@ -53,7 +66,8 @@ export default function ManagerOrdersPage() {
   if (loading) return <div className="page"><Spinner center size={36} /></div>;
 
   const pending = orders.filter(o => o.status === 'pending');
-  const others = orders.filter(o => o.status !== 'pending');
+  const preparing = orders.filter(o => o.status === 'preparing');
+  const others = orders.filter(o => !['pending', 'preparing'].includes(o.status));
 
   return (
     <div className={`page ${styles.page}`}>
@@ -73,11 +87,26 @@ export default function ManagerOrdersPage() {
                 </h2>
                 <div className={styles.list}>
                   {pending.map(order => (
-                    <OrderRow key={order.id} order={order} processing={processing} onAction={handleStatus} showActions />
+                    <OrderRow key={order.id} order={order} processing={processing} onAction={handleStatus} showPendingActions />
                   ))}
                 </div>
               </section>
             )}
+
+            {preparing.length > 0 && (
+              <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>
+                  <span className={styles.dot} style={{ background: 'var(--accent, #f5a623)' }} />
+                  Preparing ({preparing.length})
+                </h2>
+                <div className={styles.list}>
+                  {preparing.map(order => (
+                    <OrderRow key={order.id} order={order} processing={processing} onMarkReady={handleMarkReady} showReadyAction />
+                  ))}
+                </div>
+              </section>
+            )}
+
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>
                 <span className={styles.dot} style={{ background: 'var(--text3)' }} />
@@ -85,7 +114,7 @@ export default function ManagerOrdersPage() {
               </h2>
               <div className={styles.list}>
                 {others.map(order => (
-                  <OrderRow key={order.id} order={order} processing={processing} onAction={handleStatus} />
+                  <OrderRow key={order.id} order={order} processing={processing} />
                 ))}
               </div>
             </section>
@@ -96,7 +125,7 @@ export default function ManagerOrdersPage() {
   );
 }
 
-function OrderRow({ order, processing, onAction, showActions }) {
+function OrderRow({ order, processing, onAction, onMarkReady, showPendingActions, showReadyAction }) {
   return (
     <div className={styles.row}>
       <div className={styles.rowMain}>
@@ -107,7 +136,7 @@ function OrderRow({ order, processing, onAction, showActions }) {
       </div>
       <div className={styles.rowRight}>
         <StatusBadge status={order.status} />
-        {showActions && order.status === 'pending' && (
+        {showPendingActions && order.status === 'pending' && (
           <div className={styles.actions}>
             <Button
               variant="success" size="sm"
@@ -122,6 +151,17 @@ function OrderRow({ order, processing, onAction, showActions }) {
               onClick={() => onAction(order.id, 'rejected')}
             >
               <X size={14} /> Reject
+            </Button>
+          </div>
+        )}
+        {showReadyAction && order.status === 'preparing' && (
+          <div className={styles.actions}>
+            <Button
+              variant="success" size="sm"
+              loading={processing === order.id}
+              onClick={() => onMarkReady(order.id)}
+            >
+              <ChefHat size={14} /> Mark Ready
             </Button>
           </div>
         )}
