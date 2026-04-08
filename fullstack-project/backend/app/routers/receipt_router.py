@@ -6,9 +6,11 @@ A receipt is generated from the customer's cart before payment is submitted.
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.schemas.receipt_schema import Receipt
-from app.schemas.user_schema import Customer
+from app.schemas.user_schema import User, Customer
 from app.services.user_service import get_customer
 from app.services.receipt_service import create_receipt, get_receipt
+from app.services.restaurant_service import get_restaurant_by_id
+from app.auth import get_current_user
 
 router = APIRouter(prefix="/receipt", tags=["receipt"])
 
@@ -35,13 +37,13 @@ def get_receipt_route(distance_km: float = 0.0, current_user: Customer = Depends
     return create_receipt(current_user, distance_km)
 
 @router.get("/{receipt_id}", response_model=Receipt, status_code=200)
-def get_receipt_by_id_route(receipt_id: int, current_user: Customer = Depends(get_customer)):
+def get_receipt_by_id_route(receipt_id: int, current_user: User = Depends(get_current_user)):
     """
     **Returns a generated receipt by its ID.**
 
     Parameters:
         **receipt_id** (int): the ID of the receipt to retrieve
-        **current_user** (Customer): the authenticated user with role *customer*. automatically passed as argument.
+        **current_user** (User): the authenticated user. automatically passed as argument.
 
     Returns:
         **Receipt**: the receipt with full cost breakdown and a receipt_id
@@ -52,6 +54,6 @@ def get_receipt_by_id_route(receipt_id: int, current_user: Customer = Depends(ge
         **HTTPException** (status_code = 404): if the receipt is not found
     """
     receipt = get_receipt(receipt_id)
-    if receipt.customer_id != current_user.id:
+    if receipt.customer_id != current_user.id and current_user.id not in get_restaurant_by_id(receipt.restaurant_id).manager_ids:
         raise HTTPException(status_code=403, detail="Not authorized to view this receipt")
     return receipt
