@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { orderApi, receiptApi } from '../../api/client';
+import { orderApi, receiptApi, restaurantApi } from '../../api/client';
 import { Spinner, EmptyState, StatusBadge, Button, Modal, Toast } from '../../components/common/UI';
 import { useToast } from '../../hooks/useToast';
 import { Receipt, X } from 'lucide-react';
@@ -8,16 +8,30 @@ import styles from './OrderHistoryPage.module.css';
 export default function OrderHistoryPage() {
   const { toast, show, hide } = useToast();
   const [orders, setOrders] = useState([]);
+  const [restaurantMap, setRestaurantMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [receiptLoading, setReceiptLoading] = useState(false);
   const [cancelling, setCancelling] = useState(null);
 
   useEffect(() => {
-    orderApi.getForCustomer()
-      .then(setOrders)
-      .catch(err => show(err.message, 'error'))
-      .finally(() => setLoading(false));
+    const load = async () => {
+      try {
+        const [orders, allRestaurants] = await Promise.all([
+          orderApi.getForCustomer(),
+          restaurantApi.getAll().catch(() => []),
+        ]);
+        setOrders(orders);
+        const map = {};
+        allRestaurants.forEach(r => { map[r.id] = r.name; });
+        setRestaurantMap(map);
+      } catch (err) {
+        show(err.message, 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
   const viewReceipt = async (receiptId) => {
@@ -100,7 +114,7 @@ export default function OrderHistoryPage() {
                   <StatusBadge status={order.status} />
                 </div>
                 <div className={styles.orderMeta}>
-                  <span>🏪 Restaurant #{order.restaurant_id}</span>
+                  <span>🏪 {restaurantMap[order.restaurant_id] || `Restaurant #${order.restaurant_id}`}</span>
                   <span>📍 {order.distance_km.toFixed(1)} km</span>
                   {order.delivery_id > 0 && <span>🚗 Driver #{order.delivery_id}</span>}
                 </div>
