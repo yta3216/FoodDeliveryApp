@@ -35,8 +35,6 @@
   color: var(--text2);
 }
 .meta span { display: flex; align-items: center; gap: 5px; }
-
-.menuSection { }
 .menuTitle {
   font-size: 1.3rem;
   margin-bottom: 24px;

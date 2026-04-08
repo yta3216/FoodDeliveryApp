@@ -32,7 +32,6 @@ export default function CartPage() {
   const [checkingOut, setCheckingOut] = useState(false);
   const [generatingReceipt, setGeneratingReceipt] = useState(false);
   const [removingPromo, setRemovingPromo] = useState(false);
-  // Delivery details
   const [address, setAddress] = useState(EMPTY_ADDR);
   const [distanceKm, setDistanceKm] = useState('');
   const setA = (k) => (e) => { setAddress(a => ({ ...a, [k]: e.target.value })); setReceipt(null); };
@@ -41,10 +40,12 @@ export default function CartPage() {
     try {
       const c = await cartApi.get();
       setCart(c);
-      // Pre-fill promo state if cart already has a code
       if (c.promo_code) {
         setPromoCode(c.promo_code);
         setPromoApplied(true);
+      } else {
+        // Cart has no promo — ensure local state is in sync
+        setPromoApplied(false);
       }
       if (c.restaurant_id) {
         const r = await restaurantApi.getById(c.restaurant_id);
@@ -59,15 +60,26 @@ export default function CartPage() {
 
   useEffect(() => { fetchCart(); }, []);
 
+  const addressValid = address.street.trim() && address.city.trim() && address.province.trim() && address.postal_code.trim();
+
   const updateQty = async (itemId, newQty) => {
     try {
-      if (newQty <= 0) {
-        await cartApi.removeItem(itemId);
-      } else {
-        await cartApi.updateItem(itemId, newQty);
-      }
-      generateReceipt();
+      if (newQty <= 0) await cartApi.removeItem(itemId);
+      else await cartApi.updateItem(itemId, newQty);
+      // Fetch updated cart FIRST, then regenerate receipt if one was already showing
       await fetchCart();
+      if (receipt && addressValid) {
+        try {
+          const km = parseFloat(distanceKm) || 0.0;
+          const r = await receiptApi.get(km);
+          setReceipt(r);
+        } catch {
+          // Silently invalidate stale receipt on error
+          setReceipt(null);
+        }
+      } else {
+        setReceipt(null);
+      }
     } catch (err) {
       show(err.message, 'error');
     }
@@ -75,6 +87,10 @@ export default function CartPage() {
 
   const clearCart = async () => {
     try {
+      // Remove promo first if applied, then clear cart
+      if (promoApplied) {
+        await promoApi.remove().catch(() => { });
+      }
       await cartApi.clear();
       setCart(null); setRestaurant(null); setReceipt(null);
       setPromoCode(''); setPromoApplied(false);
@@ -83,27 +99,39 @@ export default function CartPage() {
     }
   };
 
-  // Apply promo to cart via POST /promo/apply (saves to cart server-side)
   const applyPromo = async () => {
     if (!promoCode.trim()) return;
     try {
       await promoApi.apply(promoCode.trim());
       setPromoApplied(true);
-      generateReceipt();
       show('Promo code applied! ✅', 'success');
+      // If address is valid, auto-regenerate receipt to verify promo works
+      if (addressValid) {
+        try {
+          const km = parseFloat(distanceKm) || 0.0;
+          const r = await receiptApi.get(km);
+          setReceipt(r);
+        } catch (receiptErr) {
+          // Promo applied but receipt failed (requirements not met) — auto-remove it
+          show(`Promo code requirements not met: ${receiptErr.message}. Code removed.`, 'error');
+          await promoApi.remove().catch(() => { });
+          setPromoCode('');
+          setPromoApplied(false);
+          setReceipt(null);
+        }
+      }
     } catch (err) {
       show(err.message, 'error');
     }
   };
 
-  // Remove promo from cart via DELETE /promo/remove
   const removePromo = async () => {
     setRemovingPromo(true);
     try {
       await promoApi.remove();
       setPromoCode('');
       setPromoApplied(false);
-      generateReceipt();
+      setReceipt(null);
       show('Promo code removed', 'success');
     } catch (err) {
       show(err.message, 'error');
@@ -112,20 +140,32 @@ export default function CartPage() {
     }
   };
 
-  const addressValid = address.street.trim() && address.city.trim() && address.province.trim() && address.postal_code.trim();
-
-  // Generate receipt via GET /receipt?distance_km=X
   const generateReceipt = async () => {
-    if (!addressValid) {
-      return show('Please fill in all delivery address fields.', 'error');
+    if (!addressValid) return show('Please fill in all delivery address fields.', 'error');
+
+    // Guard: check delivery distance against restaurant's max radius
+    const km = parseFloat(distanceKm) || 0.0;
+    if (restaurant && restaurant.max_delivery_radius_km > 0 && km > restaurant.max_delivery_radius_km) {
+      return show(
+        `You are ${km.toFixed(1)} km away, but ${restaurant.name} only delivers up to ${restaurant.max_delivery_radius_km} km.`,
+        'error'
+      );
     }
+
     setGeneratingReceipt(true);
     try {
-      const km = parseFloat(distanceKm) || 0.0;
       const r = await receiptApi.get(km);
       setReceipt(r);
     } catch (err) {
-      show(err.message, 'error');
+      // If receipt failed while a promo is applied, auto-remove the problematic promo
+      if (promoApplied) {
+        show(`Receipt generation failed: ${err.message}. Removing promo code.`, 'error');
+        await promoApi.remove().catch(() => { });
+        setPromoCode('');
+        setPromoApplied(false);
+      } else {
+        show(err.message, 'error');
+      }
     } finally {
       setGeneratingReceipt(false);
     }
@@ -139,7 +179,6 @@ export default function CartPage() {
       show('Order placed successfully! 🎉', 'success');
       navigate('/orders');
     } catch (err) {
-      // 409 means receipt is stale - regenerate
       if (err.message?.includes('409') || err.message?.toLowerCase().includes('changed')) {
         show('Prices changed - receipt refreshed. Please review and confirm.', 'error');
         const km = parseFloat(distanceKm) || 0.0;
@@ -252,6 +291,11 @@ export default function CartPage() {
                     onChange={e => { setDistanceKm(e.target.value); setReceipt(null); }}
                   />
                 </div>
+                {restaurant && distanceKm && parseFloat(distanceKm) > restaurant.max_delivery_radius_km && restaurant.max_delivery_radius_km > 0 && (
+                  <p style={{ fontSize: 12, color: 'var(--red, #e74c3c)', marginTop: 6 }}>
+                    ⚠️ Distance exceeds this restaurant's {restaurant.max_delivery_radius_km} km delivery radius.
+                  </p>
+                )}
               </div>
 
               <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
