@@ -10,6 +10,7 @@ from app.services.order_service import (
     get_orders_for_restaurant,
     cancel_order,
     accept_reject_order,
+    mark_order_ready,
 )
 from app.services.restaurant_service import check_manager
 from app.auth import require_role
@@ -99,3 +100,23 @@ async def accept_reject_order_route(order_id: int, body: OrderAcceptReject, curr
     *   **HTTPException** (status_code = 404): if order or restaurant is not found
     """
     return await accept_reject_order(order_id=order_id, new_status=body.status, manager_id=current_user.id)
+
+@router.patch("/{order_id}/ready", response_model=Order, status_code=200)
+async def mark_order_ready_route(order_id: int, current_user: User = Depends(require_role(UserRole.RESTAURANT_MANAGER))):
+    """
+    **Marks an order as ready for delivery. Must be called by a restaurant manager.**
+
+    Parameters:
+    *   **order_id** (int): the identifier of the order to be marked as ready
+    *   **current_user** (User): the authenticated user with role *manager*. automatically passed as argument.
+
+    Returns:
+    *   **Order**: the order with updated status
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *manager*, or user is not a manager of this order's restaurant
+    *   **HTTPException** (status_code = 400): if order status is not *pending*
+    *   **HTTPException** (status_code = 404): if order or restaurant is not found
+    """
+    return await mark_order_ready(order_id=order_id, manager_id=current_user.id)

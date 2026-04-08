@@ -17,7 +17,7 @@ class UserRole(str, Enum):
     *   **CUSTOMER**: "customer"
     *   **RESTAURANT_MANAGER**: "manager"
     *   **ADMIN**: "admin"
-    *   **DELIVERY_DRIVER** = "driver"
+    *   **DELIVERY_DRIVER**: "driver"
     """
     CUSTOMER = "customer"
     RESTAURANT_MANAGER = "manager"

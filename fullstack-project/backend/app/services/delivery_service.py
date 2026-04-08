@@ -9,6 +9,7 @@ import time
 from fastapi import HTTPException
 from app.repositories.delivery_repo import load_deliveries, save_deliveries
 from app.repositories.user_repo import load_users, save_users
+from app.schemas.order_schema import OrderStatus
 from app.services.order_service import _set_order_status, get_order_by_id, send_status_notification
 from app.services.restaurant_service import get_managers, get_restaurant_by_id
 from app.repositories.order_repo import load_orders, save_orders
@@ -161,7 +162,7 @@ async def start_delivery(order_id: int, driver_id: str) -> Delivery:
             delivery["eta_minutes"] = eta
             save_deliveries(deliveries)
 
-            order = _set_order_status(order_id, "delivering")
+            order = _set_order_status(order_id, OrderStatus.DELIVERING)
             await send_status_notification(order)
 
             delivery = Delivery(**delivery)
@@ -208,7 +209,7 @@ async def complete_delivery(order_id: int, driver_id: str) -> Delivery:
             delivery["delay_minutes"] = round(actual_minutes - delivery.get("eta_minutes", 0.0), 2)
             save_deliveries(deliveries)
 
-            order = _set_order_status(order_id, "delivered")
+            order = _set_order_status(order_id, OrderStatus.DELIVERED)
             await send_status_notification(order)
 
             delivery = Delivery(**delivery)
@@ -264,7 +265,7 @@ async def check_waiting_orders(driver: dict) -> None:
 
     waiting = [
         o for o in orders
-        if o.get("status") == "waiting_for_driver"
+        if o.get("status") == OrderStatus.WAITING_FOR_DRIVER
         and get_required_vehicle(o.get("distance_km", 0.0)) == required_vehicle
     ]
 
@@ -279,7 +280,7 @@ async def check_waiting_orders(driver: dict) -> None:
 
     for o in orders:
         if o["id"] == order["id"]:
-            o["status"] = "preparing"
+            o["status"] = OrderStatus.PREPARING
             o["delivery_id"] = delivery.id
             break
     save_orders(orders)

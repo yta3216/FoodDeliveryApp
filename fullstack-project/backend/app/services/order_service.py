@@ -12,7 +12,7 @@ from app.services.restaurant_service import get_restaurant_by_id, get_managers
 from app.schemas.user_schema import Customer
 from app.services.cart_service import empty_cart
 from app.services.notification_service import Notification
-from app.schemas.order_schema import Order
+from app.schemas.order_schema import Order, OrderStatus
 from app.schemas.receipt_schema import Receipt
 from app.services.receipt_service import get_receipt
 
@@ -20,7 +20,7 @@ from app.services.receipt_service import get_receipt
 async def create_order_from_receipt(current_user: Customer, receipt: Receipt) -> Order:
     """
     Converts a receipt into a pending order after successful payment.
-    Pricing and item details are stored in the receipt — the order only references the receipt id.
+    Pricing and item details are stored in the receipt - the order only references the receipt id.
     Cart is emptied once the order is saved.
 
     Parameters:
@@ -139,11 +139,11 @@ async def cancel_order(order_id: int, current_user: Customer) -> Order:
             order = Order(**order_data)
             if order.customer_id != current_user.id:
                 raise HTTPException(status_code=403, detail="You are not authorized to cancel this order.")
-            if order.status != "pending":
+            if order.status != OrderStatus.PENDING:
                 raise HTTPException(status_code=400, detail=f"Order cannot be cancelled, order is already '{order.status}'.")
 
-            order.status = "cancelled"
-            order_data["status"] = "cancelled"
+            order.status = OrderStatus.CANCELLED
+            order_data["status"] = OrderStatus.CANCELLED
             save_orders(orders)
             await send_status_notification(order)
             await send_refund_notification(order, "Order cancelled by customer")
@@ -186,12 +186,12 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: str) -
                 raise HTTPException(status_code=403, detail="You are not authorized to manage orders for this restaurant.")
 
             current_status = order.status
-            if current_status != "pending":
+            if current_status != OrderStatus.PENDING:
                 raise HTTPException(status_code=400, detail=f"Order cannot be updated - current status is '{current_status}'.")
 
-            if new_status == "rejected":
-                order.status = "rejected"
-                order_data["status"] = "rejected"
+            if new_status == OrderStatus.REJECTED:
+                order.status = OrderStatus.REJECTED
+                order_data["status"] = OrderStatus.REJECTED
                 save_orders(orders)
                 await send_status_notification(order)
                 await send_refund_notification(order, f"Rejected by restaurant")
@@ -200,8 +200,8 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: str) -
             distance_km = order.distance_km
             delivery_radius = restaurant.max_delivery_radius_km
             if delivery_radius > 0 and distance_km > delivery_radius:
-                order.status = "rejected"
-                order_data["status"] = "rejected"
+                order.status = OrderStatus.REJECTED
+                order_data["status"] = OrderStatus.REJECTED
                 save_orders(orders)
                 await send_status_notification(order)
                 await send_refund_notification(order, "Restaurant max delivery distance exceeded")
@@ -213,13 +213,13 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: str) -
             if driver:
                 delivery = await create_delivery(order_id, driver.id, distance_km)
                 set_driver_status_to_delivering(driver.id)
-                order.status = "preparing"
+                order.status = OrderStatus.PREPARING
                 order.delivery_id = delivery.id
-                order_data["status"] = "preparing"
+                order_data["status"] = OrderStatus.PREPARING
                 order_data["delivery_id"] = delivery.id
             else:
-                order.status = "waiting_for_driver"
-                order_data["status"] = "waiting_for_driver"
+                order.status = OrderStatus.WAITING_FOR_DRIVER
+                order_data["status"] = OrderStatus.WAITING_FOR_DRIVER
 
             save_orders(orders)
             await send_status_notification(order)
@@ -227,6 +227,38 @@ async def accept_reject_order(order_id: int, new_status: str, manager_id: str) -
 
     raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
+async def mark_order_ready(order_id: int, manager_id: str) -> Order:
+    """
+    Marks a "preparing" order as "ready" for pickup by the driver.
+    May only be called by a manager of the order's restaurant.
+
+    Parameters:
+        order_id (int): the identifier of the order to mark ready
+        manager_id (str): the identifier of the manager making the request
+
+    Returns:
+        Order: the updated order
+
+    Raises:
+        HTTPException (status_code = 403): if the manager does not manage this order's restaurant
+        HTTPException (status_code = 400): if the order status is not "preparing"
+        HTTPException (status_code = 404): if the order or restaurant is not found
+    """
+    orders = load_orders()
+    for order_data in orders:
+        if order_data.get("id") == order_id:
+            order = Order(**order_data)
+            restaurant = get_restaurant_by_id(order.restaurant_id)
+            if manager_id not in restaurant.manager_ids:
+                raise HTTPException(status_code=403, detail="You are not authorized to manage orders for this restaurant.")
+            if order.status != OrderStatus.PREPARING:
+                raise HTTPException(status_code=400, detail=f"Order must be 'preparing' to mark ready, current status: '{order.status}'.")
+            order.status = OrderStatus.READY
+            order_data["status"] = OrderStatus.READY
+            save_orders(orders)
+            await send_status_notification(order)
+            return order
+    raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
 
 async def send_status_notification(order: Order) -> None:
     """
@@ -274,13 +306,13 @@ async def send_refund_notification(order: Order, reason: str = None) -> None:
     notification = Notification(message, notified_users)
     await notification.send_to_users()
 
-def _set_order_status(order_id: int, status: str) -> Order:
+def _set_order_status(order_id: int, status: OrderStatus) -> Order:
     """
     Updates the status of an order.
 
     Parameters:
         order_id (int): the identifier of the order to update
-        status (str): new status value
+        status (OrderStatus): new status value
 
     Returns:
         Order: updated order object
