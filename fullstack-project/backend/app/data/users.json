@@ -22,8 +22,8 @@
     "role": "manager",
     "reset_token": null,
     "reset_token_expiry": null,
-    "auth_token": "j0VjF6iu1ruX0WznY5f85tZz4fE5NKAwzneO-RY9FuI",
-    "auth_token_expiry": 1774587541.914036
+    "auth_token": "-pPjRxn_bJBX8hXCpGFE7bB-A_toCUlCU8acljK43ec",
+    "auth_token_expiry": 1775715002.4909198
   },
   {
     "id": "498c8f4b-0006-4bc8-9b0b-4025b3d64a09",
@@ -77,8 +77,8 @@
     "wallet_balance": 32.75,
     "reset_token": null,
     "reset_token_expiry": null,
-    "auth_token": "b1qLvSbAwl8SRAadKqxMnw7YojRC1JB38eqbRZNBx1g",
-    "auth_token_expiry": 1806036929,
+    "auth_token": "DxrktkK30W5U2uiaCglSF1u1z9jp1hC-TmfIQPTT2-4",
+    "auth_token_expiry": 1775713427.458504,
     "cart": {
       "restaurant_id": 0,
       "cart_items": []
