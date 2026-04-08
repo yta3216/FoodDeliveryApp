@@ -234,6 +234,11 @@ async def test_driver_can_start_delivery(delivery_setup):
         json={"status": "accepted"},
         headers={"Authorization": f"Bearer {manager_token}"},
     )
+    client.patch(
+        f"/order/{order_id}/ready",
+        json={"status": "ready"},
+        headers={"Authorization": f"Bearer {manager_token}"},
+    )
 
     response = client.patch(
         f"/delivery/{order_id}/start",
@@ -260,6 +265,12 @@ async def test_driver_can_complete_delivery(delivery_setup):
         json={"status": "accepted"},
         headers={"Authorization": f"Bearer {manager_token}"},
     )
+    client.patch(
+        f"/order/{order_id}/ready",
+        json={"status": "ready"},
+        headers={"Authorization": f"Bearer {manager_token}"},
+    )
+
     client.patch(
         f"/delivery/{order_id}/start",
         headers={"Authorization": f"Bearer {driver_token}"},
