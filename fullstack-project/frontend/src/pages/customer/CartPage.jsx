@@ -139,9 +139,9 @@ export default function CartPage() {
       show('Order placed successfully! 🎉', 'success');
       navigate('/orders');
     } catch (err) {
-      // 409 means receipt is stale — regenerate
+      // 409 means receipt is stale - regenerate
       if (err.message?.includes('409') || err.message?.toLowerCase().includes('changed')) {
-        show('Prices changed — receipt refreshed. Please review and confirm.', 'error');
+        show('Prices changed - receipt refreshed. Please review and confirm.', 'error');
         const km = parseFloat(distanceKm) || 0.0;
         const refreshed = await receiptApi.get(km).catch(() => null);
         if (refreshed) setReceipt(refreshed);

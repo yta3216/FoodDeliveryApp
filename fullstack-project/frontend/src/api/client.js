@@ -36,7 +36,7 @@ export const userApi = {
   performReset: (token, new_password) => api.patch('/user/password-reset', { reset_token: token, new_password }),
   getNotifications: (id) => api.get(`/user/${id}/notifications`),
   readNotification: (userId, notifId) => api.patch(`/user/${userId}/notifications/${notifId}/read`),
-  // Favourites — customer only
+  // Favourites - customer only
   getFavourites: () => api.get('/user/me/favourites'),
   addFavourite: (restaurantId) => api.post(`/user/me/favourites/${restaurantId}`),
   removeFavourite: (restaurantId) => api.delete(`/user/me/favourites/${restaurantId}`),
@@ -45,7 +45,7 @@ export const userApi = {
 export const restaurantApi = {
   // Basic fetch-all (keeps backward compat)
   getAll: () => api.get('/restaurant/search?page_size=50').then(r => r.results ?? r),
-  // Advanced search — passes name, city, menu_item, sort_price, page, page_size to backend
+  // Advanced search - passes name, city, menu_item, sort_price, page, page_size to backend
   search: (params = {}) => {
     const qs = new URLSearchParams({ page_size: 50, ...params }).toString();
     return api.get(`/restaurant/search?${qs}`);
@@ -75,6 +75,7 @@ export const orderApi = {
   getForRestaurant: (restaurantId) => api.get(`/order/restaurant/${restaurantId}`),
   cancel: (orderId) => api.delete(`/order/${orderId}`),
   acceptReject: (orderId, status) => api.patch(`/order/${orderId}/status`, { status }),
+  markReady: (orderId) => api.patch(`/order/${orderId}/ready`),
 };
 
 export const paymentApi = {
@@ -82,7 +83,7 @@ export const paymentApi = {
   checkout: (receiptId) => api.post('/payment/checkout', { receipt_id: receiptId }),
 };
 
-// receiptApi.get — backend is GET /receipt?distance_km=X (was incorrectly POST before)
+// receiptApi.get - backend is GET /receipt?distance_km=X (was incorrectly POST before)
 export const receiptApi = {
   get: (distanceKm = 0.0) => api.get(`/receipt?distance_km=${distanceKm}`),
   getById: (id) => api.get(`/receipt/${id}`),
