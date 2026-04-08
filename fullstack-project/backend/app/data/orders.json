@@ -55,8 +55,68 @@
     "restaurant_id": 1,
     "delivery_id": 2,
     "receipt_id": 36,
-    "status": "preparing",
+    "status": "ready",
     "distance_km": 3.0,
     "date_created": "2026-04-08T08:40:47.856670+00:00"
+  },
+  {
+    "id": 7,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "delivery_id": 3,
+    "receipt_id": 38,
+    "status": "delivered",
+    "distance_km": 3.5,
+    "date_created": "2026-04-08T11:58:11.031828+00:00"
+  },
+  {
+    "id": 8,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 3,
+    "delivery_id": 4,
+    "receipt_id": 39,
+    "status": "delivered",
+    "distance_km": 6.0,
+    "date_created": "2026-04-08T12:39:41.209412+00:00"
+  },
+  {
+    "id": 9,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "delivery_id": 5,
+    "receipt_id": 40,
+    "status": "delivered",
+    "distance_km": 10.0,
+    "date_created": "2026-04-08T12:51:31.459277+00:00"
+  },
+  {
+    "id": 10,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "delivery_id": 6,
+    "receipt_id": 41,
+    "status": "delivered",
+    "distance_km": 5.0,
+    "date_created": "2026-04-08T13:02:36.546750+00:00"
+  },
+  {
+    "id": 11,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "delivery_id": 7,
+    "receipt_id": 42,
+    "status": "delivered",
+    "distance_km": 5.0,
+    "date_created": "2026-04-08T13:08:59.954705+00:00"
+  },
+  {
+    "id": 12,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 3,
+    "delivery_id": 8,
+    "receipt_id": 43,
+    "status": "delivered",
+    "distance_km": 5.0,
+    "date_created": "2026-04-08T13:14:33.770274+00:00"
   }
 ]

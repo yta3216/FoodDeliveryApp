@@ -9,8 +9,8 @@
     "role": "admin",
     "reset_token": null,
     "reset_token_expiry": null,
-    "auth_token": "hlLkq33SV8seUvUDfXp6n5fqIcc8Agld-sZCPOrS4U4",
-    "auth_token_expiry": 1775642931.2143555
+    "auth_token": "b7ipeUAI---KDa6tF6xIjeZVd_ahMDQXCZesUQJty4I",
+    "auth_token_expiry": 1775740883.9933393
   },
   {
     "id": "a7b36374-170b-4cfa-97a4-4a72712a2d77",
@@ -22,8 +22,8 @@
     "role": "manager",
     "reset_token": null,
     "reset_token_expiry": null,
-    "auth_token": "YYP3kNF7G_GE0t6xw31r_qsC8tJLahQREaqI1QEUQNI",
-    "auth_token_expiry": 1775723476.9342036
+    "auth_token": "E6KHMe6MZjyDNcAQSSkcVPWO8Kk8aGyivH29_XX3MM4",
+    "auth_token_expiry": 1775735775.058877
   },
   {
     "id": "498c8f4b-0006-4bc8-9b0b-4025b3d64a09",
@@ -110,10 +110,10 @@
     "role": "driver",
     "reset_token": null,
     "reset_token_expiry": null,
-    "auth_token": "ZSyn_K6Ygg3ahpCQBDwtb7cNuXrnkfhZPLfn7djU8QA",
-    "auth_token_expiry": 1806036929,
+    "auth_token": "SlAzdK1ly0XpuhbmmnDe_Om3lX7MiA2XVHG9RihbGJ0",
+    "auth_token_expiry": 1775738443.43432,
     "vehicle": "car",
-    "driver_status": "available"
+    "driver_status": "unavailable"
   },
   {
     "id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
@@ -125,15 +125,15 @@
     "role": "customer",
     "reset_token": null,
     "reset_token_expiry": null,
-    "wallet_balance": 1212.6900000000003,
+    "wallet_balance": 1061.45,
     "cart": {
       "restaurant_id": 0,
       "cart_items": [],
       "promo_code": null
     },
     "favourites": [],
-    "auth_token": "DFg42mPGK0Bg9EnFZoSmgQE5Pg0D3IL5X-FYfCEZzIw",
-    "auth_token_expiry": 1775723760.3888805
+    "auth_token": "UoyhckXBLleQ1v6r_feO1WdGZag9rES8zO7wsEjNlM8",
+    "auth_token_expiry": 1775735746.5243926
   },
   {
     "id": "ee6c6675-2f20-4ed8-8adc-429d8010e7a4",
@@ -147,7 +147,7 @@
     "reset_token_expiry": null,
     "vehicle": "bike",
     "driver_status": "available",
-    "auth_token": "T8U-KZOA41pRfj0IQPutl4cn7nsyJDYydHgOIRpSIPg",
-    "auth_token_expiry": 1775723098.3508494
+    "auth_token": "vAlpd3iZ5-jxLlwV-_iBMeNveiM7Zb6sjNb_aN8ysc8",
+    "auth_token_expiry": 1775739810.259763
   }
 ]

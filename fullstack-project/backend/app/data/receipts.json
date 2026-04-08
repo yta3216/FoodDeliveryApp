@@ -968,5 +968,215 @@
     "distance_km": 3.0,
     "total": 21.12,
     "date_created": null
+  },
+  {
+    "id": 37,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 1,
+        "line_total": 9.99
+      },
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      }
+    ],
+    "subtotal": 13.98,
+    "tax": 1.68,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 3.5,
+    "total": 16.65,
+    "date_created": null
+  },
+  {
+    "id": 38,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 1,
+        "line_total": 9.99
+      },
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      }
+    ],
+    "subtotal": 13.98,
+    "tax": 1.68,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 3.5,
+    "total": 16.65,
+    "date_created": null
+  },
+  {
+    "id": 39,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 3,
+    "items": [
+      {
+        "menu_item_id": 2,
+        "name": "Ribeye Steak",
+        "unit_price": 32.99,
+        "qty": 1,
+        "line_total": 32.99
+      },
+      {
+        "menu_item_id": 6,
+        "name": "Pepsi",
+        "unit_price": 4.49,
+        "qty": 1,
+        "line_total": 4.49
+      }
+    ],
+    "subtotal": 37.48,
+    "tax": 4.5,
+    "delivery_fee": 1.99,
+    "discount": 5.0,
+    "promo_code": null,
+    "distance_km": 6.0,
+    "total": 38.97,
+    "date_created": null
+  },
+  {
+    "id": 40,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 2,
+        "name": "Cheese Pizza",
+        "unit_price": 10.99,
+        "qty": 1,
+        "line_total": 10.99
+      },
+      {
+        "menu_item_id": 4,
+        "name": "Fries",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      },
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      }
+    ],
+    "subtotal": 18.97,
+    "tax": 2.28,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 10.0,
+    "total": 22.24,
+    "date_created": null
+  },
+  {
+    "id": 41,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Pepperoni Pizza",
+        "unit_price": 9.99,
+        "qty": 1,
+        "line_total": 9.99
+      },
+      {
+        "menu_item_id": 6,
+        "name": "Cola",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      }
+    ],
+    "subtotal": 13.98,
+    "tax": 1.68,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 5.0,
+    "total": 16.65,
+    "date_created": null
+  },
+  {
+    "id": 42,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 1,
+    "items": [
+      {
+        "menu_item_id": 3,
+        "name": "Meat Lover's Pizza",
+        "unit_price": 12.99,
+        "qty": 2,
+        "line_total": 25.98
+      },
+      {
+        "menu_item_id": 4,
+        "name": "Fries",
+        "unit_price": 3.99,
+        "qty": 1,
+        "line_total": 3.99
+      }
+    ],
+    "subtotal": 29.97,
+    "tax": 3.6,
+    "delivery_fee": 2.99,
+    "discount": 2.0,
+    "promo_code": null,
+    "distance_km": 5.0,
+    "total": 34.56,
+    "date_created": null
+  },
+  {
+    "id": 43,
+    "customer_id": "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+    "restaurant_id": 3,
+    "items": [
+      {
+        "menu_item_id": 1,
+        "name": "Grilled Salmon",
+        "unit_price": 17.99,
+        "qty": 1,
+        "line_total": 17.99
+      },
+      {
+        "menu_item_id": 6,
+        "name": "Pepsi",
+        "unit_price": 4.49,
+        "qty": 1,
+        "line_total": 4.49
+      }
+    ],
+    "subtotal": 22.48,
+    "tax": 2.7,
+    "delivery_fee": 1.99,
+    "discount": 5.0,
+    "promo_code": null,
+    "distance_km": 5.0,
+    "total": 22.17,
+    "date_created": null
   }
 ]
