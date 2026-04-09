@@ -17,7 +17,7 @@ class UserRole(str, Enum):
     *   **CUSTOMER**: "customer"
     *   **RESTAURANT_MANAGER**: "manager"
     *   **ADMIN**: "admin"
-    *   **DELIVERY_DRIVER** = "driver"
+    *   **DELIVERY_DRIVER**: "driver"
     """
     CUSTOMER = "customer"
     RESTAURANT_MANAGER = "manager"
@@ -168,11 +168,13 @@ class User_Update(BaseModel):
     *   **name** (str): the user's updated name
     *   **age** (int): the user's updated age (0-100)
     *   **gender** (str): the user's updated gender. male, female, other, or prefer not to say
+    *   **vehicle** (str | None): the user's vehicle type, only included for delivery drivers
     """
     email: EmailStr
     name: str
     age: int
     gender: str
+    vehicle: str | None = None
 
     @field_validator("name")
     @classmethod
@@ -219,6 +221,9 @@ class LoginResponse(BaseModel):
     *   **age** (int): the user's age
     *   **gender** (str): the user's gender
     *   **name** (str): the user's name
+    *   **wallet_balance** (float | None): the user's current wallet balance. Customers only.
+    *   **vehicle** (str | None): the user's vehicle type. Delivery drivers only.
+    *   **driver_status** (str | None): the user's current driver status. Delivery drivers only.
     """
     token: str
     user_id: str
@@ -227,6 +232,9 @@ class LoginResponse(BaseModel):
     age: int
     gender: str
     name: str
+    wallet_balance: float | None = None
+    vehicle: str | None = None
+    driver_status: str | None = None
 
 class Password_Reset_Request(BaseModel):
     """
@@ -272,6 +280,9 @@ class UserPublic(BaseModel):
     *   **age** (int): user's age
     *   **gender** (str): user's gender
     *   **role** (UserRole): the user's account type
+    *   **wallet_balance** (float | None): the user's current wallet balance. Customers only.
+    *   **vehicle** (str | None): the user's vehicle type. Delivery drivers only.
+    *   **driver_status** (str | None): the user's current driver status. Delivery drivers only.
     """
     id: str
     email: str
@@ -279,3 +290,6 @@ class UserPublic(BaseModel):
     age: int
     gender: str
     role: UserRole
+    wallet_balance: float | None = None
+    vehicle: str | None = None
+    driver_status: str | None = None

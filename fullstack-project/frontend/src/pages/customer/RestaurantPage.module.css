@@ -35,8 +35,6 @@
   color: var(--text2);
 }
 .meta span { display: flex; align-items: center; gap: 5px; }
-
-.menuSection { }
 .menuTitle {
   font-size: 1.3rem;
   margin-bottom: 24px;
@@ -156,4 +154,84 @@
 
 @media (max-width: 600px) {
   .headerContent { flex-direction: column; align-items: flex-start; }
+}
+
+.combosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.comboCard {
+  background: linear-gradient(135deg, var(--surface2, #1e1e2e) 0%, var(--surface, #16161e) 100%);
+  border: 1px solid var(--accent, #f5a623);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comboHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.comboName {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.comboBadge {
+  background: var(--accent, #f5a623);
+  color: #000;
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.comboItemsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.comboItemChip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--surface3, #2a2a3a);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 13px;
+}
+
+.comboItemPrice {
+  color: var(--text-muted, #888);
+  font-size: 12px;
+  margin-left: 2px;
+}
+
+.comboHint {
+  font-size: 11px;
+  color: var(--text-muted, #888);
+  margin: 0;
+  font-style: italic;
+}
+
+.stickyAddBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 14px 16px;
+  background: var(--bg, #0d0d17);
+  border-top: 1px solid var(--border, #2a2a3a);
+  z-index: 100;
+  backdrop-filter: blur(8px);
 }

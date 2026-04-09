@@ -91,11 +91,14 @@ def get_current_user_with_ws(websocket: WebSocket) -> User:
         User: the authenticated user's details
     
     Raises:
-        WebSocketException (code = WS_1008_POLICY_VIOLATION): if the Authorization header is missing from the WebSocket request
+        WebSocketException (code = WS_1008_POLICY_VIOLATION): if the Authorization header is missing from the WebSocket request and the token query parameter is missing
         HTTPException (status_code = 401): if user's token is invalid or expired
     """
     auth = websocket.headers.get("Authorization")
     if not auth:
-        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION)
-    token = auth.split()[1]
+        token = websocket.query_params.get("token")
+        if not token:
+            raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION)
+    else:
+        token = auth.split()[1]
     return get_user_from_token(token)

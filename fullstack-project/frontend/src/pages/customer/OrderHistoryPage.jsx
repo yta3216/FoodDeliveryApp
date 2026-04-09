@@ -1,24 +1,49 @@
-import { useState, useEffect } from 'react';
-import { orderApi, receiptApi } from '../../api/client';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { orderApi, receiptApi, restaurantApi } from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
 import { Spinner, EmptyState, StatusBadge, Button, Modal, Toast } from '../../components/common/UI';
 import { useToast } from '../../hooks/useToast';
 import { Receipt, X } from 'lucide-react';
 import styles from './OrderHistoryPage.module.css';
 
 export default function OrderHistoryPage() {
+  const { wsNotification } = useAuth();
   const { toast, show, hide } = useToast();
   const [orders, setOrders] = useState([]);
+  const [restaurantMap, setRestaurantMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [receiptLoading, setReceiptLoading] = useState(false);
   const [cancelling, setCancelling] = useState(null);
+  const pollRef = useRef(null);
+
+  const loadOrders = useCallback(async (showSpinner = false) => {
+    if (showSpinner) setLoading(true);
+    try {
+      const [fetchedOrders, allRestaurants] = await Promise.all([
+        orderApi.getForCustomer(),
+        restaurantApi.getAll().catch(() => []),
+      ]);
+      setOrders(fetchedOrders);
+      const map = {};
+      allRestaurants.forEach(r => { map[r.id] = r.name; });
+      setRestaurantMap(map);
+    } catch (err) {
+      show(err.message, 'error');
+    } finally {
+      if (showSpinner) setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    orderApi.getForCustomer()
-      .then(setOrders)
-      .catch(err => show(err.message, 'error'))
-      .finally(() => setLoading(false));
-  }, []);
+    loadOrders(true);
+    pollRef.current = setInterval(() => loadOrders(false), 15_000);
+    return () => clearInterval(pollRef.current);
+  }, [loadOrders]);
+  useEffect(() => {
+    if (!wsNotification) return;
+    loadOrders(false);
+  }, [wsNotification?.id]);
 
   const viewReceipt = async (receiptId) => {
     setReceiptLoading(true);
@@ -100,9 +125,9 @@ export default function OrderHistoryPage() {
                   <StatusBadge status={order.status} />
                 </div>
                 <div className={styles.orderMeta}>
-                  <span>🏪 Restaurant #{order.restaurant_id}</span>
+                  <span>🏪 {restaurantMap[order.restaurant_id] || `Restaurant #${order.restaurant_id}`}</span>
                   <span>📍 {order.distance_km.toFixed(1)} km</span>
-                  {order.delivery_id > 0 && <span>🚗 Driver #{order.delivery_id}</span>}
+                  {order.delivery_id > 0 && <span>🚗 Delivery assigned</span>}
                 </div>
                 <div className={styles.orderActions}>
                   {order.receipt_id > 0 && (

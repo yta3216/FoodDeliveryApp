@@ -1,18 +1,21 @@
 import { useState } from 'react';
-import { deliveryApi } from '../../api/client';
+import { deliveryApi, userApi } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { Button, Spinner, EmptyState, StatusBadge, Toast, Input } from '../../components/common/UI';
+import { Button, EmptyState, StatusBadge, Toast, Input } from '../../components/common/UI';
 import { useToast } from '../../hooks/useToast';
-import { Truck, CheckCircle, Radio, Search } from 'lucide-react';
+import { Truck, CheckCircle, Radio, Search, Save } from 'lucide-react';
 import styles from './DriverPage.module.css';
 
 export default function DriverDashboard() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { toast, show, hide } = useToast();
   const [driverStatus, setDriverStatus] = useState(user?.driver_status || 'available');
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
-  // Active delivery looked up by order ID
+  const [vehicle, setVehicle] = useState(user?.vehicle || '');
+  const [editingVehicle, setEditingVehicle] = useState(false);
+  const [savingVehicle, setSavingVehicle] = useState(false);
+
   const [activeDelivery, setActiveDelivery] = useState(null);
   const [lookupOrderId, setLookupOrderId] = useState('');
   const [lookupLoading, setLookupLoading] = useState(false);
@@ -31,13 +34,34 @@ export default function DriverDashboard() {
     }
   };
 
+  const saveVehicle = async () => {
+    if (!vehicle.trim()) return show('Vehicle cannot be empty', 'error');
+    setSavingVehicle(true);
+    try {
+      // Requires backend: User_Update schema must include 'vehicle' field
+      await userApi.update(user.user_id, {
+        name: user.name,
+        email: user.email,
+        age: user.age,
+        gender: user.gender,
+        vehicle: vehicle.trim(),
+      });
+      updateUser({ vehicle: vehicle.trim() });
+      setEditingVehicle(false);
+      show('Vehicle updated!', 'success');
+    } catch (err) {
+      show(err.message, 'error');
+    } finally {
+      setSavingVehicle(false);
+    }
+  };
+
   const lookupDelivery = async () => {
     const orderId = parseInt(lookupOrderId, 10);
     if (!orderId) return show('Enter a valid Order ID', 'error');
     setLookupLoading(true);
     try {
       const delivery = await deliveryApi.getByOrder(orderId);
-      // Only show if this driver is assigned
       if (delivery.driver_id && delivery.driver_id !== user?.user_id) {
         return show('This delivery is not assigned to you.', 'error');
       }
@@ -69,8 +93,6 @@ export default function DriverDashboard() {
       show(err.message, 'error');
     }
   };
-
-  const isDelivering = activeDelivery && !activeDelivery.delivered_at;
 
   return (
     <div className={`page ${styles.page}`}>
@@ -109,7 +131,30 @@ export default function DriverDashboard() {
           <div className={styles.infoCard}>
             <Truck size={28} className={styles.infoIcon} />
             <h3>Your Vehicle</h3>
-            <p>{user?.vehicle || 'Not specified'}</p>
+            {editingVehicle ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+                <Input
+                  value={vehicle}
+                  onChange={e => setVehicle(e.target.value)}
+                  placeholder="e.g. bike, car, motorcycle"
+                />
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <Button size="sm" loading={savingVehicle} onClick={saveVehicle}>
+                    <Save size={13} /> Save
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => { setEditingVehicle(false); setVehicle(user?.vehicle || ''); }}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-start' }}>
+                <p>{user?.vehicle || 'Not specified'}</p>
+                <Button size="sm" variant="ghost" onClick={() => setEditingVehicle(true)}>
+                  Edit
+                </Button>
+              </div>
+            )}
           </div>
           <div className={styles.infoCard}>
             <Radio size={28} className={styles.infoIcon} />

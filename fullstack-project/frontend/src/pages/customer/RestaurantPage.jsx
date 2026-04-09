@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { restaurantApi, cartApi } from '../../api/client';
 import { Button, Spinner, EmptyState } from '../../components/common/UI';
-import { MapPin, ShoppingCart, Plus, Minus, Tag } from 'lucide-react';
+import { MapPin, ShoppingCart, Plus, Minus, Tag, ShoppingBag } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
 import { Toast } from '../../components/common/UI';
 import styles from './RestaurantPage.module.css';
@@ -14,31 +14,52 @@ export default function RestaurantPage() {
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantities, setQuantities] = useState({});
-  const [addingItem, setAddingItem] = useState(null);
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
-    restaurantApi.getById(id)
-      .then(setRestaurant)
-      .catch(() => show('Restaurant not found', 'error'))
-      .finally(() => setLoading(false));
+    const init = async () => {
+      try {
+        const [rest, cart] = await Promise.all([
+          restaurantApi.getById(id),
+          cartApi.get().catch(() => null),
+        ]);
+        setRestaurant(rest);
+        // Pre-seed quantities from cart if viewing the same restaurant
+        if (cart && cart.restaurant_id === Number(id) && cart.cart_items?.length) {
+          const q = {};
+          cart.cart_items.forEach(ci => { q[ci.menu_item_id] = ci.qty; });
+          setQuantities(q);
+        }
+      } catch {
+        show('Restaurant not found', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
   }, [id]);
 
   const setQty = (itemId, delta) => {
     setQuantities(q => ({ ...q, [itemId]: Math.max(0, (q[itemId] || 0) + delta) }));
   };
 
-  const handleAdd = async (item) => {
-    const qty = quantities[item.id] || 1;
-    setAddingItem(item.id);
+  const totalSelected = Object.values(quantities).reduce((s, q) => s + q, 0);
+
+  const handleAddAll = async () => {
+    const entries = Object.entries(quantities).filter(([, qty]) => qty > 0);
+    if (!entries.length) return show('Select at least one item first', 'error');
+    setAdding(true);
     try {
       await cartApi.setRestaurant(Number(id));
-      await cartApi.addItem({ menu_item_id: item.id, qty });
-      show(`${item.name} added to cart!`, 'success');
-      setQuantities(q => ({ ...q, [item.id]: 0 }));
+      for (const [itemId, qty] of entries) {
+        await cartApi.addItem({ menu_item_id: Number(itemId), qty });
+      }
+      show(`${totalSelected} item${totalSelected !== 1 ? 's' : ''} added to cart!`, 'success');
+      setQuantities({});
     } catch (err) {
       show(err.message, 'error');
     } finally {
-      setAddingItem(null);
+      setAdding(false);
     }
   };
 
@@ -46,6 +67,7 @@ export default function RestaurantPage() {
   if (!restaurant) return <div className="page"><EmptyState icon="❌" title="Restaurant not found" /></div>;
 
   const items = restaurant.menu?.items || [];
+  const combos = (restaurant.menu?.combos || []).filter(c => c.is_active);
 
   return (
     <div className={`page ${styles.page}`}>
@@ -71,6 +93,44 @@ export default function RestaurantPage() {
       </div>
 
       <div className="container">
+        {/* Combo Deals Section */}
+        {combos.length > 0 && (
+          <div className={styles.menuSection}>
+            <h2 className={styles.menuTitle}>🎁 Combo Deals <span>({combos.length})</span></h2>
+            <div className={styles.combosGrid}>
+              {combos.map(combo => {
+                const comboItems = combo.item_ids
+                  .map(cid => items.find(i => i.id === cid))
+                  .filter(Boolean);
+                return (
+                  <div key={combo.id} className={styles.comboCard}>
+                    <div className={styles.comboHeader}>
+                      <span className={styles.comboName}>{combo.name}</span>
+                      <span className={styles.comboBadge}>
+                        {combo.type === 'percentage'
+                          ? `${combo.discount}% off`
+                          : `-$${Number(combo.discount).toFixed(2)}`}
+                      </span>
+                    </div>
+                    <div className={styles.comboItemsList}>
+                      {comboItems.map(item => (
+                        <span key={item.id} className={styles.comboItemChip}>
+                          {getItemEmoji(item.name)} {item.name}
+                          <span className={styles.comboItemPrice}>${item.price.toFixed(2)}</span>
+                        </span>
+                      ))}
+                    </div>
+                    <p className={styles.comboHint}>
+                      Add all items to cart — discount applies automatically at checkout
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Menu Items */}
         <div className={styles.menuSection}>
           <h2 className={styles.menuTitle}>Menu <span>({items.length} items)</span></h2>
           {items.length === 0 ? (
@@ -96,18 +156,11 @@ export default function RestaurantPage() {
                       <button onClick={() => setQty(item.id, -1)} disabled={!quantities[item.id]}>
                         <Minus size={14} />
                       </button>
-                      <span>{quantities[item.id] || 1}</span>
+                      <span>{quantities[item.id] || 0}</span>
                       <button onClick={() => setQty(item.id, 1)}>
                         <Plus size={14} />
                       </button>
                     </div>
-                    <Button
-                      size="sm"
-                      loading={addingItem === item.id}
-                      onClick={() => handleAdd(item)}
-                    >
-                      Add to cart
-                    </Button>
                   </div>
                 </div>
               ))}
@@ -115,6 +168,17 @@ export default function RestaurantPage() {
           )}
         </div>
       </div>
+
+      {totalSelected > 0 && (
+        <div className={styles.stickyAddBar}>
+          <div className="container" style={{ display: 'flex', justifyContent: 'center' }}>
+            <Button loading={adding} onClick={handleAddAll} size="lg">
+              <ShoppingBag size={16} />
+              Add {totalSelected} item{totalSelected !== 1 ? 's' : ''} to Cart
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

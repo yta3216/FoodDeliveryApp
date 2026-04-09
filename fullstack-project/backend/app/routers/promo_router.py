@@ -34,7 +34,7 @@ def get_all_promos_route(current_user: User = Depends(require_role(UserRole.ADMI
 def get_promos_route():
     """
     **Returns all active, publicly visible promotional codes.**
-    No authentication required — this is a public listing for customers to browse available discounts.
+    No authentication required - this is a public listing for customers to browse available discounts.
 
     Parameters: None
 
@@ -50,7 +50,7 @@ def apply_promo_route(body: PromoApplyRequest, current_user: Customer = Depends(
     **Applies a promotional code to the customer's cart.**
     Checks that the code exists and is active. Full validation (expiry, minimum order value,
     first-order restriction) is deferred to receipt generation when the subtotal is known.
-    Replaces any previously applied code — only one code is allowed per cart.
+    Replaces any previously applied code - only one code is allowed per cart.
 
     Parameters:
     *   **body** (PromoApplyRequest): contains the promo code string to apply

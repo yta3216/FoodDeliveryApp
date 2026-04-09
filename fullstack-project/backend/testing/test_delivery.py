@@ -234,6 +234,11 @@ async def test_driver_can_start_delivery(delivery_setup):
         json={"status": "accepted"},
         headers={"Authorization": f"Bearer {manager_token}"},
     )
+    client.patch(
+        f"/order/{order_id}/ready",
+        json={"status": "ready"},
+        headers={"Authorization": f"Bearer {manager_token}"},
+    )
 
     response = client.patch(
         f"/delivery/{order_id}/start",
@@ -260,6 +265,12 @@ async def test_driver_can_complete_delivery(delivery_setup):
         json={"status": "accepted"},
         headers={"Authorization": f"Bearer {manager_token}"},
     )
+    client.patch(
+        f"/order/{order_id}/ready",
+        json={"status": "ready"},
+        headers={"Authorization": f"Bearer {manager_token}"},
+    )
+
     client.patch(
         f"/delivery/{order_id}/start",
         headers={"Authorization": f"Bearer {driver_token}"},
@@ -346,7 +357,7 @@ def test_waiting_order_assigned_when_driver_becomes_available():
         headers={"Authorization": f"Bearer {customer_token}"}
     )
 
-    # place order with no driver available — should go to waiting_for_driver
+    # place order with no driver available - should go to waiting_for_driver
     client.patch(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
     client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 1},
                 headers={"Authorization": f"Bearer {customer_token}"})
@@ -436,7 +447,7 @@ def test_order_outside_delivery_radius_auto_declined():
         headers={"Authorization": f"Bearer {customer_token}"}
     )
 
-    # place order with 10km distance — outside the 5km radius
+    # place order with 10km distance - outside the 5km radius
     client.patch(f"/cart/{restaurant_id}", headers={"Authorization": f"Bearer {customer_token}"})
     client.post("/cart/item", json={"menu_item_id": menu_item_id, "qty": 1},
                 headers={"Authorization": f"Bearer {customer_token}"})

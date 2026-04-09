@@ -7,17 +7,17 @@ import { User, Lock, Wallet } from 'lucide-react';
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
-  const { user, login } = useAuth();
+  const { user, login, updateUser } = useAuth();
   const { toast, show, hide } = useToast();
   const [tab, setTab] = useState('profile');
   const [profileForm, setProfileForm] = useState({ name: user?.name || '', email: user?.email || '', age: user?.age || '', gender: user?.gender || 'male' });
   const [passwordForm, setPasswordForm] = useState({ old_password: '', new_password: '', confirm: '' });
   const [walletForm, setWalletForm] = useState({
     amount: '',
-    card_number: '4111111111111111',
-    expiry_month: '12',
-    expiry_year: '2026',
-    cvv: '123',
+    card_number: '',
+    expiry_month: '',
+    expiry_year: '',
+    cvv: '',
     cardholder_name: '',
   });
   const [saving, setSaving] = useState(false);
@@ -30,7 +30,8 @@ export default function ProfilePage() {
     e.preventDefault();
     setSaving(true);
     try {
-      await userApi.update(user.user_id, { ...profileForm, age: Number(profileForm.age) });
+      const updated = await userApi.update(user.user_id, { ...profileForm, age: Number(profileForm.age) });
+      updateUser(updated);
       show('Profile updated!', 'success');
     } catch (err) {
       show(err.message, 'error');
@@ -59,7 +60,7 @@ export default function ProfilePage() {
     }
   };
 
- const topupWallet = async (e) => {
+  const topupWallet = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
@@ -72,7 +73,11 @@ export default function ProfilePage() {
         cardholder_name: walletForm.cardholder_name,
       });
       show(`$${walletForm.amount} added to your wallet!`, 'success');
-      setWalletForm(f => ({ ...f, amount: '', cardholder_name: '' }));
+      setWalletForm(f => ({ ...f, amount: '' }));
+      try {
+        const refreshed = await userApi.getById(user.user_id);
+        updateUser(refreshed);
+      } catch { }
     } catch (err) {
       show(err.message, 'error');
     } finally {
@@ -155,13 +160,13 @@ export default function ProfilePage() {
                 <h3 className={styles.subhead}>Top Up</h3>
                 <form onSubmit={topupWallet} className={styles.form}>
                   <Input label="Cardholder Name" value={walletForm.cardholder_name} onChange={setW('cardholder_name')} required placeholder="John Smith" />
-                  <Input label="Card Number" value={walletForm.card_number} onChange={setW('card_number')} maxLength={16} />
+                  <Input label="Card Number" value={walletForm.card_number} onChange={setW('card_number')} maxLength={16} required placeholder="1234 5678 9012 3456" />
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-                    <Input label="Expiry Month" type="number" min="1" max="12" value={walletForm.expiry_month} onChange={setW('expiry_month')} />
-                    <Input label="Expiry Year" type="number" min="2024" value={walletForm.expiry_year} onChange={setW('expiry_year')} />
-                    <Input label="CVV" value={walletForm.cvv} onChange={setW('cvv')} maxLength={4} />
+                    <Input label="Expiry Month" type="number" min="1" max="12" value={walletForm.expiry_month} onChange={setW('expiry_month')} required placeholder="06" />
+                    <Input label="Expiry Year" type="number" min="2024" value={walletForm.expiry_year} onChange={setW('expiry_year')} required placeholder="2027" />
+                    <Input label="CVV" value={walletForm.cvv} onChange={setW('cvv')} maxLength={4} required placeholder="123" />
                   </div>
-                  <Input label="Amount ($)" type="number" min="0.01" step="0.01" value={walletForm.amount} onChange={setW('amount')} required />
+                  <Input label="Amount ($)" type="number" min="0.01" step="0.01" value={walletForm.amount} onChange={setW('amount')} required placeholder="13.67" />
                   <Button type="submit" loading={saving}><Wallet size={15} /> Top Up Wallet</Button>
                 </form>
               </div>

@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -52,6 +52,13 @@ app.include_router(payment_router)
 app.include_router(receipt_router)
 app.include_router(config_router)
 app.include_router(promo_router)
+
+@app.get("/{full_path:path}", include_in_schema=False)
+async def fallback(full_path: str):
+    if full_path.startswith(("user/", "restaurant/", "cart/", "order/", "delivery/", "payment/", "receipt/", "config/", "promo/", "ws/", "static/")):
+        raise HTTPException(status_code=404, detail="Not Found")
+    html_path = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "index.html")
+    return FileResponse(os.path.normpath(html_path))
 
 @app.get("/", tags=["root"])
 async def read_root():

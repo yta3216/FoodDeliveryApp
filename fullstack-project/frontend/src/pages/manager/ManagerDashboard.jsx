@@ -174,7 +174,7 @@ export default function ManagerDashboard() {
       </Modal>
 
       {/* Menu Modal */}
-      <Modal open={!!menuModal} onClose={() => { setMenuModal(null); setEditItemForm(null); }} title={`Menu — ${menuModal?.name}`}>
+      <Modal open={!!menuModal} onClose={() => { setMenuModal(null); setEditItemForm(null); }} title={`Menu - ${menuModal?.name}`}>
         {menuModal && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Existing items */}
