@@ -120,22 +120,22 @@ export default function ManagerDashboard() {
 
   if (loading) return <div className="page"><Spinner center size={36} /></div>;
 
-  const RestaurantForm = ({ form, onChange, onSubmit, submitLabel }) => (
-    <form onSubmit={onSubmit} className={styles.formGrid}>
-      <Input label="Restaurant Name" value={form.name} onChange={onChange('name')} required />
-      <Input label="City" value={form.city} onChange={onChange('city')} required placeholder="e.g. Kelowna" />
-      <Input label="Street Address" value={form.street} onChange={onChange('street')} required placeholder="e.g. 123 Main St" />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <Input label="Province" value={form.province} onChange={onChange('province')} required placeholder="BC" maxLength={2} />
-        <Input label="Postal Code" value={form.postal_code} onChange={onChange('postal_code')} required placeholder="V1Y 1A1" />
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <Input label="Delivery Fee ($)" type="number" min="0" step="0.01" value={form.delivery_fee} onChange={onChange('delivery_fee')} />
-        <Input label="Max Delivery Radius (km)" type="number" min="0" step="0.1" value={form.max_delivery_radius_km} onChange={onChange('max_delivery_radius_km')} />
-      </div>
-      <Button type="submit" loading={saving}>{submitLabel}</Button>
-    </form>
-  );
+const RestaurantForm = ({ form, onChange, onSubmit, submitLabel, saving }) => (
+  <form onSubmit={onSubmit} className={styles.formGrid}>
+    <Input label="Restaurant Name" value={form.name} onChange={onChange('name')} required />
+    <Input label="City" value={form.city} onChange={onChange('city')} required placeholder="e.g. Kelowna" />
+    <Input label="Street Address" value={form.street} onChange={onChange('street')} required placeholder="e.g. 123 Main St" />
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <Input label="Province" value={form.province} onChange={onChange('province')} required placeholder="BC" maxLength={2} />
+      <Input label="Postal Code" value={form.postal_code} onChange={onChange('postal_code')} required placeholder="V1Y 1A1" />
+    </div>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <Input label="Delivery Fee ($)" type="number" min="0" step="0.01" value={form.delivery_fee} onChange={onChange('delivery_fee')} />
+      <Input label="Max Delivery Radius (km)" type="number" min="0" step="0.1" value={form.max_delivery_radius_km} onChange={onChange('max_delivery_radius_km')} />
+    </div>
+    <Button type="submit" loading={saving}>{submitLabel}</Button>
+  </form>
+);
 
   return (
     <div className={`page ${styles.page}`}>
@@ -143,12 +143,12 @@ export default function ManagerDashboard() {
 
       {/* Create Restaurant Modal */}
       <Modal open={createModal} onClose={() => setCreateModal(false)} title="New Restaurant">
-        <RestaurantForm form={createForm} onChange={cf} onSubmit={handleCreate} submitLabel="Create Restaurant" />
+        <RestaurantForm form={createForm} onChange={cf} onSubmit={handleCreate} submitLabel="Create Restaurant" saving={saving} />
       </Modal>
 
       {/* Edit Restaurant Modal */}
       <Modal open={!!editModal} onClose={() => setEditModal(null)} title="Edit Restaurant">
-        {editModal && <RestaurantForm form={editForm} onChange={ef} onSubmit={handleEdit} submitLabel="Save Changes" />}
+        {editModal && <RestaurantForm form={editForm} onChange={ef} onSubmit={handleEdit} submitLabel="Save Changes" saving={saving} />}
       </Modal>
 
       {/* Update Managers Modal */}

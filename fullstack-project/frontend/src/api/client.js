@@ -94,6 +94,7 @@ export const deliveryApi = {
   startDelivery: (orderId) => api.patch(`/delivery/${orderId}/start`),
   completeDelivery: (orderId) => api.patch(`/delivery/${orderId}/complete`),
   getByOrder: (orderId) => api.get(`/delivery/${orderId}`),
+  getMyActive: () => api.get('/delivery/my-active'),
 };
 
 export const promoApi = {

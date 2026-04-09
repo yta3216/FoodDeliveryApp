@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { deliveryApi, userApi } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Button, EmptyState, StatusBadge, Toast, Input } from '../../components/common/UI';
@@ -93,6 +93,35 @@ export default function DriverDashboard() {
       show(err.message, 'error');
     }
   };
+
+  const checkForOrders = async () => {
+  setUpdatingStatus(true);
+  try {
+    await deliveryApi.updateStatus('unavailable');
+    await deliveryApi.updateStatus('available');
+    setDriverStatus('available');
+    // try to load active delivery after the check
+    try {
+      const delivery = await deliveryApi.getMyActive();
+      setActiveDelivery(delivery);
+      show('Order assigned! 🎉', 'success');
+    } catch {
+      show('No waiting orders right now', 'default');
+    }
+  } catch (err) {
+    show(err.message, 'error');
+  } finally {
+    setUpdatingStatus(false);
+  }
+};
+
+  useEffect(() => {
+  if (driverStatus === 'available' || driverStatus === 'delivering') {
+    deliveryApi.getMyActive()
+      .then(setActiveDelivery)
+      .catch(() => {}); // silently ignore 404 if no active delivery
+  }
+}, []);
 
   return (
     <div className={`page ${styles.page}`}>
@@ -229,13 +258,24 @@ export default function DriverDashboard() {
           )}
 
           {!activeDelivery && (
-            <EmptyState
-              icon={<Truck size={48} />}
-              title="No delivery loaded"
-              subtitle={driverStatus === 'available'
-                ? 'Once assigned an order, enter its ID above to manage it.'
-                : 'Go online to start receiving deliveries.'}
-            />
+            <div style={{ textAlign: 'center', padding: '32px 0' }}>
+              <EmptyState
+                icon={<Truck size={48} />}
+                title="No delivery loaded"
+                subtitle={driverStatus === 'available'
+                  ? 'Once assigned an order, enter its ID above to manage it.'
+                  : 'Go online to start receiving deliveries.'}
+              />
+              {driverStatus === 'available' && (
+                <Button
+                  onClick={checkForOrders}
+                  loading={updatingStatus}
+                  style={{ marginTop: 16 }}
+                >
+                  Check for Available Orders
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </div>

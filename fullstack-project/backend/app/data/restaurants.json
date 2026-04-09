@@ -289,5 +289,68 @@
         }
       ]
     }
+  },
+  {
+    "id": 4,
+    "name": "McCain Resto",
+    "city": "Kelowna",
+    "address": {
+      "street": "123 example st",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1V 1A1"
+    },
+    "manager_ids": [
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "delivery_fee": 5.0,
+    "menu": {
+      "items": [
+        {
+          "id": 1,
+          "name": "Lasagna",
+          "price": 5.0,
+          "tags": []
+        },
+        {
+          "id": 2,
+          "name": "Pizza",
+          "price": 10.0,
+          "tags": [
+            "spicy"
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Poutine",
+          "price": 7.0,
+          "tags": [
+            "vegan"
+          ]
+        }
+      ],
+      "combos": []
+    }
+  },
+  {
+    "id": 5,
+    "name": "Sample Test",
+    "city": "Kelowna",
+    "address": {
+      "street": "123 example st",
+      "city": "Kelowna",
+      "province": "BC",
+      "postal_code": "V1V 1A1"
+    },
+    "manager_ids": [
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "max_delivery_radius_km": 10.0,
+    "delivery_fee": 5.0,
+    "menu": {
+      "items": [],
+      "combos": []
+    }
   }
 ]
