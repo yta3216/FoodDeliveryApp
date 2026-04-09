@@ -5,6 +5,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [wsNotification, setWsNotification] = useState(null);
 
   useEffect(() => {
     const stored = localStorage.getItem('user');
@@ -27,8 +28,20 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  const updateUser = useCallback((userData) => {
+    const merged = { ...JSON.parse(localStorage.getItem('user') || '{}'), ...userData };
+    localStorage.setItem('user', JSON.stringify(merged));
+    setUser(merged);
+  }, []);
+
+  const pushNotification = useCallback((message) => {
+    setWsNotification({ message, id: Date.now() });
+  }, []);
+
+  const clearWsNotification = useCallback(() => setWsNotification(null), []);
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, updateUser, wsNotification, pushNotification, clearWsNotification }}>
       {children}
     </AuthContext.Provider>
   );

@@ -94,7 +94,7 @@ def empty_cart(current_user: Customer) -> None:
 def apply_promo_to_cart(code: str, current_user: Customer) -> Cart:
     """
     Saves a promo code string to the customer's cart.
-    Replaces any previously applied promo code — only one code is allowed per cart.
+    Replaces any previously applied promo code - only one code is allowed per cart.
  
     Parameters:
         code (str): the promo code to apply

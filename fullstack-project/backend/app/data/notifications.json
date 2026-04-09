@@ -35,5 +35,751 @@
       "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
     },
     "time": "2026/03/25 21:55"
+  },
+  {
+    "id": 4,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 3 from Tossings Pizza set to status: pending",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:23"
+  },
+  {
+    "id": 5,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 3 from Tossings Pizza set to status: cancelled",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:25"
+  },
+  {
+    "id": 6,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Refund of $24.49 for order 3 from Tossings Pizza is being processed. Reason: Order cancelled by customer.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 01:25"
+  },
+  {
+    "id": 7,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 4 from Koi Sushi set to status: pending",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 01:30"
+  },
+  {
+    "id": 8,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 4 from Koi Sushi set to status: cancelled",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 01:34"
+  },
+  {
+    "id": 9,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Refund of $24.86 for order 4 from Koi Sushi is being processed. Reason: Order cancelled by customer.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 01:34"
+  },
+  {
+    "id": 10,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 5 from Tossings Pizza set to status: pending",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:34"
+  },
+  {
+    "id": 11,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 5 from Tossings Pizza set to status: rejected",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:34"
+  },
+  {
+    "id": 12,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Refund of $27.84 for order 5 from Tossings Pizza is being processed. Reason: Restaurant max delivery distance exceeded.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 01:34"
+  },
+  {
+    "id": 13,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 6 from Tossings Pizza set to status: pending",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:40"
+  },
+  {
+    "id": 14,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 6 from Tossings Pizza has been assigned to driver 63f32ca9-e8d6-4e22-a0ff-de8d252b30e1 for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:40"
+  },
+  {
+    "id": 15,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 6 from Tossings Pizza set to status: preparing",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 01:40"
+  },
+  {
+    "id": 16,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 7 from Tossings Pizza set to status: OrderStatus.PENDING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 04:58"
+  },
+  {
+    "id": 17,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 7 from Tossings Pizza has been assigned to driver ee6c6675-2f20-4ed8-8adc-429d8010e7a4 for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 05:02"
+  },
+  {
+    "id": 18,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 7 from Tossings Pizza set to status: OrderStatus.PREPARING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 05:02"
+  },
+  {
+    "id": 19,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 7 from Tossings Pizza set to status: OrderStatus.DELIVERING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 05:06"
+  },
+  {
+    "id": 20,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Order 7 from Tossings Pizza will arrive in approximately 10.5 minutes via bike.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 05:06"
+  },
+  {
+    "id": 21,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 6 from Tossings Pizza set to status: OrderStatus.READY",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 05:08"
+  },
+  {
+    "id": 22,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 7 from Tossings Pizza set to status: OrderStatus.DELIVERED",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 05:08"
+  },
+  {
+    "id": 23,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Order 7 from Tossings Pizza was delivered in 1.84 minutes",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 05:08"
+  },
+  {
+    "id": 24,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 8 from Montana's Steakhouse set to status: OrderStatus.PENDING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 05:39"
+  },
+  {
+    "id": 25,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 8 from Montana's Steakhouse has been assigned to driver e580a1ce-62c0-46a2-81d6-dc1893559c28 for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 05:39"
+  },
+  {
+    "id": 26,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 8 from Montana's Steakhouse set to status: OrderStatus.PREPARING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 05:39"
+  },
+  {
+    "id": 27,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 8 from Montana's Steakhouse set to status: OrderStatus.READY",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 05:48"
+  },
+  {
+    "id": 28,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 8 from Montana's Steakhouse set to status: OrderStatus.DELIVERING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 05:49"
+  },
+  {
+    "id": 29,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Order 8 from Montana's Steakhouse will arrive in approximately 7.2 minutes via car.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 05:49"
+  },
+  {
+    "id": 30,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 8 from Montana's Steakhouse set to status: OrderStatus.DELIVERED",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 05:50"
+  },
+  {
+    "id": 31,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Order 8 from Montana's Steakhouse was delivered in 1.08 minutes",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 05:50"
+  },
+  {
+    "id": 32,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 9 from Tossings Pizza set to status: OrderStatus.PENDING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 05:51"
+  },
+  {
+    "id": 33,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 9 from Tossings Pizza has been assigned to driver e580a1ce-62c0-46a2-81d6-dc1893559c28 for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 05:52"
+  },
+  {
+    "id": 34,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 9 from Tossings Pizza set to status: OrderStatus.PREPARING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 05:52"
+  },
+  {
+    "id": 35,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 9 from Tossings Pizza set to status: OrderStatus.READY",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:01"
+  },
+  {
+    "id": 36,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 9 from Tossings Pizza set to status: OrderStatus.DELIVERING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:02"
+  },
+  {
+    "id": 37,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Order 9 from Tossings Pizza will arrive in approximately 12.0 minutes via car.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 06:02"
+  },
+  {
+    "id": 38,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 9 from Tossings Pizza set to status: OrderStatus.DELIVERED",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:02"
+  },
+  {
+    "id": 39,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Order 9 from Tossings Pizza was delivered in 0.08 minutes",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 06:02"
+  },
+  {
+    "id": 40,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 10 from Tossings Pizza set to status: OrderStatus.PENDING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:02"
+  },
+  {
+    "id": 41,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 10 from Tossings Pizza has been assigned to driver ee6c6675-2f20-4ed8-8adc-429d8010e7a4 for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:02"
+  },
+  {
+    "id": 42,
+    "user_ids": [
+      "ee6c6675-2f20-4ed8-8adc-429d8010e7a4"
+    ],
+    "message": "You have been assigned to deliver order 10 from Tossings Pizza. Pick up the order once it is ready.",
+    "is_read": {
+      "ee6c6675-2f20-4ed8-8adc-429d8010e7a4": false
+    },
+    "time": "2026/04/08 06:02"
+  },
+  {
+    "id": 43,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 10 from Tossings Pizza set to status: OrderStatus.PREPARING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:02"
+  },
+  {
+    "id": 44,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 10 from Tossings Pizza set to status: OrderStatus.READY",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:03"
+  },
+  {
+    "id": 45,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 11 from Tossings Pizza set to status: OrderStatus.PENDING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:08"
+  },
+  {
+    "id": 46,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 11 from Tossings Pizza has been assigned to driver ee6c6675-2f20-4ed8-8adc-429d8010e7a4 for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:09"
+  },
+  {
+    "id": 47,
+    "user_ids": [
+      "ee6c6675-2f20-4ed8-8adc-429d8010e7a4"
+    ],
+    "message": "You have been assigned to deliver order 11 from Tossings Pizza. Pick up the order once it is ready.",
+    "is_read": {
+      "ee6c6675-2f20-4ed8-8adc-429d8010e7a4": false
+    },
+    "time": "2026/04/08 06:09"
+  },
+  {
+    "id": 48,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 11 from Tossings Pizza set to status: OrderStatus.READY",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:13"
+  },
+  {
+    "id": 49,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 11 from Tossings Pizza set to status: OrderStatus.DELIVERING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:13"
+  },
+  {
+    "id": 50,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Order 11 from Tossings Pizza will arrive in approximately 15.0 minutes via bike.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 06:13"
+  },
+  {
+    "id": 51,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77"
+    ],
+    "message": "Order 11 from Tossings Pizza set to status: OrderStatus.DELIVERED",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false
+    },
+    "time": "2026/04/08 06:14"
+  },
+  {
+    "id": 52,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Order 11 from Tossings Pizza was delivered in 0.47 minutes",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 06:14"
+  },
+  {
+    "id": 53,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 12 from Montana's Steakhouse set to status: OrderStatus.PENDING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 06:14"
+  },
+  {
+    "id": 54,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 12 from Montana's Steakhouse has been assigned to driver ee6c6675-2f20-4ed8-8adc-429d8010e7a4 for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 06:14"
+  },
+  {
+    "id": 55,
+    "user_ids": [
+      "ee6c6675-2f20-4ed8-8adc-429d8010e7a4"
+    ],
+    "message": "You have been assigned to deliver order 12 from Montana's Steakhouse. Pick up the order once it is ready.",
+    "is_read": {
+      "ee6c6675-2f20-4ed8-8adc-429d8010e7a4": false
+    },
+    "time": "2026/04/08 06:14"
+  },
+  {
+    "id": 56,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 12 from Montana's Steakhouse set to status: OrderStatus.PREPARING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 06:14"
+  },
+  {
+    "id": 57,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 12 from Montana's Steakhouse set to status: OrderStatus.READY",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 06:15"
+  },
+  {
+    "id": 58,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 12 from Montana's Steakhouse set to status: OrderStatus.DELIVERING",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 06:18"
+  },
+  {
+    "id": 59,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Order 12 from Montana's Steakhouse will arrive in approximately 15.0 minutes via bike.",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 06:18"
+  },
+  {
+    "id": 60,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844",
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77",
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09"
+    ],
+    "message": "Order 12 from Montana's Steakhouse set to status: OrderStatus.DELIVERED",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false,
+      "a7b36374-170b-4cfa-97a4-4a72712a2d77": false,
+      "498c8f4b-0006-4bc8-9b0b-4025b3d64a09": false
+    },
+    "time": "2026/04/08 06:19"
+  },
+  {
+    "id": 61,
+    "user_ids": [
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844"
+    ],
+    "message": "Order 12 from Montana's Steakhouse was delivered in 1.43 minutes",
+    "is_read": {
+      "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
+    },
+    "time": "2026/04/08 06:19"
   }
 ]

@@ -127,7 +127,7 @@ def validate_promo(code: str, subtotal: float, current_user: Customer) -> PromoC
 def calculate_discount(promo: PromoCode, subtotal: float, delivery_fee: float) -> tuple[float, float]:
     """
     **Calculates the discount to apply based on promo type.**
-    Returns updated delivery_fee and discount amount — the caller applies these to the receipt total.
+    Returns updated delivery_fee and discount amount - the caller applies these to the receipt total.
 
     Parameters:
         promo (PromoCode): the validated promo code to apply

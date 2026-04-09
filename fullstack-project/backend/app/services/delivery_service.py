@@ -9,6 +9,7 @@ import time
 from fastapi import HTTPException
 from app.repositories.delivery_repo import load_deliveries, save_deliveries
 from app.repositories.user_repo import load_users, save_users
+from app.schemas.order_schema import OrderStatus
 from app.services.order_service import _set_order_status, get_order_by_id, send_status_notification
 from app.services.restaurant_service import get_managers, get_restaurant_by_id
 from app.repositories.order_repo import load_orders, save_orders
@@ -142,7 +143,7 @@ async def start_delivery(order_id: int, driver_id: str) -> Delivery:
 
     Raises:
         HTTPException (status_code = 403): if the driver is not assigned to this delivery
-        HTTPException (status_code = 400): if the delivery has already been started
+        HTTPException (status_code = 400): if the delivery has already been started or if the order is not ready for delivery
         HTTPException (status_code = 404): if no delivery record is found for this order
     """
     deliveries = load_deliveries()
@@ -152,6 +153,10 @@ async def start_delivery(order_id: int, driver_id: str) -> Delivery:
                 raise HTTPException(status_code=403, detail="You are not assigned to this delivery.")
             if delivery.get("started_at") != 0.0:
                 raise HTTPException(status_code=400, detail="Delivery already started.")
+            
+            order = get_order_by_id(order_id)
+            if order.status != OrderStatus.READY:
+                raise HTTPException(status_code=400, detail=f"Order is not ready for delivery. Current status: {order.status}")
 
             now = time.time()
             vehicle = delivery.get("method")
@@ -161,7 +166,7 @@ async def start_delivery(order_id: int, driver_id: str) -> Delivery:
             delivery["eta_minutes"] = eta
             save_deliveries(deliveries)
 
-            order = _set_order_status(order_id, "delivering")
+            order = _set_order_status(order_id, OrderStatus.DELIVERING)
             await send_status_notification(order)
 
             delivery = Delivery(**delivery)
@@ -208,7 +213,7 @@ async def complete_delivery(order_id: int, driver_id: str) -> Delivery:
             delivery["delay_minutes"] = round(actual_minutes - delivery.get("eta_minutes", 0.0), 2)
             save_deliveries(deliveries)
 
-            order = _set_order_status(order_id, "delivered")
+            order = _set_order_status(order_id, OrderStatus.DELIVERED)
             await send_status_notification(order)
 
             delivery = Delivery(**delivery)
@@ -264,7 +269,7 @@ async def check_waiting_orders(driver: dict) -> None:
 
     waiting = [
         o for o in orders
-        if o.get("status") == "waiting_for_driver"
+        if o.get("status") == OrderStatus.WAITING_FOR_DRIVER
         and get_required_vehicle(o.get("distance_km", 0.0)) == required_vehicle
     ]
 
@@ -279,7 +284,7 @@ async def check_waiting_orders(driver: dict) -> None:
 
     for o in orders:
         if o["id"] == order["id"]:
-            o["status"] = "preparing"
+            o["status"] = OrderStatus.PREPARING
             o["delivery_id"] = delivery.id
             break
     save_orders(orders)
@@ -306,6 +311,9 @@ async def send_delivery_created_notification(delivery: Delivery):
         f"Order {order.id} from {restaurant_name} has been assigned to driver {driver_id}"
         f" for delivery. Order will be delivered when food is ready.", notified_users)
     await notification.send_to_users()
+    await Notification(
+        f"You have been assigned to deliver order {order.id} from {restaurant_name}. Pick up the order once it is ready.", [driver_id]
+    ).send_to_users()
 
 
 async def send_delivery_started_notification(delivery: Delivery, eta: float):

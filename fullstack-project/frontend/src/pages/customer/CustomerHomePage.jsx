@@ -162,7 +162,7 @@ export default function CustomerHomePage() {
               />
               <select
                 className={styles.searchInput}
-                style={{ flex: '1 1 160px', marginTop: 0, background: 'var(--bg-card, #fff)' }}
+                style={{ flex: '1 1 160px', marginTop: 0 }}
                 value={filters.sort_price}
                 onChange={setF('sort_price')}
               >
@@ -233,7 +233,7 @@ export default function CustomerHomePage() {
                     disabled={togglingFav === r.id}
                     style={{
                       position: 'absolute', top: 12, right: 12, zIndex: 1,
-                      background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%',
+                      background: 'var(--background)', border: '1px solid var(--border)', borderRadius: '50%',
                       width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer', color: favIds.has(r.id) ? '#e74c3c' : 'var(--text-muted)',
                       transition: 'all .15s', boxShadow: '0 1px 4px rgba(0,0,0,.15)',

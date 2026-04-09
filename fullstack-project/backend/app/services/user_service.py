@@ -118,6 +118,9 @@ def login_user(email: str, password: str) -> LoginResponse:
                 age= user.get("age"),
                 gender= user.get("gender"),
                 name=user.get("name"),
+                wallet_balance=user.get("wallet_balance"),
+                vehicle=user.get("vehicle"),
+                driver_status=user.get("driver_status")
             )
     raise HTTPException(status_code=401, detail="Invalid email or password")
 
@@ -142,7 +145,7 @@ def reset_password_request(user_email: str) -> None:
             save_users(users)
 
             print(f"\nPassword reset link:")
-            print(f"http://localhost:8000/user/reset-password?token={token}\n")
+            print(f"http://localhost:5173/reset-password?token={token}\n")
 
             return None
     return None
@@ -222,6 +225,8 @@ def update_user(user_id: str, payload: User_Update) -> UserPublic:
             user["email"] = payload.email.strip()
             user["age"] = payload.age
             user["gender"] = payload.gender.strip()
+            if payload.vehicle is not None and user["role"] == UserRole.DELIVERY_DRIVER:
+                user["vehicle"] = payload.vehicle.strip()
             users[idx] = user
             save_users(users)
             role = UserRole(user["role"]) if isinstance(user.get("role"), str) else user["role"]
@@ -231,7 +236,10 @@ def update_user(user_id: str, payload: User_Update) -> UserPublic:
                 name=user["name"],
                 age=user["age"],
                 gender=user["gender"],
-                role=role
+                role=role,
+                wallet_balance=user.get("wallet_balance"),
+                vehicle=user.get("vehicle"),
+                driver_status=user.get("driver_status")
             )
     raise HTTPException(status_code=404, detail=f"User '{user_id}' not found")
 
