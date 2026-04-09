@@ -77,8 +77,8 @@
     "wallet_balance": 32.75,
     "reset_token": null,
     "reset_token_expiry": null,
-    "auth_token": "b1qLvSbAwl8SRAadKqxMnw7YojRC1JB38eqbRZNBx1g",
-    "auth_token_expiry": 1806036929,
+    "auth_token": "DxrktkK30W5U2uiaCglSF1u1z9jp1hC-TmfIQPTT2-4",
+    "auth_token_expiry": 1775713427.458504,
     "cart": {
       "restaurant_id": 0,
       "cart_items": []

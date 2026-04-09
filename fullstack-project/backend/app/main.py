@@ -38,9 +38,9 @@ app.add_middleware(
     allow_headers=["*"]
 )
 # Mount static files directory (CSS, JS, images, etc.)
-frontend_path = os.path.join(os.path.dirname(__file__), "..", "..", "frontend")
-frontend_path = os.path.normpath(frontend_path)
-app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+# frontend_path = os.path.join(os.path.dirname(__file__), "..", "..", "frontend")
+# frontend_path = os.path.normpath(frontend_path)
+# app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 # Include routers
 app.include_router(user_router)
 app.include_router(restaurant_router)
