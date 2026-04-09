@@ -781,5 +781,553 @@
       "8166dac7-de7f-4ca6-a8ae-406ef3afd844": false
     },
     "time": "2026/04/08 06:19"
+  },
+  {
+    "id": 62,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 13 from McCain Resto set to status: OrderStatus.PENDING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/09 03:50"
+  },
+  {
+    "id": 63,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 14 from McCain Resto set to status: OrderStatus.PENDING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/09 03:51"
+  },
+  {
+    "id": 64,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 15 from McCain Resto set to status: OrderStatus.PENDING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/09 03:52"
+  },
+  {
+    "id": 65,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 15 from McCain Resto has been assigned to driver ee6c6675-2f20-4ed8-8adc-429d8010e7a4 for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/09 03:52"
+  },
+  {
+    "id": 66,
+    "user_ids": [
+      "ee6c6675-2f20-4ed8-8adc-429d8010e7a4"
+    ],
+    "message": "You have been assigned to deliver order 15 from McCain Resto. Pick up the order once it is ready.",
+    "is_read": {
+      "ee6c6675-2f20-4ed8-8adc-429d8010e7a4": false
+    },
+    "time": "2026/04/09 03:52"
+  },
+  {
+    "id": 67,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 15 from McCain Resto set to status: OrderStatus.PREPARING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/09 03:52"
+  },
+  {
+    "id": 68,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 15 from McCain Resto set to status: OrderStatus.READY",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/09 03:52"
+  },
+  {
+    "id": 69,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 13 from McCain Resto has been assigned to driver 5c65c9c6-e0be-40eb-97bd-a19ea49b88cf for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:16"
+  },
+  {
+    "id": 70,
+    "user_ids": [
+      "5c65c9c6-e0be-40eb-97bd-a19ea49b88cf"
+    ],
+    "message": "You have been assigned to deliver order 13 from McCain Resto. Pick up the order once it is ready.",
+    "is_read": {
+      "5c65c9c6-e0be-40eb-97bd-a19ea49b88cf": false
+    },
+    "time": "2026/04/08 21:16"
+  },
+  {
+    "id": 71,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 13 from McCain Resto set to status: OrderStatus.PREPARING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:16"
+  },
+  {
+    "id": 72,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 13 from McCain Resto set to status: OrderStatus.READY",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:17"
+  },
+  {
+    "id": 73,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 14 from McCain Resto set to status: OrderStatus.WAITING_FOR_DRIVER",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:19"
+  },
+  {
+    "id": 74,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 16 from McCain Resto set to status: OrderStatus.PENDING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:23"
+  },
+  {
+    "id": 75,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 16 from McCain Resto set to status: OrderStatus.CANCELLED",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:24"
+  },
+  {
+    "id": 76,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec"
+    ],
+    "message": "Refund of $10.6 for order 16 from McCain Resto is being processed. Reason: Order cancelled by customer.",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false
+    },
+    "time": "2026/04/08 21:24"
+  },
+  {
+    "id": 77,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 17 from McCain Resto set to status: OrderStatus.PENDING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:24"
+  },
+  {
+    "id": 78,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 18 from McCain Resto set to status: OrderStatus.PENDING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:24"
+  },
+  {
+    "id": 79,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 19 from McCain Resto set to status: OrderStatus.PENDING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:25"
+  },
+  {
+    "id": 80,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 17 from McCain Resto has been assigned to driver 5c65c9c6-e0be-40eb-97bd-a19ea49b88cf for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:25"
+  },
+  {
+    "id": 81,
+    "user_ids": [
+      "5c65c9c6-e0be-40eb-97bd-a19ea49b88cf"
+    ],
+    "message": "You have been assigned to deliver order 17 from McCain Resto. Pick up the order once it is ready.",
+    "is_read": {
+      "5c65c9c6-e0be-40eb-97bd-a19ea49b88cf": false
+    },
+    "time": "2026/04/08 21:25"
+  },
+  {
+    "id": 82,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 17 from McCain Resto set to status: OrderStatus.PREPARING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:25"
+  },
+  {
+    "id": 83,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 13 from McCain Resto set to status: OrderStatus.DELIVERING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:26"
+  },
+  {
+    "id": 84,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec"
+    ],
+    "message": "Order 13 from McCain Resto will arrive in approximately 15.0 minutes via bike.",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false
+    },
+    "time": "2026/04/08 21:26"
+  },
+  {
+    "id": 85,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 13 from McCain Resto set to status: OrderStatus.DELIVERED",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:26"
+  },
+  {
+    "id": 86,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec"
+    ],
+    "message": "Order 13 from McCain Resto was delivered in 0.25 minutes",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false
+    },
+    "time": "2026/04/08 21:26"
+  },
+  {
+    "id": 87,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 18 from McCain Resto has been assigned to driver 5c65c9c6-e0be-40eb-97bd-a19ea49b88cf for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:27"
+  },
+  {
+    "id": 88,
+    "user_ids": [
+      "5c65c9c6-e0be-40eb-97bd-a19ea49b88cf"
+    ],
+    "message": "You have been assigned to deliver order 18 from McCain Resto. Pick up the order once it is ready.",
+    "is_read": {
+      "5c65c9c6-e0be-40eb-97bd-a19ea49b88cf": false
+    },
+    "time": "2026/04/08 21:27"
+  },
+  {
+    "id": 89,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 18 from McCain Resto set to status: OrderStatus.PREPARING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:27"
+  },
+  {
+    "id": 90,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 17 from McCain Resto set to status: OrderStatus.READY",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:27"
+  },
+  {
+    "id": 91,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 20 from McCain Resto set to status: OrderStatus.PENDING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:28"
+  },
+  {
+    "id": 92,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 21 from McCain Resto set to status: OrderStatus.PENDING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:30"
+  },
+  {
+    "id": 93,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 22 from McCain Resto set to status: OrderStatus.PENDING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:52"
+  },
+  {
+    "id": 94,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 21 from McCain Resto set to status: OrderStatus.REJECTED",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:55"
+  },
+  {
+    "id": 95,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec"
+    ],
+    "message": "Refund of $20.68 for order 21 from McCain Resto is being processed. Reason: Rejected by restaurant.",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false
+    },
+    "time": "2026/04/08 21:55"
+  },
+  {
+    "id": 96,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 20 from McCain Resto set to status: OrderStatus.REJECTED",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:56"
+  },
+  {
+    "id": 97,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec"
+    ],
+    "message": "Refund of $38.6 for order 20 from McCain Resto is being processed. Reason: Rejected by restaurant.",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false
+    },
+    "time": "2026/04/08 21:56"
+  },
+  {
+    "id": 98,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 22 from McCain Resto has been assigned to driver 5c65c9c6-e0be-40eb-97bd-a19ea49b88cf for delivery. Order will be delivered when food is ready.",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:56"
+  },
+  {
+    "id": 99,
+    "user_ids": [
+      "5c65c9c6-e0be-40eb-97bd-a19ea49b88cf"
+    ],
+    "message": "You have been assigned to deliver order 22 from McCain Resto. Pick up the order once it is ready.",
+    "is_read": {
+      "5c65c9c6-e0be-40eb-97bd-a19ea49b88cf": false
+    },
+    "time": "2026/04/08 21:56"
+  },
+  {
+    "id": 100,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 22 from McCain Resto set to status: OrderStatus.PREPARING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:56"
+  },
+  {
+    "id": 101,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 22 from McCain Resto set to status: OrderStatus.READY",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:56"
+  },
+  {
+    "id": 102,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 17 from McCain Resto set to status: OrderStatus.DELIVERING",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:57"
+  },
+  {
+    "id": 103,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec"
+    ],
+    "message": "Order 17 from McCain Resto will arrive in approximately 9.0 minutes via bike.",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false
+    },
+    "time": "2026/04/08 21:57"
+  },
+  {
+    "id": 104,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec",
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d"
+    ],
+    "message": "Order 17 from McCain Resto set to status: OrderStatus.DELIVERED",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false,
+      "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d": false
+    },
+    "time": "2026/04/08 21:57"
+  },
+  {
+    "id": 105,
+    "user_ids": [
+      "3b610f3b-bf95-4492-903f-c3243c0728ec"
+    ],
+    "message": "Order 17 from McCain Resto was delivered in 0.25 minutes",
+    "is_read": {
+      "3b610f3b-bf95-4492-903f-c3243c0728ec": false
+    },
+    "time": "2026/04/08 21:57"
   }
 ]

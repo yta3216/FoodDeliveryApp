@@ -13,6 +13,7 @@ from app.services.delivery_service import (
     check_waiting_orders,
 )
 from app.repositories.user_repo import load_users, save_users
+from app.repositories.delivery_repo import load_deliveries
 
 router = APIRouter(prefix="/delivery", tags=["delivery"])
 
@@ -56,6 +57,31 @@ async def update_driver_status_route(
     return {"message": f"status updated to {status}"}
 
 
+@router.get("/my-active", response_model=Delivery, status_code=200)
+def get_my_active_delivery_route(
+    current_user: User = Depends(require_role(UserRole.DELIVERY_DRIVER))
+):
+    """
+    **Returns the active (not yet completed) delivery assigned to the logged-in driver.**
+
+    Parameters:
+    *   **current_user** (User): the authenticated user with role *driver*. automatically passed as argument.
+
+    Returns:
+    *   **Delivery**: the active delivery for this driver
+
+    Raises:
+    *   **HTTPException** (status_code = 401): if user's token is invalid or expired
+    *   **HTTPException** (status_code = 403): if user's role is not *driver*
+    *   **HTTPException** (status_code = 404): if no active delivery found for this driver
+    """
+    deliveries = load_deliveries()
+    for delivery in deliveries:
+        if delivery.get("driver_id") == current_user.id and delivery.get("delivered_at", 0.0) == 0.0:
+            return Delivery(**delivery)
+    raise HTTPException(status_code=404, detail="No active delivery found")
+
+
 @router.patch("/{order_id}/start", response_model=Delivery, status_code=200)
 async def start_delivery_route(
     order_id: int,
@@ -70,15 +96,15 @@ async def start_delivery_route(
     *   **current_user** (User): the authenticated user with role *driver*. automatically passed as argument.
 
     Returns:
-    *   **Delivery**: the updated delivery record with eta_minutes and started_at populated
+    *   **Delivery**: the updated delivery record
 
     Raises:
-    *   **HTTPException** (status_code = 400): if delivery has already been started
     *   **HTTPException** (status_code = 401): if user's token is invalid or expired
-    *   **HTTPException** (status_code = 403): if user is not the assigned driver for this delivery
+    *   **HTTPException** (status_code = 403): if user's role is not *driver*, or driver is not assigned to this delivery
+    *   **HTTPException** (status_code = 400): if delivery has already been started
     *   **HTTPException** (status_code = 404): if no delivery record is found for this order
     """
-    return await start_delivery(order_id=order_id, driver_id=current_user.id)
+    return await start_delivery(order_id, current_user.id)
 
 
 @router.patch("/{order_id}/complete", response_model=Delivery, status_code=200)
@@ -95,26 +121,24 @@ async def complete_delivery_route(
     *   **current_user** (User): the authenticated user with role *driver*. automatically passed as argument.
 
     Returns:
-    *   **Delivery**: the completed delivery record with all timing fields populated
+    *   **Delivery**: the completed delivery record
 
     Raises:
-    *   **HTTPException** (status_code = 400): if delivery has not been started yet, or has already been completed
     *   **HTTPException** (status_code = 401): if user's token is invalid or expired
-    *   **HTTPException** (status_code = 403): if user is not the assigned driver for this delivery
+    *   **HTTPException** (status_code = 403): if user's role is not *driver*, or driver is not assigned to this delivery
+    *   **HTTPException** (status_code = 400): if delivery has not been started, or already completed
     *   **HTTPException** (status_code = 404): if no delivery record is found for this order
     """
-    delivery = await complete_delivery(order_id=order_id, driver_id=current_user.id)
-
-    return delivery
+    return await complete_delivery(order_id, current_user.id)
 
 
 @router.get("/{order_id}", response_model=Delivery, status_code=200)
-def get_delivery_route(
+def get_delivery_by_order_route(
     order_id: int,
     current_user: User = Depends(get_current_user)
 ):
     """
-    **Retrieves the delivery record for a given order. Accessible by any authenticated user.**
+    **Retrieves the delivery record for a given order.**
 
     Parameters:
     *   **order_id** (int): the identifier of the order
@@ -127,4 +151,4 @@ def get_delivery_route(
     *   **HTTPException** (status_code = 401): if user's token is invalid or expired
     *   **HTTPException** (status_code = 404): if no delivery record is found for this order
     """
-    return get_delivery_by_order(order_id=order_id)
+    return get_delivery_by_order(order_id)

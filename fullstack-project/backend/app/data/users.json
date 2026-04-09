@@ -146,8 +146,56 @@
     "reset_token": null,
     "reset_token_expiry": null,
     "vehicle": "bike",
-    "driver_status": "available",
+    "driver_status": "delivering",
     "auth_token": "vAlpd3iZ5-jxLlwV-_iBMeNveiM7Zb6sjNb_aN8ysc8",
     "auth_token_expiry": 1775739810.259763
+  },
+  {
+    "id": "84aab4e9-6a7b-4b99-9672-6d3da43b5d6d",
+    "email": "iamManager@example.com",
+    "name": "iamManager",
+    "password": "iamManager",
+    "age": 24,
+    "gender": "male",
+    "role": "manager",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "auth_token": "AVg00vBByofPHpT1rtFA2xBGFvdDOWLW8KCfU_QFPYE",
+    "auth_token_expiry": 1775796886.8288922
+  },
+  {
+    "id": "3b610f3b-bf95-4492-903f-c3243c0728ec",
+    "email": "iamCustomer@example.com",
+    "name": "iamCustomer",
+    "password": "iamCustomer",
+    "age": 20,
+    "gender": "male",
+    "role": "customer",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "wallet_balance": 9767.439999999997,
+    "cart": {
+      "restaurant_id": 0,
+      "cart_items": [],
+      "promo_code": null
+    },
+    "favourites": [],
+    "auth_token": "dBxjhN6FME9UcYqocBImmZF6bc2MCpzoqImUlVf9E6M",
+    "auth_token_expiry": 1775796707.4853456
+  },
+  {
+    "id": "5c65c9c6-e0be-40eb-97bd-a19ea49b88cf",
+    "email": "iamDriver@example.com",
+    "name": "iamDriver",
+    "password": "iamDriver",
+    "age": 20,
+    "gender": "male",
+    "role": "driver",
+    "reset_token": null,
+    "reset_token_expiry": null,
+    "vehicle": "bike",
+    "driver_status": "available",
+    "auth_token": "WZbLNxT29FD4tRWVIRS7uQRAhXzMAlgtv7KU7cuE2E0",
+    "auth_token_expiry": 1775797002.485748
   }
 ]

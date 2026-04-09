@@ -21,6 +21,7 @@ export default function ManagerOrdersPage() {
     if (!wsNotification) return;
     loadOrders(false);
   }, [wsNotification?.id]);
+
   const loadOrders = useCallback(async (showSpinner = false) => {
     if (showSpinner) setLoading(true);
     try {
@@ -90,7 +91,8 @@ export default function ManagerOrdersPage() {
 
   const pending = orders.filter(o => o.status === 'pending');
   const preparing = orders.filter(o => o.status === 'preparing');
-  const others = orders.filter(o => !['pending', 'preparing'].includes(o.status));
+  const inProgress = orders.filter(o => ['waiting_for_driver', 'ready', 'delivering'].includes(o.status));
+  const done = orders.filter(o => ['delivered', 'rejected', 'cancelled'].includes(o.status));
 
   return (
     <div className={`page ${styles.page}`}>
@@ -160,14 +162,29 @@ export default function ManagerOrdersPage() {
               </section>
             )}
 
-            {others.length > 0 && (
+            {inProgress.length > 0 && (
+              <section className={styles.section}>
+                <h2 className={styles.sectionTitle}>
+                  <span className={styles.dot} style={{ background: '#3498db' }} />
+                  In Progress ({inProgress.length})
+                </h2>
+                <div className={styles.list}>
+                  {inProgress.map(order => (
+                    <OrderRow key={order.id} order={order} processing={processing}
+                      onViewReceipt={viewReceipt} receiptLoading={receiptLoading} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {done.length > 0 && (
               <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>
                   <span className={styles.dot} style={{ background: 'var(--text3)' }} />
-                  All Orders
+                  Completed / Cancelled ({done.length})
                 </h2>
                 <div className={styles.list}>
-                  {others.map(order => (
+                  {done.map(order => (
                     <OrderRow key={order.id} order={order} processing={processing}
                       onViewReceipt={viewReceipt} receiptLoading={receiptLoading} />
                   ))}
@@ -187,7 +204,7 @@ function OrderRow({ order, processing, onAction, onMarkReady, onViewReceipt, rec
       <div className={styles.rowMain}>
         <span className={styles.orderId}>#{order.id}</span>
         <span className={styles.restaurantName}>{order.restaurantName}</span>
-        <span className={styles.meta}>📍 {order.distance_km.toFixed(1)} km</span>
+        <span className={styles.meta}>📍 {order.distance_km?.toFixed(1)} km</span>
         {order.date_created && <span className={styles.meta}>{new Date(order.date_created).toLocaleDateString()}</span>}
       </div>
       <div className={styles.rowRight}>
